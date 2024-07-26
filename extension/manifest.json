@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Dessage",
+  "version": "1.0.1",
+  "description": "Social Wallet For Dessage.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "file/logo_16.png",
+      "48": "file/logo_48.png",
+      "128": "file/logo_128.png"
+    }
+  },
+  "icons": {
+    "16": "file/logo_16.png",
+    "48": "file/logo_48.png",
+    "128": "file/logo_128.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "alarms",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://mainnet.infura.io/*",
+    "https://sepolia.infura.io/*"
+  ],
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "js/content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src 'none'; base-uri 'self'"
+  },
+  "default_locale": "en",
+  "optional_permissions": [
+    "notifications"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "js/inject.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}
