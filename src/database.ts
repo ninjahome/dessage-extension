@@ -36,7 +36,7 @@ function initDatabase(): Promise<IDBDatabase> {
     });
 }
 
-function closeDatabase() {
+export  function closeDatabase() {
     if (__databaseObj) {
         __databaseObj.close();
         console.log("Database connection closed.");
@@ -262,4 +262,9 @@ function getMaxIdRecord(storeName: string): Promise<any> {
             reject(`Error opening cursor: ${error}`);
         };
     });
+}
+export async function checkAndInitDatabase(): Promise<void> {
+    if (!__databaseObj) {
+        await initDatabase();
+    }
 }

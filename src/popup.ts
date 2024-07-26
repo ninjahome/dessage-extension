@@ -11,7 +11,7 @@ import {
     decodeBech32,
     generateEthereumHash,
     createEthereumTransaction
-} from './wallet';
+} from './wallet_test';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Hello World Extension loaded.');
