@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dessage Onboarding</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="welcome-container view" id="view-welcome" style="display: block;">
+    <header>
+        <img src="file/logo_128.png" alt="Dessage Logo" class="logo">
+    </header>
+    <main>
+        <h1>Let's get started</h1>
+        <p>Trusted by millions, Dessage is a secure wallet making the world of web3 accessible to all.</p>
+        <div class="welcome-carousel">
+            <!-- Carousel items (for demonstration, static content) -->
+            <div class="carousel-item active">
+                <img src="file/arch.png" alt="Slide 1">
+            </div>
+            <div class="carousel-item">
+                <img src="file/router.png" alt="Slide 2">
+            </div>
+        </div>
+        <div class="carousel-indicators">
+            <span class="indicator active"></span>
+            <span class="indicator"></span>
+        </div>
+        <form>
+            <div class="welcome-checkbox">
+                <input type="checkbox" id="welcome-agree">
+                <label for="welcome-agree">I agree to Dessage's <a
+                            href="https://github.com/ninjahome/dessage-plugin/blob/main/user_terms.md" target="_blank">Terms
+                        of use</a></label>
+            </div>
+            <button type="button" id="welcome-create" class="primary-button" disabled>Create a new wallet</button>
+            <button type="button" id="welcome-import" class="secondary-button">Import an existing wallet</button>
+        </form>
+    </main>
+</div>
+
+<div id="view-create-password" class="create-container view" style="display:none;">
+    <header>
+        <h1>Dessage protocol</h1>
+    </header>
+    <main>
+        <div class="progress-bar">
+            <div class="step active">1</div>
+            <div class="step">2</div>
+            <div class="step">3</div>
+        </div>
+        <h1>Create password</h1>
+        <p>This password will unlock your Dessage wallet only on this device. Dessage cannot recover this password.</p>
+        <form>
+            <div class="password-container">
+                <label for="new-password">New password <br> (8 characters min)</label>
+                <input type="password" id="new-password" required minlength="8">
+                <span class="show-password">Show</span>
+            </div>
+            <div class="password-container">
+                <label for="confirm-password">Confirm password</label>
+                <input type="password" id="confirm-password" required>
+            </div>
+            <div class="error-message" style="display:none;"></div>
+            <div class="password-checkbox">
+                <input type="checkbox" id="password-agree">
+                <label for="password-agree">I understand that Dessage cannot recover this password for me. <a
+                            href="https://github.com/ninjahome/dessage-plugin/blob/main/user_terms.md"
+                            class="learn-more">Learn
+                        more</a></label>
+            </div>
+            <button type="button" class="primary-button" disabled>Create a new wallet</button>
+        </form>
+    </main>
+</div>
+
+<div id="view-recovery-phrase" class="recovery-container view" style="display:none;">
+    <header>
+        <h1>Dessage protocol</h1>
+    </header>
+    <main>
+        <div class="progress-bar">
+            <div class="step completed">1</div>
+            <div class="step active">2</div>
+            <div class="step">3</div>
+        </div>
+        <h1>Write down your Secret Recovery Phrase</h1>
+        <p>Write down this 12-word Secret Recovery Phrase and save it in a place that you trust and only you can
+            access.</p>
+        <div class="tips">
+            <h2>Tips:</h2>
+            <ul>
+                <li>Save in a password manager</li>
+                <li>Store in a safe deposit box</li>
+                <li>Write down and store in multiple secret places</li>
+            </ul>
+        </div>
+        <div class="recovery-phrase-item" id="recovery-phrase-item-template" style="display: none"><span
+                    class="phrase-item-index">1</span>. <span class="phrase-item-value"></span></div>
+        <div class="recovery-phrase-container hidden-seed-phrase" data-visibile="false">
+        </div>
+        <div class="actions">
+            <button type="button" class="secondary-button" id="view-recovery-phrase-hide-seed">Reveal seed phrase
+            </button>
+            <button type="button" class="secondary-button" id="view-recovery-phrase-copy-seed">Copy to clipboard
+            </button>
+        </div>
+        <button type="button" class="primary-button">Next</button>
+    </main>
+</div>
+
+<div id="view-confirm-recovery" class="recovery-confirm-container view" style="display:none;">
+    <header>
+        <h1>Dessage protocol</h1>
+    </header>
+    <main>
+        <div class="progress-bar">
+            <div class="step completed">1</div>
+            <div class="step completed">2</div>
+            <div class="step active">3</div>
+        </div>
+        <h1>Confirm Secret Recovery Phrase</h1>
+        <p>Confirm Secret Recovery Phrase</p>
+        <form class="recovery-phrase-form">
+            <label id="phrase-item-readOnly" style="display: none">
+                <span class="phrase-item-index"></span>.
+                <input type="text" class="recovery-input" disabled>
+            </label>
+            <label id="phrase-item-writeOnly" style="display: none">
+                <span class="phrase-item-index"></span>.
+                <input type="text" class="recovery-input">
+            </label>
+            <div class="recovery-phrase-grid">
+            </div>
+            <div class="error-message" style="display:none;"></div>
+            <button type="button" class="primary-button" disabled>Confirm</button>
+        </form>
+    </main>
+</div>
+
+<div id="view-import-wallet" class="import-container view" style="display:none;">
+    <header>
+        <h1>Dessage protocol</h1>
+    </header>
+    <main>
+        <div class="progress-bar">
+            <div class="step completed">1</div>
+            <div class="step">2</div>
+        </div>
+        <h1>Access your wallet with your Secret Recovery Phrase</h1>
+        <p>Dessage cannot recover your password. We will use your Secret Recovery Phrase to validate your ownership,
+            restore your wallet and set up a new password. First, enter the Secret Recovery Phrase that you were given
+            when you created your wallet. <a href="#" class="learn-more">Learn more</a></p>
+
+        <div class="form-group">
+            <label for="recovery-phrase-length">Type your Secret Recovery Phrase</label>
+            <select id="recovery-phrase-length">
+                <option value="12">I have a 12-word phrase</option>
+                <option value="15">I have a 15-word phrase</option>
+                <option value="18">I have a 18-word phrase</option>
+                <option value="21">I have a 21-word phrase</option>
+                <option value="24">I have a 24-word phrase</option>
+            </select>
+        </div>
+
+        <p class="import-container-tip">You can paste your entire secret recovery phrase into any field</p>
+        <div class="recovery-phrase-row" id="recovery-phrase-row-template" style="display: none;">
+            <div class="recovery-phrase-input">
+                <input type="password" class="recovery-phrase"/>
+                <button type="button" class="toggle-visibility">👁</button>
+            </div>
+            <div class="recovery-phrase-input">
+                <input type="password" class="recovery-phrase"/>
+                <button type="button" class="toggle-visibility">👁</button>
+            </div>
+            <div class="recovery-phrase-input">
+                <input type="password" class="recovery-phrase"/>
+                <button type="button" class="toggle-visibility">👁</button>
+            </div>
+        </div>
+        <div class="recovery-phrase-inputs" id="recovery-phrase-inputs"></div>
+        <div id="error-message" class="error-message" style="display:none;">
+            Invalid Secret Recovery Phrase
+        </div>
+        <button type="button" disabled class="primary-button">Confirm Secret Recovery Phrase</button>
+    </main>
+</div>
+
+<div id="view-password-for-imported" class="password-for-imported view" style="display: none;">
+    <header>
+        <h1>Dessage protocol</h1>
+    </header>
+    <main>
+        <div class="progress-bar">
+            <div class="step completed">1</div>
+            <div class="step active">2</div>
+        </div>
+        <h1>Create password</h1>
+        <p>This password will unlock your Dessage wallet only on this device. Dessage cannot recover this password.</p>
+        <form>
+            <div class="password-container">
+                <label for="imported-new-password">New password <br>(8 characters min)</label>
+                <input type="password" id="imported-new-password" required minlength="8">
+                <span class="show-password">Show</span>
+            </div>
+            <div class="password-container">
+                <label for="imported-confirm-password">Confirm password</label>
+                <input type="password" id="imported-confirm-password" required>
+            </div>
+            <div class="error-message" style="display:none;"></div>
+            <div class="password-checkbox">
+                <input type="checkbox" id="imported-password-agree">
+                <label for="imported-password-agree">I understand that Dessage cannot recover this password for me. <a
+                            href="#" class="learn-more">Learn more</a></label>
+            </div>
+            <button type="button" class="primary-button" disabled>Import my wallet</button>
+        </form>
+    </main>
+</div>
+
+<div id="view-account-home" class="account-home view" style="display:none;">
+</div>
+
+<script src="js/util.js"></script>
+<script src="js/database.js"></script>
+<script src="js/wallet.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>
