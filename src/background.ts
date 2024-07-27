@@ -1,6 +1,5 @@
 /// <reference lib="webworker" />
-import browser from "webextension-polyfill";
-import {Runtime} from "webextension-polyfill";
+import browser,{Runtime} from "webextension-polyfill";
 import {WalletStatus, MsgType} from './util';
 import {checkAndInitDatabase, closeDatabase} from './database';
 import {loadLocalWallet, Wallet, OuterWallet} from "./wallet";
@@ -78,8 +77,6 @@ async function timerTaskWork(alarm: any): Promise<void> {
 
     if (alarm.name === __alarm_name__) {
         console.log("[service work] Alarm Triggered!");
-
-        let walletStatus = await sessionGet(__key_wallet_status) || WalletStatus.Init;
         if (walletStatus !== WalletStatus.Unlocked) {
             console.log("[service work] No unlocked wallet");
             return
