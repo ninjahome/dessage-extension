@@ -4,7 +4,7 @@ const __currentDatabaseVersion = 7;
 const __tableNameWallet = '__table_wallet__';
 const __tableSystemSetting = '__table_system_setting__';
 
-function initDatabase(): Promise<IDBDatabase> {
+export function initDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(__databaseName, __currentDatabaseVersion);
 
@@ -22,21 +22,21 @@ function initDatabase(): Promise<IDBDatabase> {
         request.onupgradeneeded = function (event: IDBVersionChangeEvent) {
             const db = (event.target as IDBOpenDBRequest).result;
             if (!db.objectStoreNames.contains(__tableNameWallet)) {
-                const objectStore = db.createObjectStore(__tableNameWallet, { keyPath: 'address' });
-                objectStore.createIndex('addressIdx', 'address', { unique: true });
-                objectStore.createIndex('uuidIdx', 'uuid', { unique: true });
+                const objectStore = db.createObjectStore(__tableNameWallet, {keyPath: 'address'});
+                objectStore.createIndex('addressIdx', 'address', {unique: true});
+                objectStore.createIndex('uuidIdx', 'uuid', {unique: true});
                 console.log("Created wallet table successfully.");
             }
 
             if (!db.objectStoreNames.contains(__tableSystemSetting)) {
-                const objectStore = db.createObjectStore(__tableSystemSetting, { keyPath: 'id' });
+                const objectStore = db.createObjectStore(__tableSystemSetting, {keyPath: 'id'});
                 console.log("Created wallet setting table successfully.");
             }
         };
     });
 }
 
-export  function closeDatabase() {
+export function closeDatabase() {
     if (__databaseObj) {
         __databaseObj.close();
         console.log("Database connection closed.");
@@ -129,7 +129,7 @@ function databaseUpdate(storeName: string, id: any, newData: any): Promise<strin
         const transaction = __databaseObj.transaction([storeName], 'readwrite');
         const objectStore = transaction.objectStore(storeName);
 
-        const request = objectStore.put({ ...newData, id });
+        const request = objectStore.put({...newData, id});
 
         request.onsuccess = () => {
             resolve(`Data updated in ${storeName} successfully`);
@@ -239,6 +239,7 @@ function databaseQueryByFilter(storeName: string, conditionFn: (value: any) => b
         };
     });
 }
+
 function getMaxIdRecord(storeName: string): Promise<any> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
@@ -263,6 +264,7 @@ function getMaxIdRecord(storeName: string): Promise<any> {
         };
     });
 }
+
 export async function checkAndInitDatabase(): Promise<void> {
     if (!__databaseObj) {
         await initDatabase();

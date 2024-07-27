@@ -4,7 +4,7 @@
   "version": "1.0.1",
   "description": "Social Wallet For Dessage.",
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "main.html",
     "default_icon": {
       "16": "file/logo_16.png",
       "48": "file/logo_48.png",

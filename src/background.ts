@@ -59,7 +59,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
     const extendableEvent = event as ExtendableEvent;
     extendableEvent.waitUntil((self as unknown as ServiceWorkerGlobalScope).clients.claim());
-    console.log('Service Worker activating and init database...');
+    console.log('Service Worker activating......');
 });
 
 async function createAlarm(): Promise<void> {
@@ -244,42 +244,48 @@ async function setActiveWallet(address: string, sendResponse: (response: any) =>
 
 
 runtime.onInstalled.addListener((details: Runtime.OnInstalledDetailsType) => {
-    console.log("onInstalled event triggered");
+    console.log("onInstalled event triggered......");
     if (details.reason === "install") {
         tabs.create({
-            url: runtime.getURL("html/home.html#onboarding/welcome")
+            url: runtime.getURL("home.html#onboarding/welcome")
         });
     }
 });
 
 runtime.onStartup.addListener(() => {
-    console.log('Service Worker onStartup...');
+    console.log('Service Worker onStartup......');
 });
 
 runtime.onSuspend.addListener(() => {
     console.log('Browser is shutting down, closing IndexedDB...');
     closeDatabase();
 });
+
 runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, sendResponse: (response?: any) => void): true | void => {
     console.log("action :=>", request.action);
     switch (request.action) {
         case MsgType.PluginClicked:
-            pluginClicked(sendResponse).then(r => {});
+            pluginClicked(sendResponse).then(r => {
+            });
             return true;
         case MsgType.WalletOpen:
-            openWallet(request.password, sendResponse).then(r => {});
+            openWallet(request.password, sendResponse).then(r => {
+            });
             return true;
         case MsgType.WalletClose:
-            closeWallet().then(r => {});
+            closeWallet().then(r => {
+            });
             return true;
         case MsgType.WalletCreated:
-            createWallet(sendResponse).then(r => {});
+            createWallet(sendResponse).then(r => {
+            });
             return true;
         case MsgType.SetActiveWallet:
-            setActiveWallet(request.address, sendResponse).then(r => {});
+            setActiveWallet(request.address, sendResponse).then(r => {
+            });
             return true;
         default:
             sendResponse({status: 'unknown action'});
-            return ;
+            return;
     }
 });

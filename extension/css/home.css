@@ -1,0 +1,517 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.welcome-container, .create-container {
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 50px;
+    margin-bottom: 20px;
+}
+
+main {
+    text-align: center;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.welcome-carousel {
+    margin-bottom: 20px;
+}
+
+.carousel-item {
+    display: none;
+}
+
+.carousel-item.active {
+    display: block;
+}
+
+.carousel-item img {
+    width: 100px;
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    margin: 0 5px;
+}
+
+.indicator.active {
+    background-color: #007bff;
+}
+
+.welcome-checkbox, .password-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.welcome-checkbox input, .password-checkbox input {
+    margin-right: 10px;
+}
+
+.primary-button,
+.secondary-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.primary-button {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.primary-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.secondary-button {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.progress-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ccc; /* default non-active color */
+    margin: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+}
+
+
+.step.active {
+    background-color: #8bcaf1;
+}
+
+.step.completed {
+    background-color: #007bff; /* 设置已完成步骤的背景颜色 */
+}
+
+.password-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.show-password {
+    cursor: pointer;
+    color: #007bff;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.create-container {
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+}
+
+.create-container header {
+    margin-bottom: 20px;
+}
+
+.create-container main {
+    text-align: center;
+}
+
+.create-container h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.create-container p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.create-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.create-container form label {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.create-container .primary-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    margin-top: 20px;
+}
+
+.create-container .primary-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.create-container .learn-more {
+    color: #007bff;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.recovery-container {
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+}
+
+.recovery-container header {
+    margin-bottom: 20px;
+}
+
+.recovery-container main {
+    text-align: center;
+}
+
+.recovery-container h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.recovery-container p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.recovery-container .tips {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.recovery-container .tips h2 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.recovery-container .tips ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.hidden-seed-phrase {
+    background-color: #333;
+    color: #333;
+}
+
+.recovery-phrase-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* 调整元素间的间距 */
+    padding: 0 10px; /* 可选：为容器添加内边距，以便更好的间隔 */
+}
+
+.recovery-phrase-item {
+    width: calc(33.33% - 20px); /* 调整计算公式以适应间隔 */
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* 将内边距和边框计入宽度计算 */
+    text-align: left;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.actions .secondary-button {
+    margin-right: 10px;
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.primary-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    margin-top: 20px;
+}
+
+.primary-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+/* 新增样式 */
+.recovery-phrase-container div {
+    width: calc(33.33% - 10px); /* 三列布局 */
+}
+
+
+.recovery-confirm-container {
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+}
+
+.recovery-phrase-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.recovery-phrase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.recovery-input {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.primary-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    margin-top: 20px;
+}
+.hidden-word {
+    background-color: #f0f0f0; /* 轻微高亮背景 */
+}
+.error-word {
+    background-color: #f50505; /* 轻微高亮背景 */
+}
+
+
+.import-container {
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+}
+
+.import-container header {
+    margin-bottom: 20px;
+}
+
+.import-container main {
+    text-align: center;
+}
+
+.import-container h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.import-container p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.import-container-tip {
+    font-size: 14px;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+.recovery-phrase-row {
+    display: grid; /* 使用 grid 布局 */
+    grid-template-columns: 1fr 1fr 1fr; /* 设置三列 */
+    gap: 10px; /* 设置列之间的间距 */
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.recovery-phrase-input {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.recovery-phrase-input input {
+    flex: 1;
+    padding: 5px;
+    margin-right: 5px;
+}
+
+.recovery-phrase-row button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #007bff;
+    padding: 10px;
+}
+
+.toggle-visibility {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+    display: none;
+}
+
+.password-for-imported {
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+}
+
+.password-for-imported header {
+    margin-bottom: 20px;
+}
+
+.password-for-imported main {
+    text-align: center;
+}
+
+.password-for-imported h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.password-for-imported p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
