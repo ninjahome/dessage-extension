@@ -4,7 +4,7 @@
   "description": "A simple browser extension that supports Ninja Protocol.",
   "scripts": {
     "build:dev": "webpack --mode development --stats-error-details",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production --stats-error-details"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.162",
@@ -21,6 +21,7 @@
     "vm-browserify": "^1.1.2",
     "webextension-polyfill": "^0.10.0",
     "webpack": "^5.93.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {

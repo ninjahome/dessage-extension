@@ -1,6 +1,7 @@
 const path = require('path');
 const glob = require('glob');
 const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = (env, argv) => {
     const mode = argv.mode || 'development';
@@ -29,6 +30,9 @@ module.exports = (env, argv) => {
                 },
             ],
         },
+        optimization: {
+            usedExports: true,
+        },
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],
             fallback: {
@@ -45,6 +49,7 @@ module.exports = (env, argv) => {
                     return /.*\/wordlists\/(?!english).*\.json/.test(resource);
                 }
             }),
+            new BundleAnalyzerPlugin(),
             new webpack.ProvidePlugin({
                 Buffer: ['buffer', 'Buffer'],
                 process: 'process/browser'

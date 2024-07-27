@@ -44,7 +44,7 @@ export function closeDatabase() {
     }
 }
 
-function databaseAddItem(storeName: string, data: any): Promise<IDBValidKey> {
+export function databaseAddItem(storeName: string, data: any): Promise<IDBValidKey> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
             reject('Database is not initialized');
