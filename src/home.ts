@@ -1,6 +1,7 @@
 import {initDatabase} from "./database";
 import {showView} from "./util";
-import { validateMnemonic, wordlists } from 'bip39';
+import {validateMnemonic, wordlists} from 'bip39';
+
 const wordlist = wordlists.english;
 
 document.addEventListener("DOMContentLoaded", initWelcomePage as EventListener);

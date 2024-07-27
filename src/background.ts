@@ -21,7 +21,7 @@ const tabs = browser.tabs;
 async function sessionSet(key: string, value: any): Promise<void> {
     try {
         await storage.session.set({[key]: value});
-        console.log("Value was set successfully.", value);
+        console.log("[service work] Value was set successfully.", value);
     } catch (error: unknown) {
         const err = error as Error;
         console.error("Failed to set value:", err);
@@ -31,7 +31,7 @@ async function sessionSet(key: string, value: any): Promise<void> {
 async function sessionGet(key: string): Promise<any> {
     try {
         const result = await storage.session.get(key);
-        console.log("Value is:", result[key]);
+        console.log("[service work] Value is:", result[key]);
         return result[key];
     } catch (error: unknown) {
         const err = error as Error;
@@ -43,16 +43,15 @@ async function sessionGet(key: string): Promise<any> {
 async function sessionRemove(key: string): Promise<void> {
     try {
         await storage.session.remove(key);
-        console.log("Value was removed successfully.");
-    } catch (error: unknown) {
-        const err = error as Error;
-        console.error("Failed to remove value:", err);
+        console.log("[service work] Value was removed successfully.");
+    } catch (error) {
+        console.error("Failed to remove value:", error);
     }
 }
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
     console.log('Service Worker installing...');
-    createAlarm().then(r => {
+    createAlarm().then(() => {
     });
 });
 
@@ -78,26 +77,28 @@ async function timerTaskWork(alarm: any): Promise<void> {
     let keyLastTouch = await sessionGet(__key_last_touch) || 0;
 
     if (alarm.name === __alarm_name__) {
-        console.log("Alarm Triggered!");
+        console.log("[service work] Alarm Triggered!");
 
-        console.log("time out:", keyLastTouch, __timeOut, "now:", Date.now());
+        let walletStatus = await sessionGet(__key_wallet_status) || WalletStatus.Init;
+        if (walletStatus !== WalletStatus.Unlocked) {
+            console.log("[service work] No unlocked wallet");
+            return
+        }
+        queryBalance();
+        console.log("[service work] time out:", keyLastTouch, __timeOut, "now:", Date.now());
         if (keyLastTouch + __timeOut < Date.now()) {
             console.log('time out to close wallet...');
             await closeWallet();
-            return;
-        }
-
-        if (walletStatus === WalletStatus.Unlocked) {
-            queryBalance();
         }
     }
 }
 
 function queryBalance(): void {
     if (!__curActiveWallet || !__curActiveWallet.ethAddr) {
-        console.log("no active wallet right now");
+        console.log("[service work] no active wallet right now");
         return;
     }
+
     const ethAddr = __curActiveWallet.ethAddr;
     console.log(`start to query eth[${ethAddr}] balance for:`);
     fetch(`https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}`, {
@@ -129,11 +130,11 @@ function queryBalance(): void {
 async function closeWallet(sendResponse?: (response: any) => void): Promise<void> {
     try {
         await sessionRemove(__key_wallet_map);
-        await sessionSet(__key_wallet_status, WalletStatus.Locked);
+        await sessionRemove(__key_wallet_status);
         if (sendResponse) {
             sendResponse({status: 'success'});
         }
-    } catch (error: unknown) {
+    } catch (error) {
         const err = error as Error;
         console.error('Error in closeWallet:', err);
         if (sendResponse) {
@@ -198,7 +199,7 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         const obj = Object.fromEntries(outerWallet);
         await sessionSet(__key_wallet_status, WalletStatus.Unlocked);
         await sessionSet(__key_wallet_map, obj);
-        console.log("outerWallet", outerWallet);
+        console.log("[service work] outerWallet", outerWallet);
         await sessionSet(__key_last_touch, Date.now());
         sendResponse({status: true, message: JSON.stringify(obj)});
     } catch (error) {
@@ -212,33 +213,31 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
     }
 }
 
-
 async function setActiveWallet(address: string, sendResponse: (response: any) => void): Promise<void> {
     try {
         const sObj = await sessionGet(__key_wallet_map);
         const obj = new Map(Object.entries(sObj));
 
         const outerWallet = obj.get(address);
-        console.log("obj is:", obj, " have a try:", outerWallet, "for:", address);
+        console.log("[service work] obj is:", obj, " have a try:", outerWallet, "for:", address);
         if (!outerWallet) {
             sendResponse({status: false, message: 'no such outer wallet'});
             return;
         }
         __curActiveWallet = outerWallet;
         sendResponse({status: true, message: 'success'});
-    } catch (error: unknown) {
-        const err = error as Error;
-        console.error('Error in setActiveWallet:', err);
-        sendResponse({status: false, message: err.toString()});
+    } catch (error) {
+        console.error('Error in setActiveWallet:', error);
+        sendResponse({status: false, message: error});
     }
 }
 
-
 runtime.onInstalled.addListener((details: Runtime.OnInstalledDetailsType) => {
-    console.log("onInstalled event triggered......");
+    console.log("[service work] onInstalled event triggered......");
     if (details.reason === "install") {
         tabs.create({
             url: runtime.getURL("home.html#onboarding/welcome")
+        }).then(() => {
         });
     }
 });
@@ -253,26 +252,26 @@ runtime.onSuspend.addListener(() => {
 });
 
 runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, sendResponse: (response?: any) => void): true | void => {
-    console.log("action :=>", request.action);
+    console.log("[service work] action :=>", request.action, sender.tab, sender.url);
     switch (request.action) {
         case MsgType.PluginClicked:
-            pluginClicked(sendResponse).then(r => {
+            pluginClicked(sendResponse).then(() => {
             });
             return true;
         case MsgType.WalletOpen:
-            openWallet(request.password, sendResponse).then(r => {
+            openWallet(request.password, sendResponse).then(() => {
             });
             return true;
         case MsgType.WalletClose:
-            closeWallet().then(r => {
+            closeWallet().then(() => {
             });
             return true;
         case MsgType.WalletCreated:
-            createWallet(sendResponse).then(r => {
+            createWallet(sendResponse).then(() => {
             });
             return true;
         case MsgType.SetActiveWallet:
-            setActiveWallet(request.address, sendResponse).then(r => {
+            setActiveWallet(request.address, sendResponse).then(() => {
             });
             return true;
         default:
