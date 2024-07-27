@@ -1,8 +1,8 @@
 let __databaseObj: IDBDatabase | null = null;
 const __databaseName = 'dessage-database';
 const __currentDatabaseVersion = 7;
-const __tableNameWallet = '__table_wallet__';
-const __tableSystemSetting = '__table_system_setting__';
+export const __tableNameWallet = '__table_wallet__';
+export const __tableSystemSetting = '__table_system_setting__';
 
 export function initDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -189,7 +189,7 @@ function databaseDeleteByFilter(storeName: string, conditionFn: (value: any) => 
     });
 }
 
-function databaseQueryAll(storeName: string): Promise<any[]> {
+export function databaseQueryAll(storeName: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
             reject('Database is not initialized');

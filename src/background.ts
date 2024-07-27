@@ -185,22 +185,13 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
     try {
         await checkAndInitDatabase();
         const outerWallet = new Map();
-
-        type Wallet = {
-            address: string;
-            key: {
-                BtcAddr: string;
-                EthAddr: string;
-                NostrAddr: string;
-                BtcTestAddr: string;
-            };
-            decryptKey: (pwd: string) => void;
-        };
-
         const wallets: Wallet[] = await loadLocalWallet();
         wallets.forEach(wallet => {
             wallet.decryptKey(pwd);
             const key = wallet.key;
+            if (!key) {
+                throw new Error("Failed to open wallet: key is null or undefined");
+            }
             const w = new OuterWallet(wallet.address, key.BtcAddr, key.EthAddr, key.NostrAddr, key.BtcTestAddr);
             outerWallet.set(wallet.address, w);
         });
@@ -209,9 +200,8 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         await sessionSet(__key_wallet_map, obj);
         console.log("outerWallet", outerWallet);
         await sessionSet(__key_last_touch, Date.now());
-
         sendResponse({status: true, message: JSON.stringify(obj)});
-    } catch (error: unknown) {
+    } catch (error) {
         const err = error as Error;
         console.error('Error in open wallet:', err);
         let msg = err.toString();
@@ -221,6 +211,7 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         sendResponse({status: false, message: msg});
     }
 }
+
 
 async function setActiveWallet(address: string, sendResponse: (response: any) => void): Promise<void> {
     try {
