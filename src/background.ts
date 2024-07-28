@@ -24,7 +24,7 @@ async function sessionSet(key: string, value: any): Promise<void> {
         console.log("[service work] Value was set successfully.", value);
     } catch (error: unknown) {
         const err = error as Error;
-        console.error("Failed to set value:", err);
+        console.error("[service work] Failed to set value:", err);
     }
 }
 
@@ -35,7 +35,7 @@ async function sessionGet(key: string): Promise<any> {
         return result[key];
     } catch (error: unknown) {
         const err = error as Error;
-        console.error("Failed to get value:", err);
+        console.error("[service work] Failed to get value:", err);
         return null;
     }
 }
@@ -45,12 +45,12 @@ async function sessionRemove(key: string): Promise<void> {
         await storage.session.remove(key);
         console.log("[service work] Value was removed successfully.");
     } catch (error) {
-        console.error("Failed to remove value:", error);
+        console.error("[service work] Failed to remove value:", error);
     }
 }
 
 self.addEventListener('install', () => {
-    console.log('Service Worker installing...');
+    console.log('[service work] Service Worker installing...');
     createAlarm().then(() => {
     });
 });
@@ -58,7 +58,7 @@ self.addEventListener('install', () => {
 self.addEventListener('activate', (event) => {
     const extendableEvent = event as ExtendableEvent;
     extendableEvent.waitUntil((self as unknown as ServiceWorkerGlobalScope).clients.claim());
-    console.log('Service Worker activating......');
+    console.log('[service work] Service Worker activating......');
 });
 
 async function createAlarm(): Promise<void> {
@@ -85,7 +85,7 @@ async function timerTaskWork(alarm: any): Promise<void> {
         queryBalance();
         console.log("[service work] time out:", keyLastTouch, __timeOut, "now:", Date.now());
         if (keyLastTouch + __timeOut < Date.now()) {
-            console.log('time out to close wallet...');
+            console.log('[service work] time out to close wallet...');
             await closeWallet();
         }
     }
@@ -113,15 +113,15 @@ function queryBalance(): void {
     }).then(response => response.json())
         .then(result => {
             if (result.error) {
-                console.error('Error:', result.error.message);
+                console.error('[service work] Error:', result.error.message);
             } else {
                 const balanceInWei = result.result;
                 const balanceInEth = parseInt(balanceInWei, 16) / (10 ** 18);
-                console.log(`Address: ${ethAddr}`, `Balance: ${balanceInEth} ETH`);
+                console.log(`[service work] Address: ${ethAddr}`, `Balance: ${balanceInEth} ETH`);
             }
         })
         .catch(error => {
-            console.error('Ping failed:', error);
+            console.error('[service work] Ping failed:', error);
         });
 }
 
@@ -134,7 +134,7 @@ async function closeWallet(sendResponse?: (response: any) => void): Promise<void
         }
     } catch (error) {
         const err = error as Error;
-        console.error('Error in closeWallet:', err);
+        console.error('[service work] Error in closeWallet:', err);
         if (sendResponse) {
             sendResponse({status: 'failure', message: err.toString()});
         }
@@ -164,7 +164,7 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
         await sessionSet(__key_wallet_status, walletStatus);
     } catch (error: unknown) {
         const err = error as Error;
-        console.error('Error in pluginClicked:', err);
+        console.error('[service work] Error in pluginClicked:', err);
         sendResponse({status: WalletStatus.Error, message: err.toString()});
     }
 }
@@ -175,7 +175,7 @@ async function createWallet(sendResponse: (response: any) => void): Promise<void
         sendResponse({status: 'success'});
     } catch (error: unknown) {
         const err = error as Error;
-        console.error('Error in createWallet:', err);
+        console.error('[service work] Error in createWallet:', err);
         sendResponse({status: 'failure', message: err.toString()});
     }
 }
@@ -197,7 +197,7 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         sendResponse({status: true, message: JSON.stringify(obj)});
     } catch (error) {
         const err = error as Error;
-        console.error('Error in open wallet:', err);
+        console.error('[service work] Error in open wallet:', err);
         let msg = err.toString();
         if (msg.includes("Malformed")) {
             msg = "invalid password";
@@ -220,7 +220,7 @@ async function setActiveWallet(address: string, sendResponse: (response: any) =>
         __curActiveWallet = outerWallet;
         sendResponse({status: true, message: 'success'});
     } catch (error) {
-        console.error('Error in setActiveWallet:', error);
+        console.error('[service work] Error in setActiveWallet:', error);
         sendResponse({status: false, message: error});
     }
 }
@@ -236,11 +236,11 @@ runtime.onInstalled.addListener((details: Runtime.OnInstalledDetailsType) => {
 });
 
 runtime.onStartup.addListener(() => {
-    console.log('Service Worker onStartup......');
+    console.log('[service work] Service Worker onStartup......');
 });
 
 runtime.onSuspend.addListener(() => {
-    console.log('Browser is shutting down, closing IndexedDB...');
+    console.log('[service work] Browser is shutting down, closing IndexedDB...');
     closeDatabase();
 });
 
