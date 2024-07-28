@@ -62,7 +62,7 @@ function generateRecoveryPhraseInputs(): void {
     recoveryPhraseInputs.innerHTML = '';
 
     for (let i = 0; i < length; i += 3) {
-        const rowDiv = template.content.firstElementChild!.cloneNode(true) as HTMLElement;
+        const rowDiv = template.cloneNode(true)as HTMLElement;
         rowDiv.style.display = 'grid';
         rowDiv.id = '';
         recoveryPhraseInputs.appendChild(rowDiv);
