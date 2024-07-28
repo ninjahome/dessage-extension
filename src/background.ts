@@ -1,8 +1,10 @@
 /// <reference lib="webworker" />
-import browser,{Runtime} from "webextension-polyfill";
+import browser, {Runtime} from "webextension-polyfill";
 import {WalletStatus, MsgType} from './util';
 import {checkAndInitDatabase, closeDatabase} from './database';
-import {loadLocalWallet, Wallet, OuterWallet} from "./wallet";
+import {loadLocalWallet} from "./wallet";
+import {Wallet} from "./Objects";
+import {decryptKey} from "./protocolKey";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -185,12 +187,8 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         const outerWallet = new Map();
         const wallets: Wallet[] = await loadLocalWallet();
         wallets.forEach(wallet => {
-            wallet.decryptKey(pwd);
-            const key = wallet.key;
-            if (!key) {
-                throw new Error("Failed to open wallet: key is null or undefined");
-            }
-            const w = new OuterWallet(wallet.address, key.BtcAddr, key.EthAddr, key.NostrAddr, key.BtcTestAddr);
+            const key = decryptKey(pwd, wallet.cipherTxt);
+            const w = key.outerWallet!
             outerWallet.set(wallet.address, w);
         });
         const obj = Object.fromEntries(outerWallet);
