@@ -1,11 +1,33 @@
 import {__tableNameWallet, databaseAddItem, databaseQueryAll} from "./database";
 import {mnemonicToSeedSync} from "bip39";
-import {enc, AES, lib, PBKDF2} from 'crypto-js';
-import {CipherData, DbWallet} from "./Objects";
+import {ProtocolKey} from "./protocolKey";
+import {decryptAes, encryptAes,CipherData} from "./key_crypto";
+import {hexStringToByteArray} from "./util";
+import {MultiAddress, parseAddrFromKey} from "./multi_addr";
+
+export class DbWallet {
+    uuid: string;
+    address: MultiAddress;
+    cipherTxt: CipherData;
+
+    constructor(uuid: string, address: MultiAddress, cipherTxt: CipherData) {
+        this.uuid = uuid;
+        this.address = address;
+        this.cipherTxt = cipherTxt;
+    }
+}
+
+export class MemWallet {
+    address: MultiAddress;
+    key: ProtocolKey;
+    constructor(address: MultiAddress, key: ProtocolKey) {
+        this.address = address;
+        this.key = key;
+    }
+}
 
 export async function saveWallet(w: DbWallet): Promise<void> {
-    const item = new DbWallet(w.uuid, w.address, w.cipherTxt, w.mnemonic);
-    const result = await databaseAddItem(__tableNameWallet, item);
+    const result = await databaseAddItem(__tableNameWallet, w);
     console.log("save wallet result=>", result);
 }
 
@@ -22,29 +44,31 @@ export async function loadLocalWallet(): Promise<DbWallet[]> {
     return walletObj;
 }
 
-function encryptAes(plainTxt: string, password: string): CipherData {
-    const salt = lib.WordArray.random(128 / 8);
-    const key = PBKDF2(password, salt, {
-        keySize: 256 / 32,
-        iterations: 1000
-    });
-    const iv = lib.WordArray.random(128 / 8);
-    const encrypted = AES.encrypt(plainTxt, key, {iv: iv});
-
-    return new CipherData(encrypted.toString(), iv.toString(enc.Hex), salt.toString(enc.Hex));
-}
-
-export function NewWallet(mnemonic: string, password: string): void {
-    const uuid = generateUUID();
-    const seedBuffer = mnemonicToSeedSync(mnemonic);
-    const seedUint8Array: Uint8Array = new Uint8Array(seedBuffer);
-
-}
-
 function generateUUID(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c: string): string {
         const r = Math.random() * 16 | 0;
         const v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
+}
+
+export function newWallet(mnemonic: string, password: string): DbWallet {
+    const uuid = generateUUID();
+    const seedBuffer = mnemonicToSeedSync(mnemonic);
+    const first32Bytes = seedBuffer.subarray(0, 32);
+    const hexPri = first32Bytes.toString('hex');
+    console.log(`First 32 bytes: ${hexPri}`); // 打印前32个字节的十六进制表示
+    const seedUint8Array: Uint8Array = new Uint8Array(first32Bytes);
+    const key = new ProtocolKey(seedUint8Array);
+    const data = encryptAes(hexPri, password);
+    const mulAddr = parseAddrFromKey(key.ecKey);
+    return new DbWallet(uuid, mulAddr, data);
+}
+
+export function castToMemWallet(pwd: string, wallet: DbWallet): MemWallet {
+    const decryptedPri = decryptAes(wallet.cipherTxt, pwd);
+    const priArray = hexStringToByteArray(decryptedPri);
+    const key = new ProtocolKey(priArray);
+    const address = parseAddrFromKey(key.ecKey);
+    return new MemWallet(address, key);
 }

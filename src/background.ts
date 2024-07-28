@@ -2,9 +2,8 @@
 import browser, {Runtime} from "webextension-polyfill";
 import {WalletStatus, MsgType} from './util';
 import {checkAndInitDatabase, closeDatabase} from './database';
-import {loadLocalWallet} from "./wallet";
-import {castToOuterWallet} from "./protocolKey";
-import {DbWallet} from "./Objects";
+import {castToMemWallet, loadLocalWallet} from "./wallet";
+import {DbWallet} from "./wallet";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -187,7 +186,7 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         const outerWallet = new Map();
         const wallets: DbWallet[] = await loadLocalWallet();
         wallets.forEach(wallet => {
-            const mulAddr = castToOuterWallet(pwd, wallet);
+            const mulAddr = castToMemWallet(pwd, wallet);
             outerWallet.set(wallet.address, mulAddr);
         });
         const obj = Object.fromEntries(outerWallet);
