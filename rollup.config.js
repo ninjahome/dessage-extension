@@ -8,6 +8,7 @@ import babel from '@rollup/plugin-babel';
 import inject from '@rollup/plugin-inject';
 import terser from '@rollup/plugin-terser';
 import glob from 'glob';
+import path from 'path';
 
 const shouldAnalyze = process.env.ANALYZE === 'true';
 
@@ -47,11 +48,13 @@ const outputConfig = {
     dir: 'extension/js',
     format: 'es',
     sourcemap: true,
-    entryFileNames: '[name].js'
+    entryFileNames: '[name].js',  // this ensures the files are placed directly in 'extension/js'
+    chunkFileNames: '[name].js',  // this ensures dynamic imports are also placed in 'extension/js'
+    assetFileNames: '[name][extname]'
 };
 
 const inputConfig = entryFiles.reduce((acc, filePath) => {
-    const entryName = filePath.replace(/^\.\/src\//, '').replace(/\.(ts|tsx)$/, '');
+    const entryName = path.relative('./src', filePath).replace(/\.(ts|tsx)$/, '');
     acc[entryName] = filePath;
     return acc;
 }, {});
