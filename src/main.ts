@@ -26,9 +26,7 @@ function checkBackgroundStatus(): void {
             case WalletStatus.NoWallet:
                 browser.tabs.create({
                     url: browser.runtime.getURL("home.html#onboarding/welcome")
-                }).then(r => {
-                    console.log("creating tab success:", r)
-                });
+                }).then(() => { });
                 return;
             case WalletStatus.Locked:
             case WalletStatus.Expired:
