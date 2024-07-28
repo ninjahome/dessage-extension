@@ -41,7 +41,10 @@ const plugins = [
         process: 'process/browser'
     }),
     terser(),
-    shouldAnalyze && visualizer()
+    shouldAnalyze && visualizer({
+        filename: 'bundle-analysis.html',
+        open: true, // Automatically opens the report in your default browser
+    })
 ];
 
 const outputConfig = {
