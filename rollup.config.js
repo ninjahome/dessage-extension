@@ -1,4 +1,3 @@
-import glob from 'glob';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
@@ -6,7 +5,9 @@ import replace from '@rollup/plugin-replace';
 import { visualizer } from 'rollup-plugin-visualizer';
 import json from '@rollup/plugin-json';
 import babel from '@rollup/plugin-babel';
-import nodePolyfills from 'rollup-plugin-node-polyfills';
+import inject from '@rollup/plugin-inject';
+import terser from '@rollup/plugin-terser';
+import glob from 'glob';
 
 const shouldAnalyze = process.env.ANALYZE === 'true';
 
@@ -19,12 +20,11 @@ const plugins = [
         preferBuiltins: false
     }),
     commonjs({
-        include: /node_modules/
+        include: 'node_modules/**'
     }),
     json(),
     typescript({
-        tsconfig: "tsconfig.json",
-        useTsconfigDeclarationDir: true
+        tsconfig: "tsconfig.json"
     }),
     babel({
         exclude: 'node_modules/**',
@@ -35,13 +35,17 @@ const plugins = [
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
         preventAssignment: true
     }),
-    nodePolyfills(),
+    inject({
+        Buffer: ['buffer', 'Buffer'],
+        process: 'process/browser'
+    }),
+    terser(),
     shouldAnalyze && visualizer()
 ];
 
 const outputConfig = {
     dir: 'extension/js',
-    format: 'esm',  // 修改此处为 'esm'
+    format: 'es',
     sourcemap: true,
     entryFileNames: '[name].js'
 };
