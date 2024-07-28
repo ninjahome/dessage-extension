@@ -132,5 +132,5 @@ interface NIP44 {
         }
     };
 
-    console.log(`------>>>>Dessage client initialized for domain:[${window.location.host}]`);
+    console.log(`------>>>>Dessage inject success domain:[${window.location.host}] dessage obj:[${window.dessage}] nostr obj:[${window.nostr}]`);
 })();
