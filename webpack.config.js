@@ -5,6 +5,23 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 module.exports = (env, argv) => {
     const mode = argv.mode || 'development';
+    const shouldAnalyze = env && env.ANALYZE === 'true';
+
+    const plugins = [
+        new webpack.IgnorePlugin({
+            checkResource(resource) {
+                return /.*\/wordlists\/(?!english).*\.json/.test(resource);
+            }
+        }),
+        new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+            process: 'process/browser'
+        })
+    ];
+
+    if (shouldAnalyze) {
+        plugins.push(new BundleAnalyzerPlugin());
+    }
 
     return {
         mode: mode,
@@ -43,17 +60,6 @@ module.exports = (env, argv) => {
                 "process": require.resolve("process/browser")
             }
         },
-        plugins: [
-            new webpack.IgnorePlugin({
-                checkResource(resource) {
-                    return /.*\/wordlists\/(?!english).*\.json/.test(resource);
-                }
-            }),
-            new BundleAnalyzerPlugin(),
-            new webpack.ProvidePlugin({
-                Buffer: ['buffer', 'Buffer'],
-                process: 'process/browser'
-            })
-        ],
+        plugins: plugins,
     };
 };
