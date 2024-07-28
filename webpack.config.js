@@ -63,15 +63,6 @@ module.exports = (env, argv) => {
         },
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],
-            alias: {
-                'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
-                'elliptic': path.resolve(__dirname, 'node_modules/elliptic'),
-                'nacl-fast': path.resolve(__dirname, 'node_modules/tweetnacl/nacl-fast.js'),
-                'bech32': path.resolve(__dirname, 'node_modules/bech32'),
-                'bs58': path.resolve(__dirname, 'node_modules/bs58'),
-                'ethereumjs-util': path.resolve(__dirname, 'node_modules/ethereumjs-util'),
-                'crypto-js': path.resolve(__dirname, 'node_modules/crypto-js')
-            },
             fallback: {
                 "buffer": require.resolve("buffer/"),
                 "crypto": require.resolve("crypto-browserify"),

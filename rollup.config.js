@@ -48,22 +48,20 @@ const plugins = [
 ];
 
 const outputConfig = {
-    dir: 'extension/js',
-    format: 'es',
-    sourcemap: true,
-    entryFileNames: '[name].js',  // this ensures the files are placed directly in 'extension/js'
-    chunkFileNames: '[name].js',  // this ensures dynamic imports are also placed in 'extension/js'
-    assetFileNames: '[name][extname]'
+    format: 'iife', // 使用iife格式
+    sourcemap: true
 };
 
-const inputConfig = entryFiles.reduce((acc, filePath) => {
+const configs = entryFiles.map(filePath => {
     const entryName = path.relative('./src', filePath).replace(/\.(ts|tsx)$/, '');
-    acc[entryName] = filePath;
-    return acc;
-}, {});
+    return {
+        input: filePath,
+        output: {
+            ...outputConfig,
+            file: `extension/js/${entryName}.js`
+        },
+        plugins: plugins.filter(Boolean)
+    };
+});
 
-export default {
-    input: inputConfig,
-    output: outputConfig,
-    plugins: plugins.filter(Boolean)
-};
+export default configs;
