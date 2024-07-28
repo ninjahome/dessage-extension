@@ -1,24 +1,23 @@
 import {__tableNameWallet, databaseAddItem, databaseQueryAll} from "./database";
 import {mnemonicToSeedSync} from "bip39";
-import {enc, AES, lib, PBKDF2 } from 'crypto-js';
-import {CipherData, DbWallet, Wallet} from "./Objects";
+import {enc, AES, lib, PBKDF2} from 'crypto-js';
+import {CipherData, DbWallet} from "./Objects";
 
-export async function saveWallet(w: Wallet): Promise<void> {
+export async function saveWallet(w: DbWallet): Promise<void> {
     const item = new DbWallet(w.uuid, w.address, w.cipherTxt, w.mnemonic);
     const result = await databaseAddItem(__tableNameWallet, item);
     console.log("save wallet result=>", result);
 }
 
-export async function loadLocalWallet(): Promise<Wallet[]> {
+export async function loadLocalWallet(): Promise<DbWallet[]> {
     const wallets = await databaseQueryAll(__tableNameWallet);
     if (!wallets) {
         return [];
     }
-    const walletObj: Wallet[] = [];
+    const walletObj: DbWallet[] = [];
     for (const dbWallet of wallets) {
-        const wallet = new Wallet(dbWallet.uuid, dbWallet.address, dbWallet.cipherTxt, dbWallet.mnemonic);
-        console.log("load wallet success:=>", wallet.address);
-        walletObj.push(wallet);
+        console.log("load wallet success:=>", dbWallet.address);
+        walletObj.push(dbWallet);
     }
     return walletObj;
 }
