@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "A simple browser extension that supports Ninja Protocol.",
   "scripts": {
+    "build:dec": "node build.js",
     "build:dev": "webpack --mode development --stats-error-details",
     "build": "webpack --mode production --stats-error-details",
     "analyze": "webpack --mode production --env ANALYZE=true --stats-error-details"

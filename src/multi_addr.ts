@@ -8,6 +8,7 @@ import {keccak256} from "js-sha3";
 import {convertBits, hexStringToByteArray} from "./util";
 import {bech32} from "bech32";
 
+
 const NinjaAddrLen = 32;
 const NinjaAddrPrefix = "NJ";
 
@@ -32,15 +33,26 @@ function generateBtcAddress(ecPriKey: EC.KeyPair, isTestNet: boolean = false): s
     const publicKeyBytes = Hex.parse(pubKey);
     const sha256Hash = SHA256(publicKeyBytes);
     const ripemd160Hash = RIPEMD160(sha256Hash);
-
     let version = isTestNet ? '6f' : '00'; // Choose version based on network
-    const versionByte = Hex.parse(version);
-    const versionedPayload = WordArray.create(versionByte.words.concat(ripemd160Hash.words), versionByte.sigBytes + ripemd160Hash.sigBytes);
+    const versionByte = new Uint8Array([parseInt(version, 16)]);
+    const ripemd160Bytes = Uint8Array.from(Hex.parse(ripemd160Hash.toString()).words.map(word => [
+        (word >> 24) & 0xFF, (word >> 16) & 0xFF, (word >> 8) & 0xFF, word & 0xFF
+    ]).flat());
 
-    const doubleSHA256 = SHA256(SHA256(versionedPayload));
-    const checksum = doubleSHA256.toString(Hex).slice(0, 8);
-    const finalPayloadHex = versionedPayload.toString() + checksum; // Concatenate in hex format
-    return base58.encode(Buffer.from(finalPayloadHex, 'hex'));
+    const versionedPayload = new Uint8Array(versionByte.length + ripemd160Bytes.length);
+    versionedPayload.set(versionByte, 0);
+    versionedPayload.set(ripemd160Bytes, versionByte.length);
+
+    const wordPayload = WordArray.create(versionedPayload);
+    const doubleSHA256 = SHA256(SHA256(wordPayload));
+    const checkSumArray = Uint8Array.from(Hex.parse(doubleSHA256.toString()).words.map(word => [
+        (word >> 24) & 0xFF, (word >> 16) & 0xFF, (word >> 8) & 0xFF, word & 0xFF
+    ]).flat()).slice(0, 4);
+
+    const finalPayload = new Uint8Array(versionedPayload.length + 4);
+    finalPayload.set(versionedPayload, 0);
+    finalPayload.set(checkSumArray, versionedPayload.length);
+    return base58.encode(Buffer.from(finalPayload));
 }
 
 function generateEthAddress(ecKey: EC.KeyPair): string {
@@ -71,7 +83,7 @@ function encodeKeysWithBech32(ecKey: EC.KeyPair): { publicKey: string, privateKe
 }
 
 function getNinjaAddress(ninjaKey: EC.KeyPair): string {
-    const publicKeyArray = ninjaKey.getPublic(true, 'array'); // true表示压缩格式，'array'表示返回字节数组
+    const publicKeyArray = ninjaKey.getPublic(true, 'array');
     const subAddr = new Uint8Array(NinjaAddrLen);
     const publicKeyUint8Array = new Uint8Array(publicKeyArray);
     subAddr.set(publicKeyUint8Array.slice(0, NinjaAddrLen));
