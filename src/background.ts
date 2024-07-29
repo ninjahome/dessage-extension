@@ -186,13 +186,13 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         const outerWallet = new Map();
         const wallets: DbWallet[] = await loadLocalWallet();
         wallets.forEach(wallet => {
-            const mulAddr = castToMemWallet(pwd, wallet);
-            outerWallet.set(wallet.address, mulAddr);
+            const memWallet = castToMemWallet(pwd, wallet);
+            outerWallet.set(wallet.address, memWallet.address);
         });
         const obj = Object.fromEntries(outerWallet);
         await sessionSet(__key_wallet_status, WalletStatus.Unlocked);
         await sessionSet(__key_wallet_map, obj);
-        console.log("[service work] outerWallet", outerWallet);
+        console.log("[service work] outerWallet=>", outerWallet);
         await sessionSet(__key_last_touch, Date.now());
         sendResponse({status: true, message: JSON.stringify(obj)});
     } catch (error) {

@@ -1,4 +1,4 @@
-import { ec as EC} from "elliptic";
+import {ec as EC} from "elliptic";
 import Hex from "crypto-js/enc-hex";
 import SHA256 from "crypto-js/sha256";
 import RIPEMD160 from "crypto-js/ripemd160";
@@ -43,11 +43,11 @@ function generateBtcAddress(ecPriKey: EC.KeyPair, isTestNet: boolean = false): s
     return base58.encode(Buffer.from(finalPayloadHex, 'hex'));
 }
 
- function generateEthAddress(ecKey: EC.KeyPair): string {
+function generateEthAddress(ecKey: EC.KeyPair): string {
     const publicKey = ecKey.getPublic();
     const publicKeyBytes = Buffer.from(publicKey.encode('array', false).slice(1));
     const hashedPublicKey = keccak256(publicKeyBytes);
-     return '0x' + hashedPublicKey.slice(-40);
+    return '0x' + hashedPublicKey.slice(-40);
 }
 
 function encodeKeysWithBech32(ecKey: EC.KeyPair): { publicKey: string, privateKey: string } {
@@ -79,11 +79,11 @@ function getNinjaAddress(ninjaKey: EC.KeyPair): string {
     return NinjaAddrPrefix + encodedAddress;
 }
 
-export function parseAddrFromKey(ecKey:EC.KeyPair): MultiAddress {
+export function parseAddrFromKey(ecKey: EC.KeyPair): MultiAddress {
     const address = getNinjaAddress(ecKey);
     const btcAddr = generateBtcAddress(ecKey);
     const ethAddr = generateEthAddress(ecKey);
     const nostrKey = encodeKeysWithBech32(ecKey);
-    const btcTestAddr = generateBtcAddress(ecKey,true);
-    return new MultiAddress(address,btcAddr,ethAddr,nostrKey.publicKey,btcTestAddr);
+    const btcTestAddr = generateBtcAddress(ecKey, true);
+    return new MultiAddress(address, btcAddr, ethAddr, nostrKey.publicKey, btcTestAddr);
 }
