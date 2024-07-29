@@ -16,7 +16,6 @@ async function initWelcomePage(): Promise<void> {
     initPasswordDiv();
     initMnemonicDiv();
     initMnemonicConfirmDiv();
-    initImportFromWallet();
     initImportPasswordDiv();
 
     window.addEventListener('hashchange', function () {
@@ -29,14 +28,9 @@ async function initWelcomePage(): Promise<void> {
 }
 
 function initWelcomeDiv(): void {
-    const agreeCheckbox = document.getElementById('welcome-agree') as HTMLInputElement | null;
-    const createButton = document.getElementById('welcome-create') as HTMLButtonElement | null;
-    const importButton = document.getElementById('welcome-import') as HTMLButtonElement | null;
-
-    if (!agreeCheckbox || !createButton || !importButton) {
-        console.error('One or more required elements are missing.');
-        return;
-    }
+    const agreeCheckbox = document.getElementById('welcome-agree') as HTMLInputElement;
+    const createButton = document.getElementById('welcome-create') as HTMLButtonElement;
+    const importButton = document.getElementById('welcome-import') as HTMLButtonElement;
 
     createButton.addEventListener('click', () => {
         navigateTo('#onboarding/create-password');
@@ -51,28 +45,17 @@ function initWelcomeDiv(): void {
 }
 
 function initPasswordDiv(): void {
-    const passwordAgreeCheckbox = document.getElementById('password-agree') as HTMLInputElement | null;
-    const createPasswordButton = document.querySelector('#view-create-password .primary-button') as HTMLButtonElement | null;
-
-    if (!passwordAgreeCheckbox || !createPasswordButton) {
-        console.error('Required elements are missing.');
-        return;
-    }
-
+    const passwordAgreeCheckbox = document.getElementById('password-agree') as HTMLInputElement;
+    const createPasswordButton = document.querySelector('#view-create-password .primary-button') as HTMLButtonElement;
     createPasswordButton.disabled = !passwordAgreeCheckbox.checked;
     createPasswordButton.addEventListener('click', createWallet);
 
     passwordAgreeCheckbox.addEventListener('change', checkImportPassword);
 
-    const newPasswordInput = document.getElementById("new-password") as HTMLInputElement | null;
-    const confirmPasswordInput = document.getElementById("confirm-password") as HTMLInputElement | null;
-
-    if (newPasswordInput && confirmPasswordInput) {
-        newPasswordInput.addEventListener('input', checkImportPassword);
-        confirmPasswordInput.addEventListener('input', checkImportPassword);
-    } else {
-        console.error('Password input elements are missing.');
-    }
+    const newPasswordInput = document.getElementById("new-password") as HTMLInputElement ;
+    const confirmPasswordInput = document.getElementById("confirm-password") as HTMLInputElement;
+    newPasswordInput.addEventListener('input', checkImportPassword);
+    confirmPasswordInput.addEventListener('input', checkImportPassword);
 
     const showPasswordButtons = document.querySelectorAll('.show-password') as NodeListOf<HTMLButtonElement>;
     showPasswordButtons.forEach(button => {
@@ -120,14 +103,9 @@ function importWallet(): void {
 function generateRecoveryPhraseInputs(): void {
     setRecoverPhaseTips(false, '');
 
-    const lengthElement = document.getElementById('recovery-phrase-length') as HTMLInputElement | null;
-    const recoveryPhraseInputs = document.getElementById('recovery-phrase-inputs') as HTMLElement | null;
-    const template = document.getElementById("recovery-phrase-row-template") as HTMLTemplateElement | null;
-
-    if (!lengthElement || !recoveryPhraseInputs || !template) {
-        console.error('One or more required elements are missing.');
-        return;
-    }
+    const lengthElement = document.getElementById('recovery-phrase-length') as HTMLInputElement ;
+    const recoveryPhraseInputs = document.getElementById('recovery-phrase-inputs') as HTMLElement ;
+    const template = document.getElementById("recovery-phrase-row-template") as HTMLTemplateElement ;
 
     const length = parseInt(lengthElement.value, 10);
     recoveryPhraseInputs.innerHTML = '';
@@ -139,10 +117,8 @@ function generateRecoveryPhraseInputs(): void {
         recoveryPhraseInputs.appendChild(rowDiv);
         rowDiv.querySelectorAll("input").forEach(input => {
             input.addEventListener('input', validateRecoveryPhrase);
-            const nextSibling = input.nextElementSibling as HTMLElement | null;
-            if (nextSibling) {
+            const nextSibling = input.nextElementSibling as HTMLElement;
                 nextSibling.addEventListener('click', changeInputType);
-            }
         });
     }
 }
@@ -168,13 +144,8 @@ function router(path: string): void {
 }
 
 function setRecoverPhaseTips(isValid: boolean, errMsg: string): void {
-    const errorMessage = document.getElementById('error-message') as HTMLElement | null;
-    const primaryButton = document.querySelector("#view-import-wallet .primary-button") as HTMLButtonElement | null;
-
-    if (!errorMessage || !primaryButton) {
-        console.error('One or more required elements are missing.');
-        return;
-    }
+    const errorMessage = document.getElementById('error-message') as HTMLElement;
+    const primaryButton = document.querySelector("#view-import-wallet .primary-button") as HTMLButtonElement;
 
     if (isValid) {
         errorMessage.style.display = 'none';
@@ -285,66 +256,38 @@ function displayConfirmVal(): void {
         }
     }
 
-    const mnemonicContainer = document.querySelector(".recovery-phrase-grid") as HTMLElement | null;
-    if (!mnemonicContainer) {
-        console.error('Mnemonic container element not found.');
-        return;
-    }
+    const mnemonicContainer = document.querySelector(".recovery-phrase-grid") as HTMLElement;
     mnemonicContainer.innerHTML = '';
 
     wordsArray.forEach((word, index) => {
         let div: HTMLElement;
         if (indices.get(index)) {
-            const template = document.getElementById("phrase-item-writeOnly") as HTMLElement | null;
-            if (!template) {
-                console.error('Template element for write-only phrase item not found.');
-                return;
-            }
+            const template = document.getElementById("phrase-item-writeOnly") as HTMLElement;
             div = template.cloneNode(true) as HTMLElement;
             div.classList.add('hidden-word');
             div.dataset.correctWord = wordsArray[index];
-            const input = div.querySelector(".recovery-input") as HTMLInputElement | null;
-            if (input) {
+            const input = div.querySelector(".recovery-input") as HTMLInputElement;
                 input.addEventListener('input', checkConfirmUserPhrase);
-            }
-
         } else {
-            const template = document.getElementById("phrase-item-readOnly") as HTMLElement | null;
-            if (!template) {
-                console.error('Template element for read-only phrase item not found.');
-                return;
-            }
+            const template = document.getElementById("phrase-item-readOnly") as HTMLElement;
             div = template.cloneNode(true) as HTMLElement;
-            const input = div.querySelector(".recovery-input") as HTMLInputElement | null;
-            if (input) {
+            const input = div.querySelector(".recovery-input") as HTMLInputElement;
                 input.value = word;
-            }
         }
         div.id = '';
         div.style.display = 'block';
-        const indexElement = div.querySelector(".phrase-item-index") as HTMLElement | null;
-        if (indexElement) {
-            indexElement.innerText = (index + 1).toString();
-        }
+        const indexElement = div.querySelector(".phrase-item-index") as HTMLElement;
+        indexElement.innerText = (index + 1).toString();
         mnemonicContainer.appendChild(div);
     });
 }
 
 function checkConfirmUserPhrase(this: HTMLInputElement): void {
-    const form = this.closest('form') as HTMLFormElement | null;
-    if (!form) {
-        console.error('Form element not found.');
-        return;
-    }
-
+    const form = this.closest('form') as HTMLFormElement;
     let confirmIsOk = true;
     form.querySelectorAll(".hidden-word").forEach(div => {
         const element = div as HTMLElement;
-        const input = element.querySelector(".recovery-input") as HTMLInputElement | null;
-        if (!input) {
-            console.error('Input element not found.');
-            return;
-        }
+        const input = element.querySelector(".recovery-input") as HTMLInputElement;
         if (element.dataset.correctWord !== input.value) {
             confirmIsOk = false;
             if (input.value.length > 0) {
@@ -355,12 +298,8 @@ function checkConfirmUserPhrase(this: HTMLInputElement): void {
         }
     });
 
-    const primaryButton = form.querySelector(".primary-button") as HTMLButtonElement | null;
-    if (primaryButton) {
-        primaryButton.disabled = !confirmIsOk;
-    } else {
-        console.error('Primary button element not found.');
-    }
+    const primaryButton = form.querySelector(".primary-button") as HTMLButtonElement;
+    primaryButton.disabled = !confirmIsOk;
 }
 
 function displayMnemonic(): void {
@@ -374,47 +313,24 @@ function displayMnemonic(): void {
     }
 
     const wordsArray = ___mnemonic_in_mem.split(' ');
-    const mnemonicContainer = document.querySelector(".recovery-phrase-container") as HTMLElement | null;
-
-    if (!mnemonicContainer) {
-        console.error('Mnemonic container element not found.');
-        return;
-    }
-
+    const mnemonicContainer = document.querySelector(".recovery-phrase-container") as HTMLElement;
     mnemonicContainer.innerHTML = ''; // 清空以前的内容
 
     wordsArray.forEach((word, index) => {
-        const template = document.getElementById("recovery-phrase-item-template") as HTMLElement | null;
-        if (!template) {
-            console.error('Template element not found.');
-            return;
-        }
+        const template = document.getElementById("recovery-phrase-item-template") as HTMLElement;
         const div = template.cloneNode(true) as HTMLElement;
         div.style.display = 'block';
-        const indexElement = div.querySelector(".phrase-item-index") as HTMLElement | null;
-        const valueElement = div.querySelector(".phrase-item-value") as HTMLElement | null;
-        if (indexElement) {
-            indexElement.innerText = (index + 1).toString();
-        }
-        if (valueElement) {
-            valueElement.innerText = word;
-        }
+        const indexElement = div.querySelector(".phrase-item-index") as HTMLElement;
+        const valueElement = div.querySelector(".phrase-item-value") as HTMLElement;
+        indexElement.innerText = (index + 1).toString();
+        valueElement.innerText = word;
         mnemonicContainer.appendChild(div);
     });
 }
 
 function checkImportPassword(this: HTMLInputElement): void {
-    const form = this.closest('form') as HTMLFormElement | null;
-    if (!form) {
-        console.error('Form element not found.');
-        return;
-    }
-
-    const okBtn = form.querySelector(".primary-button") as HTMLButtonElement | null;
-    if (!okBtn) {
-        console.error('Primary button element not found.');
-        return;
-    }
+    const form = this.closest('form') as HTMLFormElement;
+    const okBtn = form.querySelector(".primary-button") as HTMLButtonElement;
 
     const pwd: string[] = [];
     form.querySelectorAll("input").forEach(input => {
@@ -423,12 +339,7 @@ function checkImportPassword(this: HTMLInputElement): void {
         }
     });
 
-    const errMsg = form.querySelector(".error-message") as HTMLElement | null;
-    if (!errMsg) {
-        console.error('Error message element not found.');
-        return;
-    }
-
+    const errMsg = form.querySelector(".error-message") as HTMLElement;
     if (pwd[0].length < 8 && pwd[0].length > 0) {
         errMsg.innerText = "Password must be longer than 8 characters";
         errMsg.style.display = 'block';
@@ -445,22 +356,12 @@ function checkImportPassword(this: HTMLInputElement): void {
 
     errMsg.innerText = '';
     errMsg.style.display = 'none';
-    const checkbox = form.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
-    if (!checkbox) {
-        console.error('Checkbox element not found.');
-        return;
-    }
-
+    const checkbox = form.querySelector('input[type="checkbox"]') as HTMLInputElement;
     okBtn.disabled = !(checkbox.checked && pwd[0].length >= 8);
 }
 
 function showPassword(this: HTMLElement): void {
-    const form = this.closest('form') as HTMLFormElement | null;
-    if (!form) {
-        console.error('Form element not found.');
-        return;
-    }
-
+    const form = this.closest('form') as HTMLFormElement;
     form.querySelectorAll("input").forEach(input => {
         if (input.type === 'password' || input.type === 'text') {
             input.type = input.type === 'password' ? 'text' : 'password';
@@ -481,48 +382,32 @@ function prepareAccountData() {
 }
 
 function initMnemonicDiv(): void {
-    const nextBtnForConfirm = document.querySelector('#view-recovery-phrase .primary-button') as HTMLButtonElement | null;
-    if (nextBtnForConfirm) {
-        nextBtnForConfirm.addEventListener('click', nextToConfirmPage);
-    } else {
-        console.error('Next button for confirm not found.');
-    }
+    const nextBtnForConfirm = document.querySelector('#view-recovery-phrase .primary-button') as HTMLButtonElement;
+    nextBtnForConfirm.addEventListener('click', nextToConfirmPage);
 
-    const hideSeedButton = document.getElementById("view-recovery-phrase-hide-seed") as HTMLButtonElement | null;
-    if (hideSeedButton) {
-        hideSeedButton.addEventListener('click', hideSeedDiv);
-    } else {
-        console.error('Hide seed button not found.');
-    }
+    const hideSeedButton = document.getElementById("view-recovery-phrase-hide-seed") as HTMLButtonElement;
+    hideSeedButton.addEventListener('click', hideSeedDiv);
 
-    const copySeedButton = document.getElementById("view-recovery-phrase-copy-seed") as HTMLButtonElement | null;
-    if (copySeedButton) {
-        copySeedButton.addEventListener('click', () => {
-            if (!___mnemonic_in_mem) {
-                return;
-            }
-            navigator.clipboard.writeText(___mnemonic_in_mem).then(() => {
-                alert("Copy success");
-            }).catch(err => {
-                console.error('Error copying text: ', err);
-            });
+    const copySeedButton = document.getElementById("view-recovery-phrase-copy-seed") as HTMLButtonElement;
+    copySeedButton.addEventListener('click', () => {
+        if (!___mnemonic_in_mem) {
+            return;
+        }
+        navigator.clipboard.writeText(___mnemonic_in_mem).then(() => {
+            alert("Copy success");
+        }).catch(err => {
+            console.error('Error copying text: ', err);
         });
-    } else {
-        console.error('Copy seed button not found.');
-    }
+    });
 }
 
 function nextToConfirmPage() {
     navigateTo('#onboarding/confirm-recovery');
     displayConfirmVal();
 }
-function hideSeedDiv(this: HTMLElement): void {
-    const recoveryPhraseContainer = document.querySelector('.recovery-phrase-container') as HTMLElement | null;
-    if (!recoveryPhraseContainer) {
-        console.error('Recovery phrase container not found.');
-        return;
-    }
 
+function hideSeedDiv(this: HTMLElement): void {
+    const recoveryPhraseContainer = document.querySelector('.recovery-phrase-container') as HTMLElement;
     const seedPhraseVisible = recoveryPhraseContainer.dataset.visible === 'true';
     if (seedPhraseVisible) {
         recoveryPhraseContainer.classList.add('hidden-seed-phrase');
@@ -531,17 +416,17 @@ function hideSeedDiv(this: HTMLElement): void {
         recoveryPhraseContainer.classList.remove('hidden-seed-phrase');
         this.textContent = 'Hide seed phrase';
     }
-
     recoveryPhraseContainer.dataset.visible = String(!seedPhraseVisible);
 }
 
 function initMnemonicConfirmDiv(): void {
-    const confirmPhraseBtn = document.querySelector("#view-confirm-recovery .primary-button") as HTMLButtonElement | null;
-    if (confirmPhraseBtn) {
-        confirmPhraseBtn.addEventListener('click', confirmUserInputPhrase);
-    } else {
-        console.error('Confirm phrase button not found.');
-    }
+    const confirmPhraseBtn = document.querySelector("#view-confirm-recovery .primary-button") as HTMLButtonElement;
+    confirmPhraseBtn.addEventListener('click', confirmUserInputPhrase);
+
+    const recoveryPhraseLength = document.getElementById('recovery-phrase-length') as HTMLInputElement;
+    recoveryPhraseLength.addEventListener('change', generateRecoveryPhraseInputs);
+    const confirmRecoverBtn = document.querySelector('#view-import-wallet .primary-button') as HTMLButtonElement;
+    confirmRecoverBtn.addEventListener('click', confirmImportedWallet);
 }
 
 function confirmUserInputPhrase(): void {
@@ -550,50 +435,18 @@ function confirmUserInputPhrase(): void {
     navigateTo('#onboarding/account-home');
 }
 
-function initImportFromWallet(): void {
-    const recoveryPhraseLength = document.getElementById('recovery-phrase-length') as HTMLInputElement | null;
-    if (recoveryPhraseLength) {
-        recoveryPhraseLength.addEventListener('change', generateRecoveryPhraseInputs);
-    } else {
-        console.error('Recovery phrase length input element not found.');
-    }
-
-    const confirmRecoverBtn = document.querySelector('#view-import-wallet .primary-button') as HTMLButtonElement | null;
-    if (confirmRecoverBtn) {
-        confirmRecoverBtn.addEventListener('click', confirmImportedWallet);
-    } else {
-        console.error('Confirm recover button not found.');
-    }
-}
-
 function initImportPasswordDiv(): void {
-    const importBtn = document.querySelector("#view-password-for-imported .primary-button") as HTMLButtonElement | null;
-    if (importBtn) {
-        importBtn.addEventListener('click', actionOfWalletImport);
-    } else {
-        console.error('Import button not found.');
-    }
+    const importBtn = document.querySelector("#view-password-for-imported .primary-button") as HTMLButtonElement;
+    importBtn.addEventListener('click', actionOfWalletImport);
 
-    const importedPasswordAgree = document.getElementById('imported-password-agree') as HTMLInputElement | null;
-    if (importedPasswordAgree) {
-        importedPasswordAgree.addEventListener('change', checkImportPassword);
-    } else {
-        console.error('Imported password agree checkbox not found.');
-    }
+    const importedPasswordAgree = document.getElementById('imported-password-agree') as HTMLInputElement;
+    importedPasswordAgree.addEventListener('change', checkImportPassword);
 
-    const importedNewPassword = document.getElementById("imported-new-password") as HTMLInputElement | null;
-    if (importedNewPassword) {
-        importedNewPassword.addEventListener('input', checkImportPassword);
-    } else {
-        console.error('Imported new password input not found.');
-    }
+    const importedNewPassword = document.getElementById("imported-new-password") as HTMLInputElement;
+    importedNewPassword.addEventListener('input', checkImportPassword);
 
-    const importedConfirmPassword = document.getElementById("imported-confirm-password") as HTMLInputElement | null;
-    if (importedConfirmPassword) {
-        importedConfirmPassword.addEventListener('input', checkImportPassword);
-    } else {
-        console.error('Imported confirm password input not found.');
-    }
+    const importedConfirmPassword = document.getElementById("imported-confirm-password") as HTMLInputElement;
+    importedConfirmPassword.addEventListener('input', checkImportPassword);
 }
 
 function confirmImportedWallet(): void {
@@ -618,22 +471,20 @@ function confirmImportedWallet(): void {
 }
 
 async function actionOfWalletImport(): Promise<void> {
-    const passwordInput = document.getElementById("imported-new-password") as HTMLInputElement | null;
-    if (!passwordInput) {
-        console.error('Password input element not found.');
-        return;
-    }
+    const passwordInput = document.getElementById("imported-new-password") as HTMLInputElement;
     const password = passwordInput.value;
 
     if (!___mnemonic_in_mem) {
-        console.error('Mnemonic is missing.');
+        navigateTo('#onboarding/welcome');
         return;
     }
 
     const wallet = newWallet(___mnemonic_in_mem, password);
-    await saveWallet(wallet);
+    await saveWallet(wallet)
+        .then(key => console.log(`Added item with key: ${key}`))
+        .catch(error => console.error(`Failed to add item: ${error}`));
 
-    browser.runtime.sendMessage({ action: MsgType.WalletCreated })
+    browser.runtime.sendMessage({action: MsgType.WalletCreated})
         .then(response => {
             console.log("Message sent successfully", response);
         })

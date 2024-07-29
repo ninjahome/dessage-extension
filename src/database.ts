@@ -1,6 +1,6 @@
 let __databaseObj: IDBDatabase | null = null;
 const __databaseName = 'dessage-database';
-const __currentDatabaseVersion = 7;
+const __currentDatabaseVersion = 9;
 export const __tableNameWallet = '__table_wallet__';
 export const __tableSystemSetting = '__table_system_setting__';
 
@@ -22,9 +22,8 @@ export function initDatabase(): Promise<IDBDatabase> {
         request.onupgradeneeded = function (event: IDBVersionChangeEvent) {
             const db = (event.target as IDBOpenDBRequest).result;
             if (!db.objectStoreNames.contains(__tableNameWallet)) {
-                const objectStore = db.createObjectStore(__tableNameWallet, {keyPath: 'address'});
-                objectStore.createIndex('addressIdx', 'address', {unique: true});
-                objectStore.createIndex('uuidIdx', 'uuid', {unique: true});
+                const objectStore = db.createObjectStore(__tableNameWallet, {keyPath: 'uuid'});
+                // objectStore.createIndex("uuid", "uuid", { unique: true });
                 console.log("Created wallet table successfully.");
             }
 
@@ -50,17 +49,22 @@ export function databaseAddItem(storeName: string, data: any): Promise<IDBValidK
             reject('Database is not initialized');
             return;
         }
-        const transaction = __databaseObj.transaction([storeName], 'readwrite');
-        const objectStore = transaction.objectStore(storeName);
-        const request = objectStore.add(data);
 
-        request.onsuccess = () => {
-            resolve(request.result);
-        };
+        try {
+            const transaction = __databaseObj.transaction([storeName], 'readwrite');
+            const objectStore = transaction.objectStore(storeName);
+            const request = objectStore.add(data);
 
-        request.onerror = event => {
-            reject(`Error adding data to ${storeName}: ${(event.target as IDBRequest).error}`);
-        };
+            request.onsuccess = () => {
+                resolve(request.result);
+            };
+
+            request.onerror = event => {
+                reject(`Error adding data to ${storeName}: ${(event.target as IDBRequest).error}`);
+            };
+        } catch (error) {
+            reject(`Unexpected error: ${error}`);
+        }
     });
 }
 

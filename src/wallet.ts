@@ -57,7 +57,7 @@ export function newWallet(mnemonic: string, password: string): DbWallet {
     const seedBuffer = mnemonicToSeedSync(mnemonic);
     const first32Bytes = seedBuffer.subarray(0, 32);
     const hexPri = first32Bytes.toString('hex');
-    console.log(`First 32 bytes: ${hexPri}`); // 打印前32个字节的十六进制表示
+    // console.log(`First 32 bytes: ${hexPri}`); // 打印前32个字节的十六进制表示
     const seedUint8Array: Uint8Array = new Uint8Array(first32Bytes);
     const key = new ProtocolKey(seedUint8Array);
     const data = encryptAes(hexPri, password);
