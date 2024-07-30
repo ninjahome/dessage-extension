@@ -67,7 +67,6 @@ function encodeKeysWithBech32(ecKey: EC.KeyPair): { publicKey: string, privateKe
     const privateKeyBN = ecKey.getPrivate();
 
     const privateKeyBytes = new Uint8Array(privateKeyBN.toArray('be', 32));
-
     const publicKeyBytes = hexStringToByteArray(publicKeyHex).slice(1);
 
     const publicWords = convertBits(publicKeyBytes, 8, 5);
