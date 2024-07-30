@@ -1,22 +1,10 @@
 const path = require('path');
-const glob = require('glob');
 const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = (env, argv) => {
     const mode = argv.mode || 'development';
     const shouldAnalyze = env && env.ANALYZE === 'true';
-
-    const entryFiles = glob.sync('./src/**/*.{ts,tsx}');
-    console.log('Entry files:', entryFiles);
-
-    const entry = entryFiles.reduce((acc, filePath) => {
-        const entryName = filePath.replace(/^\.\/src\//, '').replace(/\.(ts|tsx)$/, '');
-        acc[entryName] = './' + filePath;
-        return acc;
-    }, {});
-
-    console.log('Entry object:', entry);
 
     const plugins = [
         new webpack.IgnorePlugin({
@@ -37,16 +25,15 @@ module.exports = (env, argv) => {
     return {
         mode: mode,
         devtool: mode === 'development' ? 'inline-source-map' : 'source-map',
-        entry: glob.sync('./src/**/*.{ts,tsx}').reduce((acc, filePath) => {
-            const entry = filePath.replace(/^\.\/src\//, '').replace(/\.(ts|tsx)$/, '');
-            acc[entry] = './' + filePath;
-            return acc;
-        }, {}),
+        entry: {
+            background: './src/background.ts',
+            home: './src/home.ts',
+            wallet: './src/main.ts',
+            inject: './src/inject.ts',
+            content: './src/content.ts',
+        },
         output: {
-            filename: (pathData) => {
-                const name = pathData.chunk.name;
-                return 'js/' + name.replace(/^src\//, '') + '.js';
-            },
+            filename: 'js/[name].js',
             path: path.resolve(__dirname, 'extension'),
         },
         module: {
