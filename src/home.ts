@@ -1,7 +1,7 @@
 import {initDatabase} from "./database";
-import {MsgType, showView} from "./util";
+import {MsgType, showView,loadLocalWallet,saveWallet} from "./common";
 import {generateMnemonic, validateMnemonic, wordlists} from 'bip39';
-import {loadLocalWallet, newWallet, saveWallet} from "./wallet";
+import {newWallet} from "./dessage/wallet";
 import browser from "webextension-polyfill";
 
 let __key_for_mnemonic_temp = '__key_for_mnemonic_temp__';

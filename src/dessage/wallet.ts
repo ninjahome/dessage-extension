@@ -1,4 +1,3 @@
-import {__tableNameWallet, databaseAddItem, databaseQueryAll} from "./database";
 import {mnemonicToSeedSync} from "bip39";
 import {ProtocolKey} from "./protocolKey";
 import {decryptAes, encryptAes,CipherData} from "./key_crypto";
@@ -24,24 +23,6 @@ export class MemWallet {
         this.address = address;
         this.key = key;
     }
-}
-
-export async function saveWallet(w: DbWallet): Promise<void> {
-    const result = await databaseAddItem(__tableNameWallet, w);
-    console.log("save wallet result=>", result);
-}
-
-export async function loadLocalWallet(): Promise<DbWallet[]> {
-    const wallets = await databaseQueryAll(__tableNameWallet);
-    if (!wallets) {
-        return [];
-    }
-    const walletObj: DbWallet[] = [];
-    for (const dbWallet of wallets) {
-        console.log("load wallet success:=>", dbWallet.address);
-        walletObj.push(dbWallet);
-    }
-    return walletObj;
 }
 
 function generateUUID(): string {

@@ -1,8 +1,8 @@
 /// <reference lib="webworker" />
 import browser, {Runtime} from "webextension-polyfill";
-import {WalletStatus, MsgType} from './util';
+import {WalletStatus,loadLocalWallet, MsgType} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
-import {castToMemWallet, loadLocalWallet, DbWallet} from "./wallet";
+import {castToMemWallet, DbWallet} from "./dessage/wallet";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';

@@ -1,7 +1,7 @@
 import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
-import {MsgType, showView, WalletStatus} from './util';
-import {MultiAddress} from "./multi_addr";
+import {MsgType, showView, WalletStatus} from './common';
+import {MultiAddress} from "./dessage/multi_addr";
 
 class SysSetting {
     id: string;
