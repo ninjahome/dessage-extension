@@ -24,13 +24,13 @@ module.exports = (env, argv) => {
 
     return {
         mode: mode,
-        devtool: mode === 'development' ? 'inline-source-map' : 'source-map',
+        devtool: mode === 'development' ? 'source-map' : 'inline-source-map',  // 确保开发模式下生成Source Map
         entry: {
-            background: './src/background.ts',
-            home: './src/home.ts',
-            wallet: './src/main.ts',
-            inject: './src/inject.ts',
-            content: './src/content.ts',
+            background: path.resolve(__dirname, './src/background.ts'),
+            home: path.resolve(__dirname, './src/home.ts'),
+            wallet: path.resolve(__dirname, './src/main.ts'),
+            inject: path.resolve(__dirname, './src/inject.ts'),
+            content: path.resolve(__dirname, './src/content.ts'),
         },
         output: {
             filename: 'js/[name].js',
