@@ -186,7 +186,7 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         const wallets: DbWallet[] = await loadLocalWallet();
         wallets.forEach(wallet => {
             const memWallet = castToMemWallet(pwd, wallet);
-            outerWallet.set(wallet.address, memWallet.address);
+            outerWallet.set(wallet.address.address, memWallet.address);
         });
         const obj = Object.fromEntries(outerWallet);
         await sessionSet(__key_wallet_status, WalletStatus.Unlocked);

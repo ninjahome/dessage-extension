@@ -28,7 +28,7 @@ module.exports = (env, argv) => {
         entry: {
             background: path.resolve(__dirname, './src/background.ts'),
             home: path.resolve(__dirname, './src/home.ts'),
-            wallet: path.resolve(__dirname, './src/main.ts'),
+            main: path.resolve(__dirname, './src/main.ts'),
             inject: path.resolve(__dirname, './src/inject.ts'),
             content: path.resolve(__dirname, './src/content.ts'),
         },
