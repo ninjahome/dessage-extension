@@ -10,13 +10,12 @@ module.exports = (env, argv) => {
     const entryFiles = glob.sync('./src/**/*.{ts,tsx}');
     console.log('Entry files:', entryFiles);
 
-    const entry = entryFiles.reduce((acc, filePath) => {
-        const entryName = filePath.replace(/^\.\/src\//, '').replace(/\.(ts|tsx)$/, '');
-        acc[entryName] = './' + filePath;
-        return acc;
-    }, {});
-
-    console.log('Entry object:', entry);
+    // 定义特定的入口
+    const entry = {
+        background: './src/background.ts', // 确保这里的路径正确
+        main: './src/main.ts',             // 确保这里的路径正确
+        home: './src/home.ts'              // 确保这里的路径正确
+    };
 
     const plugins = [
         new webpack.IgnorePlugin({
@@ -37,16 +36,9 @@ module.exports = (env, argv) => {
     return {
         mode: mode,
         devtool: mode === 'development' ? 'inline-source-map' : 'source-map',
-        entry: glob.sync('./src/**/*.{ts,tsx}').reduce((acc, filePath) => {
-            const entry = filePath.replace(/^\.\/src\//, '').replace(/\.(ts|tsx)$/, '');
-            acc[entry] = './' + filePath;
-            return acc;
-        }, {}),
+        entry: entry,
         output: {
-            filename: (pathData) => {
-                const name = pathData.chunk.name;
-                return 'js/' + name.replace(/^src\//, '') + '.js';
-            },
+            filename: 'js/[name].js', // 生成的文件位于 extension/js 目录下
             path: path.resolve(__dirname, 'extension'),
         },
         module: {
@@ -60,6 +52,23 @@ module.exports = (env, argv) => {
         },
         optimization: {
             usedExports: true,
+            splitChunks: {
+                chunks: 'all',
+                minSize: 30000,
+                automaticNameDelimiter: '-',
+                cacheGroups: {
+                    commons: {
+                        name: 'commons',
+                        chunks: 'initial',
+                        minChunks: 2
+                    },
+                    vendors: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name: 'vendors',
+                        chunks: 'all'
+                    }
+                }
+            }
         },
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],
