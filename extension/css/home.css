@@ -1,21 +1,27 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
     margin: 0;
+    padding-top: 98px;
 }
 
-.welcome-container, .create-container {
+.welcome-container,
+.create-container,
+.recovery-container,
+.recovery-confirm-container,
+.account-home,
+.import-container,
+.password-for-imported{
+    background-color: #ffffff;
     text-align: center;
     border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 400px;
+    border-radius: 24px;
+    padding: 64px 32px;
+    max-width: 608px;
     width: 100%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
 }
 
 header {
@@ -23,25 +29,44 @@ header {
 }
 
 .logo {
-    width: 50px;
-    margin-bottom: 20px;
+    width: 42px;
+    margin-right: 8px;
 }
 
 main {
     text-align: center;
+    margin: 0 auto;
+    width: 72%;
 }
 
 h1 {
+    font-size: 22px;
+    margin: 0;
+    color: #1d2027;
+    margin-bottom: 8px;
+}
+h2 {
     font-size: 24px;
-    margin-bottom: 10px;
+    margin: 0;
+    color: #1d2027;
+    text-align: left;
+
 }
 
 p {
-    font-size: 16px;
+    font-size: 14px;
+    line-height: 20px;
     color: #666;
-    margin-bottom: 20px;
+    text-align: left;
+    margin: 0;
 }
-
+a {
+    color:rgb(113 128 150);
+    font-weight: 600;
+}
+a:hover{
+    color: #5ba7fc;
+}
 .welcome-carousel {
     margin-bottom: 20px;
 }
@@ -52,10 +77,6 @@ p {
 
 .carousel-item.active {
     display: block;
-}
-
-.carousel-item img {
-    width: 100px;
 }
 
 .carousel-indicators {
@@ -73,43 +94,36 @@ p {
 }
 
 .indicator.active {
-    background-color: #007bff;
+    background-color: #5ba7fc;
 }
 
-.welcome-checkbox, .password-checkbox {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.welcome-checkbox input, .password-checkbox input {
-    margin-right: 10px;
-}
-
-.primary-button,
-.secondary-button {
+.welcome-container .secondary-button{
     width: 100%;
-    padding: 10px;
+    padding: 17px;
     font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin: 12px 0;
+}
+.primary-button{
+    width: 60%;
+    padding: 17px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 12px 0;
 }
 
 .primary-button {
-    background-color: #007bff;
+    background-color: #5ba7fc;
     color: #fff;
 }
 
 .primary-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
-}
-
-.secondary-button {
-    background-color: #e0e0e0;
-    color: #333;
 }
 
 .progress-bar {
@@ -137,42 +151,26 @@ p {
 }
 
 .step.completed {
-    background-color: #007bff; /* 设置已完成步骤的背景颜色 */
+    background-color: #5ba7fc; /* 设置已完成步骤的背景颜色 */
 }
 
-.password-container {
-    display: flex;
-    align-items: center;
+.input-wrapper input[type="password"],
+.input-wrapper input[type="text"]{
     width: 100%;
-    margin-bottom: 20px;
-}
-
-.password-container input[type="password"],
-.password-container input[type="text"] {
-    flex: 1;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-right: 10px;
+    padding: 13.5px 8px;
+    font-size: 18px;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
+    border-radius: 12px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    letter-spacing: 0.1em; /* Increase the spacing between characters */
 }
 
 .show-password {
     cursor: pointer;
-    color: #007bff;
+    color: #5ba7fc;
     font-size: 14px;
     white-space: nowrap;
-}
-
-.create-container {
-    text-align: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
 }
 
 .create-container header {
@@ -190,7 +188,7 @@ p {
 
 .create-container p {
     font-size: 16px;
-    color: #666;
+    color: rgb(113 128 150);
     margin-bottom: 20px;
 }
 
@@ -198,6 +196,7 @@ p {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 44px 0;
 }
 
 .create-container form label {
@@ -205,19 +204,7 @@ p {
     text-align: left;
     margin-bottom: 5px;
     font-size: 14px;
-    color: #666;
-}
-
-.create-container .primary-button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: #fff;
-    margin-top: 20px;
+    color: rgb(113 128 150);
 }
 
 .create-container .primary-button:disabled {
@@ -226,21 +213,11 @@ p {
 }
 
 .create-container .learn-more {
-    color: #007bff;
+    color: #5ba7fc;
     cursor: pointer;
     font-size: 12px;
 }
 
-.recovery-container {
-    text-align: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-}
 
 .recovery-container header {
     margin-bottom: 20px;
@@ -257,15 +234,23 @@ p {
 
 .recovery-container p {
     font-size: 16px;
-    color: #666;
+    color: rgb(113 128 150);
     margin-bottom: 20px;
 }
 
 .recovery-container .tips {
     text-align: left;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
+    padding: 16px;
+    border: 2px solid #f3dfca;
+    background-color: rgba(248, 219, 213, 0.5);
+    border-radius: 5px;
+    margin-top: 44px;
 }
-
+.recovery-container .tips ul li {
+    font-size: 14px;
+    margin: 4px 0;
+}
 .recovery-container .tips h2 {
     font-size: 16px;
     margin-bottom: 10px;
@@ -273,80 +258,91 @@ p {
 
 .recovery-container .tips ul {
     list-style-type: disc;
-    padding-left: 20px;
+    padding-left: 12px;
     font-size: 14px;
-    color: #666;
+    color: rgb(113 128 150);
+    margin: 0;
 }
 
 .hidden-seed-phrase {
     background-color: #333;
     color: #333;
+    border-radius: 5px;
 }
 
 .recovery-phrase-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between; /* 调整元素间的间距 */
-    padding: 0 10px; /* 可选：为容器添加内边距，以便更好的间隔 */
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
+    border-radius: 5px 5px 0 0;
+    padding: 6px 12px;
 }
 
 .recovery-phrase-item {
-    width: calc(33.33% - 20px); /* 调整计算公式以适应间隔 */
-    padding: 10px;
-    margin-bottom: 10px;
+    width: calc(33.33% - 12px); /* 调整计算公式以适应间隔 */
+    padding: 12px;
+    margin: 6px 0;
     box-sizing: border-box; /* 将内边距和边框计入宽度计算 */
     text-align: left;
-    border: 1px solid #ccc;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
     border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .actions {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    position: relative;
 }
 
 .actions .secondary-button {
-    margin-right: 10px;
-    background-color: #e0e0e0;
-    color: #333;
+    width: calc(50%);
+    background-color: rgba(91, 167, 252, 0.2);
+    color: #5ba7fc;
     border: none;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px;
     cursor: pointer;
 }
 
-.primary-button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: #fff;
-    margin-top: 20px;
+.secondary-button:hover{
+    background-color: rgba(91, 167, 252, 0.5);
+}
+
+.secondary-buttonRight {
+    border-radius: 0 0 5px 0;
+}
+
+.secondary-buttonLeft {
+    border-radius: 0 0 0 5px;
+}
+
+.secondary-buttonRight::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    bottom: 0;
+    width: 1px;
+    height: 20px;
+    background-color: rgba(91, 167, 252, 0.5);
+    z-index: 1;
 }
 
 .primary-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
+.primary-button:hover{
+    background-color: rgba(91, 167, 252, 0.5);
+}
 /* 新增样式 */
 .recovery-phrase-container div {
     width: calc(33.33% - 10px); /* 三列布局 */
-}
-
-
-.recovery-confirm-container {
-    text-align: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
 }
 
 .recovery-phrase-form {
@@ -360,7 +356,7 @@ p {
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     width: 100%;
-    margin-bottom: 20px;
+    margin: 44px 0;
 }
 
 .recovery-input {
@@ -368,36 +364,15 @@ p {
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    width: 104px;
 }
 
-.primary-button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: #fff;
-    margin-top: 20px;
-}
 .hidden-word {
     background-color: #f0f0f0; /* 轻微高亮背景 */
 }
+
 .error-word {
-    background-color: #f50505; /* 轻微高亮背景 */
-}
-
-
-.import-container {
-    text-align: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
+    background-color: #cb4c4c; /* 轻微高亮背景 */
 }
 
 .import-container header {
@@ -408,14 +383,9 @@ p {
     text-align: center;
 }
 
-.import-container h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
 .import-container p {
     font-size: 16px;
-    color: #666;
+    color: rgb(113 128 150);
     margin-bottom: 20px;
 }
 
@@ -426,7 +396,7 @@ p {
 .form-group label {
     display: block;
     font-size: 14px;
-    color: #666;
+    color: rgb(113 128 150);
     margin-bottom: 5px;
 }
 
@@ -434,13 +404,14 @@ p {
     width: 100%;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
     border-radius: 5px;
 }
 
 .import-container-tip {
     font-size: 14px;
-    color: #007bff;
+    color: #5ba7fc;
     margin-bottom: 20px;
 }
 
@@ -460,8 +431,11 @@ p {
 
 .recovery-phrase-input input {
     flex: 1;
-    padding: 5px;
-    margin-right: 5px;
+    padding: 12px;
+    width: 80px;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
+    border-radius: 5px;
 }
 
 .recovery-phrase-row button {
@@ -469,7 +443,7 @@ p {
     border: none;
     cursor: pointer;
     font-size: 14px;
-    color: #007bff;
+    color: #5ba7fc;
     padding: 10px;
 }
 
@@ -481,20 +455,11 @@ p {
 }
 
 .error-message {
-    color: red;
-    margin-bottom: 10px;
-    display: none;
-}
-
-.password-for-imported {
-    text-align: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 400px;
     width: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
+    font-size: 14px;
+    color: #cb4c4c;
+    text-align: left;
+    display: none;
 }
 
 .password-for-imported header {
@@ -512,6 +477,88 @@ p {
 
 .password-for-imported p {
     font-size: 16px;
-    color: #666;
+    color: rgb(113 128 150);
     margin-bottom: 20px;
+}
+.password-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.password-container label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.input-wrapper .toggle-visibility,
+.show-password{
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #5ba7fc;
+    padding: 0;
+}
+
+.welcome-checkbox,
+.password-checkbox {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    padding: 12px 8px;
+    border-radius: 12px;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
+    color: rgb(113 128 150);
+}
+
+.password-checkbox input {
+    margin-right: 10px;
+}
+
+.password-checkbox label {
+    font-size: 14px;
+    color: #666;
+}
+
+.primary-button {
+    width: 100%;
+    padding: 17px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 12px 0;
+}
+
+.primary-button {
+    background-color: #5ba7fc;
+    color: #fff;
+}
+
+.primary-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.secondary-button {
+    background-color: #e0e0e0;
+    color: #333;
 }
