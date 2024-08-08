@@ -31,7 +31,9 @@
     "webextension-polyfill": "^0.10.0",
     "webpack": "^5.93.0",
     "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1"
   },
   "dependencies": {
     "@ethereumjs/common": "^4.3.0",
@@ -43,8 +45,6 @@
     "elliptic": "^6.5.6",
     "glob": "^11.0.0",
     "js-sha3": "^0.9.3",
-    "process": "^0.11.10",
-    "tweetnacl": "^1.0.3",
-    "tweetnacl-util": "^0.15.1"
+    "process": "^0.11.10"
   }
 }

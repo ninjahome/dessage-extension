@@ -41,7 +41,7 @@ export function newWallet(mnemonic: string, password: string): DbWallet {
     const seedUint8Array: Uint8Array = new Uint8Array(first32Bytes);
     const key = new ProtocolKey(seedUint8Array);
     const data = encryptAes(hexPri, password);
-    const mulAddr = parseAddrFromKey(key.ecKey);
+    const mulAddr = parseAddrFromKey(key);
     return new DbWallet(uuid, mulAddr, data);
 }
 
@@ -49,6 +49,6 @@ export function castToMemWallet(pwd: string, wallet: DbWallet): MemWallet {
     const decryptedPri = decryptAes(wallet.cipherTxt, pwd);
     const priArray = hexStringToByteArray(decryptedPri);
     const key = new ProtocolKey(priArray);
-    const address = parseAddrFromKey(key.ecKey);
+    const address = parseAddrFromKey(key);
     return new MemWallet(address, key);
 }
