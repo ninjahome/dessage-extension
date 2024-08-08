@@ -1,8 +1,8 @@
 /// <reference lib="webworker" />
 import browser, {Runtime} from "webextension-polyfill";
-import {WalletStatus, MsgType} from './util';
+import {WalletStatus,loadLocalWallet, MsgType} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
-import {castToMemWallet, loadLocalWallet, DbWallet} from "./wallet";
+import {castToMemWallet, DbWallet} from "./dessage/wallet";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -186,7 +186,7 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
         const wallets: DbWallet[] = await loadLocalWallet();
         wallets.forEach(wallet => {
             const memWallet = castToMemWallet(pwd, wallet);
-            outerWallet.set(wallet.address, memWallet.address);
+            outerWallet.set(wallet.address.address, memWallet.address);
         });
         const obj = Object.fromEntries(outerWallet);
         await sessionSet(__key_wallet_status, WalletStatus.Unlocked);

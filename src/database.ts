@@ -1,6 +1,6 @@
 let __databaseObj: IDBDatabase | null = null;
 const __databaseName = 'dessage-database';
-const __currentDatabaseVersion = 9;
+export const __currentDatabaseVersion = 9;
 export const __tableNameWallet = '__table_wallet__';
 export const __tableSystemSetting = '__table_system_setting__';
 
@@ -124,7 +124,7 @@ function databaseGetByID(storeName: string, id: any): Promise<any> {
     });
 }
 
-function databaseUpdate(storeName: string, id: any, newData: any): Promise<string> {
+export function databaseUpdate(storeName: string, id: any, newData: any): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
             reject('Database is not initialized');
@@ -244,7 +244,7 @@ function databaseQueryByFilter(storeName: string, conditionFn: (value: any) => b
     });
 }
 
-function getMaxIdRecord(storeName: string): Promise<any> {
+export function getMaxIdRecord(storeName: string): Promise<any> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
             reject('Database is not initialized');

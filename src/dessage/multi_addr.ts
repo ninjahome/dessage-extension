@@ -7,6 +7,8 @@ import base58 from "bs58";
 import {keccak256} from "js-sha3";
 import {convertBits, hexStringToByteArray} from "./util";
 import {bech32} from "bech32";
+import nacl from "tweetnacl";
+import {ProtocolKey} from "./protocolKey";
 
 
 const NinjaAddrLen = 32;
@@ -67,7 +69,6 @@ function encodeKeysWithBech32(ecKey: EC.KeyPair): { publicKey: string, privateKe
     const privateKeyBN = ecKey.getPrivate();
 
     const privateKeyBytes = new Uint8Array(privateKeyBN.toArray('be', 32));
-
     const publicKeyBytes = hexStringToByteArray(publicKeyHex).slice(1);
 
     const publicWords = convertBits(publicKeyBytes, 8, 5);
@@ -82,20 +83,18 @@ function encodeKeysWithBech32(ecKey: EC.KeyPair): { publicKey: string, privateKe
     };
 }
 
-function getNinjaAddress(ninjaKey: EC.KeyPair): string {
-    const publicKeyArray = ninjaKey.getPublic(true, 'array');
-    const subAddr = new Uint8Array(NinjaAddrLen);
+function getNinjaAddress(dessageKey: nacl.BoxKeyPair): string {
+    const publicKeyArray = dessageKey.publicKey;
     const publicKeyUint8Array = new Uint8Array(publicKeyArray);
-    subAddr.set(publicKeyUint8Array.slice(0, NinjaAddrLen));
-    const encodedAddress = base58.encode(subAddr);
+    const encodedAddress = base58.encode(publicKeyUint8Array);
     return NinjaAddrPrefix + encodedAddress;
 }
 
-export function parseAddrFromKey(ecKey: EC.KeyPair): MultiAddress {
-    const address = getNinjaAddress(ecKey);
-    const btcAddr = generateBtcAddress(ecKey);
-    const ethAddr = generateEthAddress(ecKey);
-    const nostrKey = encodeKeysWithBech32(ecKey);
-    const btcTestAddr = generateBtcAddress(ecKey, true);
+export function parseAddrFromKey(key:ProtocolKey): MultiAddress {
+    const address = getNinjaAddress(key.dessageKey);
+    const btcAddr = generateBtcAddress(key.ecKey);
+    const ethAddr = generateEthAddress(key.ecKey);
+    const nostrKey = encodeKeysWithBech32(key.ecKey);
+    const btcTestAddr = generateBtcAddress(key.ecKey, true);
     return new MultiAddress(address, btcAddr, ethAddr, nostrKey.publicKey, btcTestAddr);
 }

@@ -1,4 +1,3 @@
-import {__tableNameWallet, databaseAddItem, databaseQueryAll} from "./database";
 import {mnemonicToSeedSync} from "bip39";
 import {ProtocolKey} from "./protocolKey";
 import {decryptAes, encryptAes,CipherData} from "./key_crypto";
@@ -26,24 +25,6 @@ export class MemWallet {
     }
 }
 
-export async function saveWallet(w: DbWallet): Promise<void> {
-    const result = await databaseAddItem(__tableNameWallet, w);
-    console.log("save wallet result=>", result);
-}
-
-export async function loadLocalWallet(): Promise<DbWallet[]> {
-    const wallets = await databaseQueryAll(__tableNameWallet);
-    if (!wallets) {
-        return [];
-    }
-    const walletObj: DbWallet[] = [];
-    for (const dbWallet of wallets) {
-        console.log("load wallet success:=>", dbWallet.address);
-        walletObj.push(dbWallet);
-    }
-    return walletObj;
-}
-
 function generateUUID(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c: string): string {
         const r = Math.random() * 16 | 0;
@@ -60,7 +41,7 @@ export function newWallet(mnemonic: string, password: string): DbWallet {
     const seedUint8Array: Uint8Array = new Uint8Array(first32Bytes);
     const key = new ProtocolKey(seedUint8Array);
     const data = encryptAes(hexPri, password);
-    const mulAddr = parseAddrFromKey(key.ecKey);
+    const mulAddr = parseAddrFromKey(key);
     return new DbWallet(uuid, mulAddr, data);
 }
 
@@ -68,6 +49,6 @@ export function castToMemWallet(pwd: string, wallet: DbWallet): MemWallet {
     const decryptedPri = decryptAes(wallet.cipherTxt, pwd);
     const priArray = hexStringToByteArray(decryptedPri);
     const key = new ProtocolKey(priArray);
-    const address = parseAddrFromKey(key.ecKey);
+    const address = parseAddrFromKey(key);
     return new MemWallet(address, key);
 }
