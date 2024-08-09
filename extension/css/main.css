@@ -6,10 +6,279 @@ body {
     overflow: hidden; /* 防止内容溢出 */
     display: flex;
     flex-direction: column;
+    background-color: rgba(224, 224, 224, 0.02);
+}
+
+h1 {
+    font-size: 22px;
+    margin: 0;
+    color: #1d2027;
+    margin-bottom: 8px;
+}
+
+h2 {
+    font-size: 24px;
+    margin: 0;
+    color: #1d2027;
+    text-align: left;
+
+}
+
+p {
+    font-size: 14px;
+    line-height: 20px;
+    color: #666;
+    text-align: left;
+    margin: 0;
+}
+
+a {
+    color:rgb(113 128 150);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+a:hover{
+    color: #5ba7fc;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 12px;
+    font-size: 14px;
+    margin: 0;
+}
+.login-container{
+    padding: 48px 24px;
 }
 .login-header {
+    width: 100%;
+    margin: 0 auto;
     display: flex;
+    flex-direction: column;
+    justify-content: center; /* 垂直居中对齐 */
+    text-align: center; /* 使文本居中对齐 */
+}
+
+.logo{
+    width: 72px;
+    margin: 0 auto;
+}
+.login-header p {
+    margin-top: 12px;
+}
+
+.login-body {
+    margin: 44px 0;
+}
+
+.login-body input[type="password"],
+.login-body input[type="text"]{
+    width: 100%;
+    padding: 16px 8px;
+    font-size: 16px;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    letter-spacing: 0.1em; /* Increase the spacing between characters */
+    margin: 12px 0;
+}
+.primary-button {
+    width: 100%;
+    padding: 18px 0;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #5ba7fc ;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.primary-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+.primary-button:hover{
+    background-color: rgba(91, 167, 252, 0.5);
 }
 .login-error {
     color: #f50505;
+}
+.login-footer p {
+    text-align: center ;
+}
+
+.tab-container {
+    display: flex;
+    justify-content: space-around;
+    align-content: center;
+    margin-bottom: 20px;
+    background-color: #5ba7fc;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 5px 5px 0 0;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.tab.active {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    border-bottom: 2px solid  #fff;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+.ninja-account-switch-area,
+.wallet-content-area {
+    padding: 8px 24px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.account-header {
+   background-color: #5ba7fc;
+    height: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+}
+
+.account-header p {
+    color: #ffffff;
+    font-size: 16px;
+    margin-left: 8px;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.dropdown-icon {
+    width: 24px;
+    height: 24px;
+    fill: #fff;
+}
+.balance{
+    font-size: 48px;
+    font-weight: 600;
+}
+
+.balanceUsd {
+    font-size: 16px;
+    font-weight: 300;
+}
+.plugin-setting {
+    background-color: transparent;
+    border: none;
+}
+.btnAll {
+    display: flex;
+    justify-content: space-around;
+    align-content: center;
+    margin-top: 44px;
+}
+.align-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.functionbtn {
+    width: 42px;
+    height: 42px;
+    background-color: #5ba7fc;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.functionbtn:hover{
+    background-color: rgba(91, 167, 252, 0.8);
+}
+.functionbtn img {
+    width: 42px;
+    height: 42px;
+}
+.dessage-token-operation span{
+    color: rgb(113 128 150);
+}
+
+.accountInfo {
+    width: 100%;
+    padding: 12px 8px;
+    font-size: 18px;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 32px;
+}
+
+.eth-accountInfo,
+.nostr-accountInfo,
+.btc-accountInfo {
+    padding: 12px 8px;
+    font-size: 18px;
+    border: 2px solid #ECEFF2;
+    background-color: #F5F7F8;
+    margin-bottom: 32px;
+    border-radius: 5px;
+}
+
+.account-address {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 12px;
+}
+
+.ninja-account-info img,
+.account-address img ,
+.btc-address img,
+.nostr-address img{
+    width: 58px;
+    height: 58px;
+    margin-right: 8px;
+}
+
+.ninja-account-info span,
+.account-address span{
+    font-size: 14px;
+    font-weight: normal;
+    color: #718096;
+    background-color: rgba(204, 204, 204, 0.3);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 5px;
+}
+
+.balance-unit{
+    font-size: 12px;
+    font-weight: normal;
+    color: #718096;
 }

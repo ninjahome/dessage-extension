@@ -8,18 +8,18 @@
 <body>
 <div class="login-container view" id="view-unlock-plugin">
     <div class="login-header">
-        <img src="file/logo_48.png" alt="Dessage Logo" class="logo">
+        <img src="file/logo_blue128.png" alt="Dessage Logo" class="logo">
         <h1>Welcome back!</h1>
-        <p>The decentralized web awaits</p>
+        <p style="text-align: center">The decentralized web awaits</p>
     </div>
     <div class="login-body">
         <form>
             <div class="input-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" name="password" required>
+                <h2 for="login-password">Password</h2>
+                <input type="password" id="login-password" name="password" required minlength="8" placeholder="********">
                 <br> <span class="login-error"></span>
             </div>
-            <button type="button" class="primary-button">Unlock</button>
+            <button type="button" class="primary-button" >Unlock</button>
         </form>
         <a href="#" class="forgot-password">Forgot password?</a>
     </div>
@@ -29,95 +29,176 @@
 </div>
 
 <div id="view-dashboard" class="main-dashboard view">
-    <div id="ninja-account-switch-area" class="ninja-account-switch-area">
-        <option value="" class="wallet-item" style="display: none" id="wallet-option-item"></option>
-
-        <select id="wallet-dropdown" class="wallet-dropdown">
-        </select>
+    <header class="account-header">
+        <div style="display: flex;justify-content: flex-start;align-items: center">
+            <img src="file/logo_128.png" style="width: 32px;height: 32px">
+            <p style="margin: 0">Account 01 </p>
+            <button class="dropdown-btn"> <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z"/>
+                </svg></button>
+        </div>
         <button class="plugin-setting"><img src="file/setting.png" alt="setting"></button>
-        <div id="ninja-account-area" class="ninja-account-area" style="background-color: #f0f0f0">
+    </header>
+    <div class="tab-container">
+        <div class="tab active" data-target="ninja-account-area">Dessage</div>
+        <div class="tab" data-target="wallet-content-area">ETH</div>
+        <div class="tab" data-target="btc-account-area">BTC</div>
+        <div class="tab" data-target="nostr-account-area">Nostr</div>
+    </div>
+
+    <div id="ninja-account-switch-area" class="ninja-account-switch-area" style="display: block">
+        <div style="display: none">
+            <option value="" class="wallet-item" style="display: none" id="wallet-option-item"></option>
+            <select id="wallet-dropdown" class="wallet-dropdown">
+            </select>
+        </div>
+        <div class="ninja-account-info accountInfo">
+            <img src="file/qr.png">
+            <span>0x87A4387A487A4487A4...c8649</span>
+        </div>
+
+        <div id="ninja-account-area" class="ninja-account-area">
             <div class="dessage-token-infos">
-                <span class="dessage-token-lbl">Dessage Area</span>
-                <br>
-                <span class="dessage-token-val">0.00</span> <span class="dessage-token-unit">DSG</span>
+                <span class="dessage-token-val balance">0.00</span> <span class="dessage-token-unit balance-unit">DSG</span>
             </div>
-            <div class="dessage-token-operation">
-                <button class="dessage-token-op-buy-sell">Buy/Sell</button>
-                <button class="dessage-token-op-send">Send</button>
-                <button class="dessage-token-op-swap">Swap</button>
-                <button class="dessage-token-op-im">Chat</button>
-                <button class="dessage-token-op-tweet">Tweets</button>
+            <div class="dessage-token-operation btnAll">
+                <div class="align-center">
+                    <button class="dessage-token-op-buy-sell functionbtn">
+                        <img src="file/buysell.png">
+                    </button>
+                    <span>Buy/Sell</span>
+                </div>
+                <div class="align-center">
+                    <button class="dessage-token-op-buy-send functionbtn">
+                        <img src="file/send.png">
+                    </button>
+                    <span>Send</span>
+                </div>
+                <div class="align-center">
+                    <button class="dessage-token-op-buy-swap functionbtn">
+                        <img src="file/swap.png">
+                    </button>
+                    <span>Swap</span>
+                </div>
+                <div class="align-center">
+                    <button class="dessage-token-op-buy-chat functionbtn">
+                        <img src="file/chat.png">
+                    </button>
+                    <span>Chat</span>
+                </div>
+                <div class="align-center">
+                    <button class="dessage-token-op-buy-chat functionbtn">
+                        <img src="file/tweets.png">
+                    </button>
+                    <span>Tweets</span>
+                </div>
             </div>
         </div>
     </div>
     <div id="wallet-content-area" class="wallet-content-area">
-
-        <hr class="wallet-content-splitter">
-
-        <div id="eth-account-area" class="eth-account-area" style="background-color: aqua">
-            <span class="eth-area-tittle">Ethereum Area</span>
-            <br>
-            <select id="eth-network-switch" class="eth-network-switch">
-                <option value="1" class="eth-network-item" id="eth-network-item-main">Ethereum Main</option>
-                <option value="2" class="eth-network-item" id="eth-network-item-linea-main">Linea Main</option>
-                <option value="3" class="eth-network-item" id="eth-network-item-arbitrum-one">Arbitrum One</option>
-                <option value="4" class="eth-network-item" id="eth-network-item-sepolia">Sepolia</option>
-                <option value="5" class="eth-network-item" id="eth-network-item-linea-sepolia">Linea Sepolia</option>
-            </select>
-
-            <div class="eth-address">
-                <span class="eth-address-val"></span>
-                <button class="eth-copy-btn">Copy</button>
-                <button class="eth-qr-btn">QR</button>
-            </div>
-            <div class="eth-balance-info">
-                <span class="eth-token-val">0.00</span> <span class="eth-token-unit">ETH</span>
-                <br>
-                <span class="eth-token-to-usdt">0.00</span> <span class="eth-token-to-usdt-unit">USD</span>
-            </div>
-            <div class="eth-operation">
-                <button class="eth-operation-send">Send</button>
-                <button class="eth-operation-erc20">ERC 20</button>
-                <button class="eth-op-more">More</button>
+        <div id="eth-account-area" class="eth-account-area" style="display: none">
+            <div class="eth-accountInfo ">
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                    <span class="eth-area-tittle">Ethereum Area</span>
+                    <select id="eth-network-switch" class="eth-network-switch">
+                        <option value="1" class="eth-network-item" id="eth-network-item-main">Ethereum Main</option>
+                        <option value="2" class="eth-network-item" id="eth-network-item-linea-main">Linea Main</option>
+                        <option value="3" class="eth-network-item" id="eth-network-item-arbitrum-one">Arbitrum One</option>
+                        <option value="4" class="eth-network-item" id="eth-network-item-sepolia">Sepolia</option>
+                        <option value="5" class="eth-network-item" id="eth-network-item-linea-sepolia">Linea Sepolia</option>
+                    </select>
+                </div>
+                <div class="eth-address account-address">
+                    <button class="eth-qr-btn">QR</button>
+                    <span class="eth-address-val"></span>
+                    <button class="eth-copy-btn">Copy</button>
+                </div>
             </div>
 
-        </div>
-
-        <hr class="wallet-content-splitter">
-        <div id="btc-account-area" class="btc-account-area" style="background-color: azure">
-            <span class="btc-area-tittle">BTC Area</span>
-            <br>
-            <select id="btc-network-switch" class="btc-network-switch">
-                <option value="1" class="btc-network-item" id="btc-network-item-main">main</option>
-                <option value="2" class="btc-network-item" id="btc-network-item-test">test</option>
-            </select>
-
-            <div class="btc-address">
-                <span class="btc-address-val"></span>
-                <button class="btc-copy-btn">Copy</button>
-                <button class="btc-qr-btn">QR</button>
-                <button class="btc-op-more">More</button>
-            </div>
-
-            <div class="btc-balance-info">
-                <span class="btc-token-val">0.00</span> <span class="btc-token-unit">BTC</span>
-                <br>
-                <span class="btc-token-to-usdt">0.00</span> <span class="btc-token-to-usdt-unit">USD</span>
-            </div>
-
-            <div class="btc-operation">
-                <button class="btc-operation-send">Send</button>
-                <button class="btc-operation-send">Receive</button>
-                <button class="btc-operation-brc20">BRC 20</button>
-                <button class="btc-operation-more">More</button>
+            <ul class="eth-balance-info balanceInfo">
+                <li>
+                    <span class="eth-token-val balance">0.00</span> <span class="eth-token-unit balance-unit">ETH</span>
+                </li>
+                <li>
+                    <span class="eth-token-to-usdt balanceUsd">0.00</span> <span class="eth-token-to-usdt-unit balance-unit ">USD</span>
+                </li>
+            </ul>
+            <div class="eth-operation btnAll">
+                <div class="align-center">
+                    <button class="eth-operation-send functionbtn">
+                        <img src="file/send.png">
+                    </button>
+                    <span>Send</span>
+                </div>
+                <div class="align-center">
+                    <button class="eth-operation-erc20 functionbtn">
+                        <img src="file/erc.png">
+                    </button>
+                    <span>ERC 20</span>
+                </div>
+                <div class="align-center">
+                    <button class="eth-op-more functionbtn">
+                        <img src="file/more.png">
+                    </button>
+                    <span>More</span>
+                </div>
             </div>
 
         </div>
+        <div id="btc-account-area" class="btc-account-area" style="display: none">
+            <div class="btc-accountInfo">
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                    <span class="btc-area-tittle">BTC Area</span>
+                    <select id="btc-network-switch" class="btc-network-switch">
+                        <option value="1" class="btc-network-item" id="btc-network-item-main">main</option>
+                        <option value="2" class="btc-network-item" id="btc-network-item-test">test</option>
+                    </select>
+                </div>
+                <div class="btc-address account-address">
+                    <button class="btc-qr-btn">QR</button>
+                    <span class="btc-address-val"></span>
+                    <button class="btc-copy-btn">Copy</button>
+                </div>
+            </div>
 
-        <hr class="wallet-content-splitter">
-        <div id="nostr-account-area" class="nostr-account-area" style="background-color: beige">
+            <div class="btc-balance-info balanceInfo">
+                <span class="btc-token-val balance">0.00</span> <span class="btc-token-unit">BTC</span>
+                <br>
+                <span class="btc-token-to-usdt balanceUsd">0.00</span> <span class="btc-token-to-usdt-unit balance-unit">USD</span>
+            </div>
+
+            <div class="btc-operation btnAll">
+                <div class="align-center">
+                    <button class="btc-operation-send functionbtn">
+                        <img src="file/send.png">
+                    </button>
+                    <span>Send</span>
+                </div>
+                <div class="align-center">
+                    <button class="eth-operation-receive functionbtn">
+                        <img src="file/buysell.png">
+                    </button>
+                    <span>Receive</span>
+                </div>
+                <div class="align-center">
+                    <button class="btc-operation-brc20 functionbtn">
+                        <img src="file/erc.png">
+                    </button>
+                    <span>BRC 20</span>
+                </div>
+                <div class="align-center">
+                    <button class="btc-operation-more functionbtn">
+                        <img src="file/more.png">
+                    </button>
+                    <span>More</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="nostr-account-area" class="nostr-account-area" style="display: none">
+            <div class="nostr-accountInfo">
+            <div style="display: flex; justify-content: space-between; align-items: center">
             <span class="nostr-area-tittle">Nostr Area</span>
-            <br>
             <select id="nostr-relay-switch" class="nostr-relay-switch">
                 <option value="wss://lightningrelay.com" class="nostr-relay-item">wss://lightningrelay.com</option>
                 <option value="wss://at.nostrworks.com" class="nostr-relay-item">wss://at.nostrworks.com</option>
@@ -127,16 +208,27 @@
                 <option value="wss://cache2.primal.net/v1" class="nostr-relay-item">wss://cache2.primal.net/v1</option>
                 <option value="wss://relay.nostr.nu" class="nostr-relay-item">wss://relay.nostr.nu</option>
             </select>
-
-            <div class="nostr-address">
+            </div>
+            <div class="nostr-address account-address">
+                <img class="nostr-qr-btn" src="file/qr.png" alt=" ">
                 <span class="nostr-address-val"></span>
-                <button class="nostr-copy-btn">Copy</button>
-                <button class="nostr-qr-btn">QR</button>
+            </div>
             </div>
 
-            <div class="nostr-operation">
-                <button class="nostr-op-show-private-password">Show Private Key</button>
-                <button class="nostr-op-more">More</button>
+            <div class="nostr-operation btnAll">
+                <div class="align-center">
+                    <button class="nostr-op-show-private-password functionbtn">
+                        <img src="file/key.png">
+                    </button>
+                    <span>Show Private Key</span>
+                </div>
+                <div class="align-center">
+                    <button class="nostr-op-more functionbtn">
+                        <img src="file/more.png">
+                    </button>
+                    <span>More</span>
+                </div>
+
             </div>
 
         </div>
@@ -144,5 +236,6 @@
     <div id="ninja-operation-area" class="ninja-operation-area"></div>
 </div>
 <script src="js/main.js"></script>
+
 </body>
 </html>
