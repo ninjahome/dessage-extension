@@ -239,6 +239,35 @@ ul {
     margin-bottom: 32px;
 }
 
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    height: 18px;
+    visibility: hidden;
+    background-color: black;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px 12px;
+    position: absolute;
+    top: -32px;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px; /* Adjust as needed */
+    opacity: 0;
+    transition: opacity 0.5s;
+    font-size: 12px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
 .eth-accountInfo,
 .nostr-accountInfo,
 .btc-accountInfo {
