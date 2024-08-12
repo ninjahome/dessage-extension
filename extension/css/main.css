@@ -136,15 +136,14 @@ ul {
     border-bottom: 2px solid  #fff;
 }
 
-.view {
+.wallet-content-area > div {
     display: none;
 }
-
-.view.active {
+.wallet-content-area > div.active {
     display: block;
 }
 
-.ninja-account-switch-area,
+
 .wallet-content-area {
     padding: 8px 24px;
     margin: 0 auto;
