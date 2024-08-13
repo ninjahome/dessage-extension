@@ -56,6 +56,20 @@ function initDashBoard(): void {
         });
     });
 
+
+    document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => {
+        tab.addEventListener('click', function(this: HTMLDivElement) {
+            document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll<HTMLDivElement>('.wallet-content-area > div').forEach(content => content.classList.remove('active'));
+
+            this.classList.add('active');
+            const targetId = this.dataset.target;
+            if (targetId) {
+                document.getElementById(targetId)?.classList.add('active');
+            }
+        });
+    });
+
 }
 
 function checkBackgroundStatus(): void {
