@@ -437,6 +437,11 @@ a:hover{
     border-radius: 5px;
 }
 
+.hidden-seed-phrase {
+    background-color: #333;
+    color: #333;
+}
+
 .recovery-phrase-row button {
     background: none;
     border: none;
