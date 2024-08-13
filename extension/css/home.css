@@ -262,13 +262,6 @@ a:hover{
     color: rgb(113 128 150);
     margin: 0;
 }
-
-.hidden-seed-phrase {
-    background-color: #333;
-    color: #333;
-    border-radius: 5px;
-}
-
 .recovery-phrase-container {
     display: flex;
     flex-wrap: wrap;

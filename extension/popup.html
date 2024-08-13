@@ -2,12 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello WebExtension</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle Hidden Seed Phrase</title>
+    <style>
+        .recovery-phrase-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between; /* 调整元素间的间距 */
+            border: 2px solid #ECEFF2;
+            background-color: #F5F7F8;
+            border-radius: 5px 5px 0 0;
+            padding: 6px 12px;
+            position: relative; /* 确保内容遮蔽覆盖在容器上 */
+        }
+
+        .hidden-seed-phrase {
+            background-color: rgba(51, 51, 51, 0.9); /* 半透明背景遮蔽 */
+            color: transparent; /* 透明文字颜色 */
+        }
+
+        .recovery-phrase-item {
+            width: calc(33.33% - 12px); /* 调整计算公式以适应间隔 */
+            padding: 12px;
+            margin: 6px 0;
+            box-sizing: border-box; /* 将内边距和边框计入宽度计算 */
+            text-align: left;
+            border: 2px solid #ECEFF2;
+            background-color: #F5F7F8;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-<h1>Hello World!</h1>
-<button id="generate-button">Generate Mnemonic</button> <!-- 添加按钮 -->
-<script src="js/popup.js"></script>
-<script src="js/wallet.js"></script>
+<div class="recovery-phrase-container hidden-seed-phrase" data-visible="false" id="recoveryPhrase">
+    <div class="recovery-phrase-item" id="recovery-phrase-item-template" style="display: none">
+        <span class="phrase-item-index">1</span>. <span class="phrase-item-value">example</span>
+    </div>
+</div>
+<button id="toggleButton">Toggle Visibility</button>
+
+<script>
+    const toggleButton = document.getElementById('toggleButton');
+    const recoveryPhrase = document.getElementById('recoveryPhrase');
+    const recoveryItemTemplate = document.getElementById('recovery-phrase-item-template');
+
+    // 模拟添加动态元素
+    const newItem = recoveryItemTemplate.cloneNode(true);
+    newItem.style.display = 'block';
+    newItem.querySelector('.phrase-item-value').textContent = 'dynamic content';
+    recoveryPhrase.appendChild(newItem);
+
+    toggleButton.addEventListener('click', () => {
+        recoveryPhrase.classList.toggle('hidden-seed-phrase');
+    });
+</script>
 </body>
 </html>
