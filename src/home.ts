@@ -409,11 +409,10 @@ function nextToConfirmPage() {
 function hideSeedDiv(this: HTMLElement): void {
     const recoveryPhraseContainer = document.querySelector('.recovery-phrase-container') as HTMLElement;
     const seedPhraseVisible = recoveryPhraseContainer.dataset.visible === 'true';
+    recoveryPhraseContainer.classList.toggle('hidden-seed-phrase');
     if (seedPhraseVisible) {
-        recoveryPhraseContainer.classList.add('hidden-seed-phrase');
         this.textContent = 'Reveal seed phrase';
     } else {
-        recoveryPhraseContainer.classList.remove('hidden-seed-phrase');
         this.textContent = 'Hide seed phrase';
     }
     recoveryPhraseContainer.dataset.visible = String(!seedPhraseVisible);

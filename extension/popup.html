@@ -17,8 +17,21 @@
         }
 
         .hidden-seed-phrase {
-            background-color: rgba(51, 51, 51, 0.9); /* 半透明背景遮蔽 */
-            color: transparent; /* 透明文字颜色 */
+            position: relative;
+        }
+        .hidden-seed-phrase::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            z-index: 1;
+        }
+        .hidden-seed-phrase * {
+            color: transparent;
+            background-color: transparent !important;
         }
 
         .recovery-phrase-item {

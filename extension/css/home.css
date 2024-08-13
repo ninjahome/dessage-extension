@@ -270,6 +270,7 @@ a:hover{
     background-color: #F5F7F8;
     border-radius: 5px 5px 0 0;
     padding: 6px 12px;
+    position: relative; /* 确保内容遮蔽覆盖在容器上 */
 }
 
 .recovery-phrase-item {
@@ -431,8 +432,21 @@ a:hover{
 }
 
 .hidden-seed-phrase {
+    position: relative;
+}
+.hidden-seed-phrase::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: #333;
-    color: #333;
+    z-index: 1;
+}
+.hidden-seed-phrase * {
+    color: transparent;
+    background-color: transparent !important;
 }
 
 .recovery-phrase-row button {
