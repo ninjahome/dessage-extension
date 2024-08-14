@@ -434,6 +434,7 @@ a:hover{
 .hidden-seed-phrase {
     position: relative;
 }
+
 .hidden-seed-phrase::after {
     content: "";
     position: absolute;
@@ -441,7 +442,9 @@ a:hover{
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #333;
+    background-color: #3b3c3e;
+    border-radius: 5px 5px 0 0;
+    border: 2px solid #718096;
     z-index: 1;
 }
 .hidden-seed-phrase * {
