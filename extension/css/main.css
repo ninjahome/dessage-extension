@@ -271,7 +271,8 @@ ul {
 .nostr-accountInfo,
 .btc-accountInfo {
     padding: 12px 8px;
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 400;
     border: 2px solid #ECEFF2;
     background-color: #F5F7F8;
     margin-bottom: 32px;
@@ -282,18 +283,28 @@ ul {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
-.ninja-account-info img,
-.account-address img ,
-.btc-address img,
-.nostr-address img{
-    width: 58px;
-    height: 58px;
-    margin-right: 8px;
+.qr-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 5px;
+    padding: 4px;
+    background-color: transparent;
+    background-size: contain; /* 确保背景图适应按钮 */
+    background-repeat: no-repeat; /* 确保背景图不重复 */
 }
-
+.qr-btn img {
+    width: 24px;
+    height: 24px;
+    z-index: 2;
+}
+.qr-btn :hover{
+    background-color: rgba(204, 204, 204, 0.3);
+}
 .ninja-account-info span,
 .account-address span{
     font-size: 14px;
