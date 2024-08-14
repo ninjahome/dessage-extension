@@ -288,7 +288,7 @@ function checkConfirmUserPhrase(this: HTMLInputElement): void {
     form.querySelectorAll(".hidden-word").forEach(div => {
         const element = div as HTMLElement;
         const input = element.querySelector(".recovery-input") as HTMLInputElement;
-        if (element.dataset.correctWord !== input.value) {
+        if (element.dataset.correctWord !== input.value.trim()) {
             confirmIsOk = false;
             if (input.value.length > 0) {
                 element.classList.add('error-message');
