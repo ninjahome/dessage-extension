@@ -1,8 +1,7 @@
 import {mnemonicToSeedSync} from "bip39";
-import {ProtocolKey} from "./protocolKey";
+import {MultiAddress, ProtocolKey} from "./protocolKey";
 import {decryptAes, encryptAes,CipherData} from "./key_crypto";
-import {hexStringToByteArray} from "./util";
-import {MultiAddress, parseAddrFromKey} from "./multi_addr";
+import {decodeHex} from "./util";
 
 export class DbWallet {
     uuid: string;
@@ -41,14 +40,14 @@ export function newWallet(mnemonic: string, password: string): DbWallet {
     const seedUint8Array: Uint8Array = new Uint8Array(first32Bytes);
     const key = new ProtocolKey(seedUint8Array);
     const data = encryptAes(hexPri, password);
-    const mulAddr = parseAddrFromKey(key);
+    const mulAddr = key.driveAddress();
     return new DbWallet(uuid, mulAddr, data);
 }
 
 export function castToMemWallet(pwd: string, wallet: DbWallet): MemWallet {
     const decryptedPri = decryptAes(wallet.cipherTxt, pwd);
-    const priArray = hexStringToByteArray(decryptedPri);
+    const priArray = decodeHex(decryptedPri);
     const key = new ProtocolKey(priArray);
-    const address = parseAddrFromKey(key);
+    const address = key.driveAddress();
     return new MemWallet(address, key);
 }

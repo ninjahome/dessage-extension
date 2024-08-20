@@ -4,6 +4,9 @@ import AES from "crypto-js/aes";
 import Utf8 from "crypto-js/enc-utf8";
 import WordArray from "crypto-js/lib-typedarrays";
 
+const CryptoKeySize = 8;
+const ScryptN = 1024;
+
 export class CipherData {
     cipherTxt: string;
     iv: string;

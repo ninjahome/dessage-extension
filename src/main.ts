@@ -1,7 +1,7 @@
 import {__currentDatabaseVersion, __tableSystemSetting, databaseUpdate, getMaxIdRecord, initDatabase} from "./database";
 import browser from "webextension-polyfill";
 import {MsgType, showView, WalletStatus} from './common';
-import {MultiAddress} from "./dessage/multi_addr";
+import {MultiAddress} from "./dessage/protocolKey";
 
 class SysSetting {
     id: number;
