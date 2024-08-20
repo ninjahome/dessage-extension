@@ -80,7 +80,7 @@
                         <span class="ninja-address-val address-val">0x87A4387A487A4487A487A48...c8649</span>
                         <span class="tooltiptext">Copy to Clipboard</span>
                     </div>
-                    <button class="qr-btn">
+                    <button class="qr-btn" id="ninja-address-qr-btn">
                         <img src="file/qr.png" alt="QR Image Test">
                     </button>
                 </div>
@@ -142,7 +142,7 @@
                         <span class="eth-address-val address-val"></span>
                         <span class="tooltiptext">Copy to Clipboard</span>
                     </div>
-                    <button class="qr-btn">
+                    <button class="qr-btn" id="eth-address-qr-btn">
                         <img src="file/qr.png" alt="QR Image Test">
                     </button>
                 </div>
@@ -192,7 +192,7 @@
                         <span class="btc-address-val address-val"></span>
                         <span class="tooltiptext">Copy to Clipboard</span>
                     </div>
-                    <button class="qr-btn">
+                    <button class="qr-btn" id="btc-address-qr-btn">
                         <img src="file/qr.png" alt="QR Image Test">
                     </button>
                 </div>
@@ -253,7 +253,7 @@
                         <span class="nostr-address-val address-val"></span>
                         <span class="tooltiptext">Copy to Clipboard</span>
                     </div>
-                    <button class="qr-btn">
+                    <button class="qr-btn" id="nostr-address-qr-btn">
                         <img src="file/qr.png" alt="QR Image Test">
                     </button>
                 </div>
@@ -275,8 +275,13 @@
         </div>
     </div>
     <div id="ninja-operation-area" class="ninja-operation-area"></div>
-
 </div>
+
+<div class="qr-code-image-div" id="qr-code-image-div" style="display: none">
+    <button class="qr-code-image-close" id="qr-code-image-close">close</button>
+    <img src="" alt="qr-code-image" class="qr-code-image">
+</div>
+
 <script src="js/main.js"></script>
 </body>
 </html>

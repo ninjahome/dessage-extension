@@ -1,4 +1,5 @@
 import {DbWallet} from "./dessage/wallet";
+import * as QRCode from 'qrcode';
 import {__tableNameWallet, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
 
 export enum WalletStatus {
@@ -53,4 +54,16 @@ export async function loadLocalWallet(): Promise<DbWallet[]> {
         walletObj.push(dbWallet);
     }
     return walletObj;
+}
+
+
+export async function createQRCodeImg(data: string) {
+    try {
+        const url = await QRCode.toDataURL(data, {errorCorrectionLevel: 'H'});
+        console.log('Generated QR Code:', url);
+        return url;
+    } catch (error) {
+        console.error('Error generating QR Code:', error);
+        return null
+    }
 }
