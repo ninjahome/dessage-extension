@@ -126,6 +126,18 @@ function checkBackgroundStatus(): void {
 
 function populateDashboard() {
     setAccountSwitchArea();
+    setupAllAccountArea()
+}
+
+function setupAllAccountArea(){
+    const wallet = __walletMap.get(__systemSetting.address);
+    if (!wallet) {
+        return;
+    }
+
+    const nameDiv = document.getElementById("account-info-name") as HTMLElement;
+    nameDiv.innerText = wallet.name ?? "Account";
+
     setupNinjaDetail();
     setupEtherArea();
     setupBtcArea();
@@ -157,6 +169,11 @@ function setAccountSwitchArea(): void {
             __systemSetting.address = addr;
             __systemSetting.syncToDB().then();
         }
+
+        if (selAddress == addr){
+            itemDiv.classList.add("active");
+        }
+
     });
 }
 
@@ -262,16 +279,19 @@ function importAccount() {
 }
 
 async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: MultiAddress) {
+    if(__systemSetting.address === wallet.address){
+        console.log("------>>> no need to change ", __systemSetting.address);
+        return;
+    }
+
     const allItemDiv = parentDiv.querySelectorAll(".account-detail-item") as NodeListOf<HTMLElement>;
     allItemDiv.forEach(itemDiv => {
         itemDiv.classList.remove("active");
     });
     itemDiv.classList.add("active");
-    const nameDiv = document.createElement("account-info-name") as HTMLElement;
-    nameDiv.innerText = wallet.name ?? "Account";
-
     await __systemSetting.changeAddr(wallet.address);
     notifyBackgroundActiveWallet(__systemSetting.address);
+    setupAllAccountArea()
 }
 
 function initDessageArea() {
