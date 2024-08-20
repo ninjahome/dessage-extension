@@ -26,8 +26,6 @@ export function convertBits(data: Uint8Array, fromBits: number, toBits: number, 
     return new Uint8Array(result);
 }
 
-
-
 export function encodeHex(array: Uint8Array): string {
     return Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
 }

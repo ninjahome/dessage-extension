@@ -157,9 +157,8 @@ function setRecoverPhaseTips(isValid: boolean, errMsg: string): void {
     errorMessage.innerText = errMsg;
 }
 
-
 function validateRecoveryPhrase(this: HTMLInputElement): void {
-    const wordsArray = this.value.split(' ');
+    const wordsArray = this.value.trim().split(/\s+/).filter(word => word.length > 0);
     let errMsg = '';
     let everyWordIsOk = true;
     const inputs = document.querySelectorAll<HTMLInputElement>("#recovery-phrase-inputs .recovery-phrase");
@@ -178,11 +177,11 @@ function validateRecoveryPhrase(this: HTMLInputElement): void {
                 return;
             }
 
-            const wordIsOk = wordlist.includes(input.value);
+            const wordIsOk = wordlist.includes(input.value.trim());
             if (!wordIsOk) {
                 everyWordIsOk = false;
             }
-            inputValues.push(input.value);
+            inputValues.push(input.value.trim());
         });
 
         if (!everyWordIsOk) {
@@ -361,8 +360,8 @@ function checkImportPassword(this: HTMLInputElement): void {
 }
 
 function showPassword(this: HTMLElement): void {
-    const form = this.closest('form') as HTMLFormElement;
-    form.querySelectorAll("input").forEach(input => {
+    const parentDiv = this.closest('div') as HTMLElement;
+    parentDiv.querySelectorAll("input").forEach(input => {
         if (input.type === 'password' || input.type === 'text') {
             input.type = input.type === 'password' ? 'text' : 'password';
         }
@@ -453,7 +452,7 @@ function confirmImportedWallet(): void {
     const inputValues: string[] = [];
 
     inputs.forEach(input => {
-        inputValues.push(input.value);
+        inputValues.push(input.value.trim());
     });
 
     const mnemonic = inputValues.join(' ');

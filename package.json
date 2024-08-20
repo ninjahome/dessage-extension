@@ -1,6 +1,6 @@
 {
   "name": "Dessage-webextension",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A simple browser extension that supports Ninja Protocol.",
   "scripts": {
     "build:dec": "node build.js",

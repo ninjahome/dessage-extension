@@ -1,6 +1,6 @@
 let __databaseObj: IDBDatabase | null = null;
 const __databaseName = 'dessage-database';
-export const __currentDatabaseVersion = 9;
+export const __currentDatabaseVersion = 14;
 export const __tableNameWallet = '__table_wallet__';
 export const __tableSystemSetting = '__table_system_setting__';
 
@@ -9,27 +9,27 @@ export function initDatabase(): Promise<IDBDatabase> {
         const request = indexedDB.open(__databaseName, __currentDatabaseVersion);
 
         request.onerror = function (event: Event) {
-            console.error("Database open failed:", (event.target as IDBOpenDBRequest).error);
+            console.error("[Database] open failed:", (event.target as IDBOpenDBRequest).error);
             reject((event.target as IDBOpenDBRequest).error);
         };
 
         request.onsuccess = function (event: Event) {
             __databaseObj = (event.target as IDBOpenDBRequest).result;
-            console.log("Database open success, version=", __databaseObj.version);
+            console.log("[Database] open success, version=", __databaseObj.version);
             resolve(__databaseObj);
         };
 
         request.onupgradeneeded = function (event: IDBVersionChangeEvent) {
             const db = (event.target as IDBOpenDBRequest).result;
             if (!db.objectStoreNames.contains(__tableNameWallet)) {
-                const objectStore = db.createObjectStore(__tableNameWallet, {keyPath: 'uuid'});
-                // objectStore.createIndex("uuid", "uuid", { unique: true });
-                console.log("Created wallet table successfully.");
+                const objectStore = db.createObjectStore(__tableNameWallet, { keyPath: 'id', autoIncrement: true });
+                objectStore.createIndex("uuid", "uuid", {unique: true});
+                console.log("[Database] Created wallet table successfully.");
             }
 
             if (!db.objectStoreNames.contains(__tableSystemSetting)) {
                 const objectStore = db.createObjectStore(__tableSystemSetting, {keyPath: 'id'});
-                console.log("Created wallet setting table successfully.");
+                console.log("[Database] Created wallet setting table successfully.");
             }
         };
     });
@@ -38,7 +38,7 @@ export function initDatabase(): Promise<IDBDatabase> {
 export function closeDatabase() {
     if (__databaseObj) {
         __databaseObj.close();
-        console.log("Database connection closed.");
+        console.log("[Database]  connection closed.");
         __databaseObj = null;
     }
 }
@@ -46,7 +46,7 @@ export function closeDatabase() {
 export function databaseAddItem(storeName: string, data: any): Promise<IDBValidKey> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database]  is not initialized');
             return;
         }
 
@@ -72,7 +72,7 @@ function databaseGetByIndex(storeName: string, idx: string, idxVal: any): Promis
     return new Promise((resolve, reject) => {
         try {
             if (!__databaseObj) {
-                reject('Database is not initialized');
+                reject('[Database]  is not initialized');
                 return;
             }
             const transaction = __databaseObj.transaction([storeName], 'readonly');
@@ -101,7 +101,7 @@ function databaseGetByIndex(storeName: string, idx: string, idxVal: any): Promis
 function databaseGetByID(storeName: string, id: any): Promise<any> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database]  is not initialized');
             return;
         }
         const transaction = __databaseObj.transaction([storeName], 'readonly');
@@ -127,7 +127,7 @@ function databaseGetByID(storeName: string, id: any): Promise<any> {
 export function databaseUpdate(storeName: string, id: any, newData: any): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database] is not initialized');
             return;
         }
         const transaction = __databaseObj.transaction([storeName], 'readwrite');
@@ -148,7 +148,7 @@ export function databaseUpdate(storeName: string, id: any, newData: any): Promis
 function databaseDelete(storeName: string, id: any): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database]  is not initialized');
             return;
         }
         const transaction = __databaseObj.transaction([storeName], 'readwrite');
@@ -168,7 +168,7 @@ function databaseDelete(storeName: string, id: any): Promise<string> {
 function databaseDeleteByFilter(storeName: string, conditionFn: (value: any) => boolean): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database]  is not initialized');
             return;
         }
         const transaction = __databaseObj.transaction([storeName], 'readwrite');
@@ -196,7 +196,7 @@ function databaseDeleteByFilter(storeName: string, conditionFn: (value: any) => 
 export function databaseQueryAll(storeName: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database]  is not initialized');
             return;
         }
         const transaction = __databaseObj.transaction([storeName], 'readonly');
@@ -217,7 +217,7 @@ export function databaseQueryAll(storeName: string): Promise<any[]> {
 function databaseQueryByFilter(storeName: string, conditionFn: (value: any) => boolean): Promise<any[]> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database]  is not initialized');
             return;
         }
         const transaction = __databaseObj.transaction([storeName], 'readonly');
@@ -247,7 +247,7 @@ function databaseQueryByFilter(storeName: string, conditionFn: (value: any) => b
 export function getMaxIdRecord(storeName: string): Promise<any> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
-            reject('Database is not initialized');
+            reject('[Database]  is not initialized');
             return;
         }
         const transaction = __databaseObj.transaction([storeName], 'readonly');

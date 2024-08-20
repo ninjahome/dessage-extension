@@ -1,5 +1,5 @@
 import {DbWallet} from "./dessage/wallet";
-import {__tableNameWallet, databaseAddItem, databaseQueryAll} from "./database";
+import {__tableNameWallet, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
 
 export enum WalletStatus {
     Init = 'Init',
@@ -32,8 +32,14 @@ export function showView(hash: string, callback: (hash: string) => void): void {
 
 
 export async function saveWallet(w: DbWallet): Promise<void> {
-    const result = await databaseAddItem(__tableNameWallet, w);
-    console.log("save wallet result=>", result);
+    try {
+        const result = await databaseAddItem(__tableNameWallet, w);
+        console.log("save wallet result=>", result, w.uuid);
+        w.updateName(result as string);
+        await databaseUpdate(__tableNameWallet, result, w);
+    } catch (error) {
+        console.error("Error saving wallet:", error);
+    }
 }
 
 export async function loadLocalWallet(): Promise<DbWallet[]> {
