@@ -246,7 +246,7 @@ function commonAddrAndCode(valElmId: string, qrBtnId: string) {
     const area = document.getElementById(valElmId) as HTMLElement;
     const addrVal = area.querySelector(".address-val") as HTMLElement;
     const address = addrVal.innerText;
-    area.addEventListener("click", async () => {
+    addrVal.addEventListener("click", async () => {
         navigator.clipboard.writeText(address).then(() => {
             alert("copy success");
         });
