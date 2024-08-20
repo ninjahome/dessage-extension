@@ -56,5 +56,6 @@ export function castToMemWallet(pwd: string, wallet: DbWallet): MemWallet {
     const priArray = decodeHex(decryptedPri);
     const key = new ProtocolKey(priArray);
     const address = key.driveAddress();
+    address.name = wallet.name;
     return new MemWallet(address, key);
 }
