@@ -227,7 +227,7 @@ function setupBtcArea(): void {
     const btcAddressVal = btcArea.querySelector(".address-val") as HTMLElement;
     btcAddressVal.textContent = wallet.btcAddr;
 
-    commonAddrAndCode("eth-account-area", "btc-address-qr-btn");
+    commonAddrAndCode("btc-account-area", "btc-address-qr-btn");
 }
 
 function setupNostr(): void {
@@ -239,7 +239,7 @@ function setupNostr(): void {
     const nostrAddressVal = nostrArea.querySelector(".address-val") as HTMLElement;
     nostrAddressVal.textContent = wallet.nostrAddr;
 
-    commonAddrAndCode("eth-account-area", "nostr-address-qr-btn");
+    commonAddrAndCode("nostr-account-area", "nostr-address-qr-btn");
 }
 
 function commonAddrAndCode(valElmId: string, qrBtnId: string) {
