@@ -35,7 +35,10 @@ async function initDessagePlugin(): Promise<void> {
     checkBackgroundStatus();
     initLoginDiv();
     initDashBoard();
-
+    initDessageArea();
+    initEthArea();
+    initBtcArea();
+    initNostrArea();
 }
 
 async function loadLastSystemSetting(): Promise<void> {
@@ -123,22 +126,23 @@ function checkBackgroundStatus(): void {
 
 function populateDashboard() {
     setAccountSwitchArea();
-    setupWalletArea(__systemSetting.address).then();
+    setupNinjaDetail();
+    setupEtherArea();
+    setupBtcArea();
+    setupNostr();
 }
 
 function setAccountSwitchArea(): void {
-
     const parentDiv = document.getElementById("account-list-content") as HTMLElement;
     parentDiv.innerHTML = '';
     const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
     let selAddress = __systemSetting.address;
 
     __walletMap.forEach((wallet, addr) => {
-
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
         itemDiv.addEventListener("click", async () => {
-            changeSelectedAccount(parentDiv, itemDiv, wallet);
+            await changeSelectedAccount(parentDiv, itemDiv, wallet);
         })
 
         const nameDiv = itemDiv.querySelector(".account-detail-name") as HTMLElement;
@@ -154,20 +158,6 @@ function setAccountSwitchArea(): void {
             __systemSetting.syncToDB().then();
         }
     });
-}
-
-async function setupWalletArea(addr: string): Promise<void> {
-    await __systemSetting.changeAddr(addr);
-    notifyBackgroundActiveWallet(__systemSetting.address);
-    const wallet = __walletMap.get(addr);
-    if (!wallet) {
-        console.error('No such addr');
-        return;
-    }
-    setupNinjaDetail(wallet);
-    setupEtherArea(wallet);
-    setupBtcArea(wallet);
-    setupNostr(wallet);
 }
 
 function notifyBackgroundActiveWallet(address: string): void {
@@ -186,31 +176,49 @@ function notifyBackgroundActiveWallet(address: string): void {
     });
 }
 
-function setupNinjaDetail(wallet: MultiAddress): void {
-    // 实现细节
+function setupNinjaDetail(): void {
+    const wallet = __walletMap.get(__systemSetting.address);
+    if (!wallet) {
+        return;
+    }
+    const ninjaArea = document.getElementById("ninja-account-area") as HTMLElement;
+    const ninjaAddrDiv = ninjaArea.querySelector(".ninja-address-val") as HTMLElement;
+    ninjaAddrDiv.innerText = wallet.address;
 }
 
-function setupEtherArea(mulAddr: MultiAddress): void {
+function setupEtherArea(): void {
+    const wallet = __walletMap.get(__systemSetting.address);
+    if (!wallet) {
+        return;
+    }
     const ethArea = document.getElementById("eth-account-area") as HTMLElement;
     const ethAddressVal = ethArea.querySelector(".eth-address-val") as HTMLElement;
-    if (ethAddressVal) {
-        ethAddressVal.textContent = mulAddr.ethAddr;
-    }
+    ethAddressVal.textContent = wallet.ethAddr;
 }
 
-function setupBtcArea(mulAddr: MultiAddress): void {
+function setupBtcArea(): void {
+
+    const wallet = __walletMap.get(__systemSetting.address);
+    if (!wallet) {
+        return;
+    }
+
     const btcArea = document.getElementById("btc-account-area") as HTMLElement;
     const btcAddressVal = btcArea.querySelector(".btc-address-val") as HTMLElement;
     if (btcAddressVal) {
-        btcAddressVal.textContent = mulAddr.btcAddr;
+        btcAddressVal.textContent = wallet.btcAddr;
     }
 }
 
-function setupNostr(mulAddr: MultiAddress): void {
+function setupNostr(): void {
+    const wallet = __walletMap.get(__systemSetting.address);
+    if (!wallet) {
+        return;
+    }
     const nostrArea = document.getElementById("nostr-account-area") as HTMLElement;
     const nostrAddressVal = nostrArea.querySelector(".nostr-address-val") as HTMLElement;
     if (nostrAddressVal) {
-        nostrAddressVal.textContent = mulAddr.nostrAddr;
+        nostrAddressVal.textContent = wallet.nostrAddr;
     }
 }
 
@@ -253,7 +261,7 @@ function newAccount() {
 function importAccount() {
 }
 
-function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: MultiAddress) {
+async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: MultiAddress) {
     const allItemDiv = parentDiv.querySelectorAll(".account-detail-item") as NodeListOf<HTMLElement>;
     allItemDiv.forEach(itemDiv => {
         itemDiv.classList.remove("active");
@@ -261,4 +269,23 @@ function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wal
     itemDiv.classList.add("active");
     const nameDiv = document.createElement("account-info-name") as HTMLElement;
     nameDiv.innerText = wallet.name ?? "Account";
+
+    await __systemSetting.changeAddr(wallet.address);
+    notifyBackgroundActiveWallet(__systemSetting.address);
+}
+
+function initDessageArea() {
+
+}
+
+function initEthArea() {
+
+}
+
+function initBtcArea() {
+
+}
+
+function initNostrArea() {
+
 }
