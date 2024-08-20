@@ -18,6 +18,7 @@ export class MultiAddress {
     ethAddr: string;
     nostrAddr: string;
     testBtcAddr: string;
+    name?:string;
 
     constructor(address: string, btcAddr: string, ethAddr: string, nostrAddr: string, testBtcAddr: string) {
         this.address = address;

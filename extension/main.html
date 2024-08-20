@@ -16,10 +16,11 @@
         <form>
             <div class="input-group">
                 <h2 for="login-password">Password</h2>
-                <input type="password" id="login-password" name="password" required minlength="8" placeholder="********">
+                <input type="password" id="login-password" name="password" required minlength="8"
+                       placeholder="********">
                 <br> <span class="login-error"></span>
             </div>
-            <button type="button" class="primary-button" >Unlock</button>
+            <button type="button" class="primary-button">Unlock</button>
         </form>
         <a href="#" class="forgot-password">Forgot password?</a>
     </div>
@@ -31,11 +32,36 @@
 <div id="view-dashboard" class="main-dashboard view">
     <header class="account-header">
         <div style="display: flex;justify-content: flex-start;align-items: center">
-            <img src="file/logo_128.png" style="width: 32px;height: 32px" alt="logo of dessage">
-            <p style="margin: 0">Account 01 </p>
-            <button class="dropdown-btn"> <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <div id="account-info-in-header" class="account-info-in-header">
+                <img src="file/logo_128.png" style="width: 32px;height: 32px" alt="logo of dessage">
+                <p style="margin: 0" id="account-info-name">Account 01 </p>
+            </div>
+
+            <div class="account-list-area" id="account-list-area" style="display: none">
+                <div>
+                    <span class="account-list-header-title">Select an account</span>
+                    <span class="account-list-header-btn">Close</span>
+                </div>
+                <div>
+                    <li class="account-detail-item" id="account-detail-item-template">
+                        <div>
+                            <span class="account-detail-name"></span>
+                            <span class="account-detail-address"></span>
+                        </div>
+                    </li>
+                    <ul class="account-list-content" id="account-list-content"></ul>
+                </div>
+                <div>
+                    <span class="account-list-new-account">Add New Account</span>
+                    <span class="account-list-import-account">Add New Account</span>
+                </div>
+            </div>
+
+            <button class="dropdown-btn" id="account-list-drop-down-btn">
+                <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M7 10l5 5 5-5z"/>
-                </svg></button>
+                </svg>
+            </button>
         </div>
         <button class="plugin-setting"><img src="file/setting.png" alt="setting"></button>
     </header>
@@ -49,10 +75,6 @@
     <div id="wallet-content-area" class="wallet-content-area">
         <div id="ninja-account-area" class="ninja-account-area active">
             <div class="ninja-account-switch-area">
-                <div style="display: none">
-                    <option value="" class="wallet-item" style="display: none" id="wallet-option-item"></option>
-                    <select id="wallet-dropdown" class="wallet-dropdown"></select>
-                </div>
                 <div class="ninja-account-info accountInfo">
                     <div class="tooltip">
                         <span class="ninja-address-val">0x87A4387A487A4487A487A48...c8649</span>
@@ -107,9 +129,11 @@
                     <select id="eth-network-switch" class="eth-network-switch">
                         <option value="1" class="eth-network-item" id="eth-network-item-main">Ethereum Main</option>
                         <option value="2" class="eth-network-item" id="eth-network-item-linea-main">Linea Main</option>
-                        <option value="3" class="eth-network-item" id="eth-network-item-arbitrum-one">Arbitrum One</option>
+                        <option value="3" class="eth-network-item" id="eth-network-item-arbitrum-one">Arbitrum One
+                        </option>
                         <option value="4" class="eth-network-item" id="eth-network-item-sepolia">Sepolia</option>
-                        <option value="5" class="eth-network-item" id="eth-network-item-linea-sepolia">Linea Sepolia</option>
+                        <option value="5" class="eth-network-item" id="eth-network-item-linea-sepolia">Linea Sepolia
+                        </option>
                     </select>
                 </div>
                 <div class="eth-address account-address">
@@ -127,7 +151,8 @@
                     <span class="eth-token-val balance">0.00</span> <span class="eth-token-unit balance-unit">ETH</span>
                 </li>
                 <li>
-                    <span class="eth-token-to-usdt balanceUsd">0.00</span> <span class="eth-token-to-usdt-unit balance-unit ">USD</span>
+                    <span class="eth-token-to-usdt balanceUsd">0.00</span> <span
+                        class="eth-token-to-usdt-unit balance-unit ">USD</span>
                 </li>
             </ul>
             <div class="eth-operation btnAll">
@@ -174,7 +199,8 @@
             <div class="btc-balance-info balanceInfo">
                 <span class="btc-token-val balance">0.00</span> <span class="btc-token-unit">BTC</span>
                 <br>
-                <span class="btc-token-to-usdt balanceUsd">0.00</span> <span class="btc-token-to-usdt-unit balance-unit">USD</span>
+                <span class="btc-token-to-usdt balanceUsd">0.00</span> <span
+                    class="btc-token-to-usdt-unit balance-unit">USD</span>
             </div>
             <div class="btc-operation btnAll">
                 <div class="align-center">
@@ -209,12 +235,15 @@
                 <div style="display: flex; justify-content: space-between; align-items: center">
                     <span class="nostr-area-tittle">Nostr Area</span>
                     <select id="nostr-relay-switch" class="nostr-relay-switch">
-                        <option value="wss://lightningrelay.com" class="nostr-relay-item">wss://lightningrelay.com</option>
-                        <option value="wss://at.nostrworks.com" class="nostr-relay-item">wss://at.nostrworks.com</option>
+                        <option value="wss://lightningrelay.com" class="nostr-relay-item">wss://lightningrelay.com
+                        </option>
+                        <option value="wss://at.nostrworks.com" class="nostr-relay-item">wss://at.nostrworks.com
+                        </option>
                         <option value="wss://btc.klendazu.com" class="nostr-relay-item">wss://btc.klendazu.com</option>
                         <option value="wss://relay.damus.io" class="nostr-relay-item">wss://relay.damus.io</option>
                         <option value="wss://bitcoiner.social" class="nostr-relay-item">wss://bitcoiner.social</option>
-                        <option value="wss://cache2.primal.net/v1" class="nostr-relay-item">wss://cache2.primal.net/v1</option>
+                        <option value="wss://cache2.primal.net/v1" class="nostr-relay-item">wss://cache2.primal.net/v1
+                        </option>
                         <option value="wss://relay.nostr.nu" class="nostr-relay-item">wss://relay.nostr.nu</option>
                     </select>
                 </div>

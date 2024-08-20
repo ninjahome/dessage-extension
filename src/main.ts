@@ -35,6 +35,7 @@ async function initDessagePlugin(): Promise<void> {
     checkBackgroundStatus();
     initLoginDiv();
     initDashBoard();
+
 }
 
 async function loadLastSystemSetting(): Promise<void> {
@@ -47,18 +48,30 @@ async function loadLastSystemSetting(): Promise<void> {
 }
 
 function initDashBoard(): void {
-    const selectElement = document.getElementById("wallet-dropdown") as HTMLSelectElement;
-    selectElement.addEventListener('change', function (event: Event) {
-        const target = event.target as HTMLSelectElement;
-        const selectedValue = target.value;
-        console.log('------>>>selected value:', selectedValue);
-        setupWalletArea(selectedValue).then(() => {
-        });
+
+    const accountListDiv = document.getElementById("account-list-area") as HTMLDivElement;
+
+    const accountListDropDownBtn = document.getElementById("account-list-drop-down-btn") as HTMLButtonElement;
+    accountListDropDownBtn.addEventListener("click", async () => {
+        accountListDiv.style.display = "block";
     });
 
+    const listCloseBtn = accountListDiv.querySelector(".account-list-header-btn") as HTMLButtonElement;
+    listCloseBtn.addEventListener("click", async () => {
+        accountListDiv.style.display = "none";
+    })
+
+    const newAccBtn = accountListDiv.querySelector(".account-list-new-account") as HTMLButtonElement;
+    const importAccBtn = accountListDiv.querySelector(".account-list-import-account") as HTMLButtonElement;
+    newAccBtn.addEventListener("click", async () => {
+        newAccount();
+    });
+    importAccBtn.addEventListener("click", async () => {
+        importAccount();
+    });
 
     document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => {
-        tab.addEventListener('click', function(this: HTMLDivElement) {
+        tab.addEventListener('click', function (this: HTMLDivElement) {
             document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll<HTMLDivElement>('.wallet-content-area > div').forEach(content => content.classList.remove('active'));
 
@@ -69,7 +82,6 @@ function initDashBoard(): void {
             }
         });
     });
-
 }
 
 function checkBackgroundStatus(): void {
@@ -111,34 +123,37 @@ function checkBackgroundStatus(): void {
 
 function populateDashboard() {
     setAccountSwitchArea();
-    setupWalletArea(__systemSetting.address).then(() => {
-    });
+    setupWalletArea(__systemSetting.address).then();
 }
 
 function setAccountSwitchArea(): void {
-    const selectElement = document.getElementById("wallet-dropdown") as HTMLSelectElement;
-    selectElement.innerHTML = '';
-    const optionTemplate = document.getElementById("wallet-option-item") as HTMLOptionElement;
+
+    const parentDiv = document.getElementById("account-list-content") as HTMLElement;
+    parentDiv.innerHTML = '';
+    const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
+    let selAddress = __systemSetting.address;
 
     __walletMap.forEach((wallet, addr) => {
-        const optionDiv = optionTemplate.cloneNode(true) as HTMLOptionElement;
-        optionDiv.style.display = 'block';
-        optionDiv.value = wallet.address;
-        optionDiv.textContent = wallet.address;
-        selectElement.appendChild(optionDiv);
-    });
 
-    if (__systemSetting) {
-        const selAddr = __systemSetting.address;
-        if (selAddr) {
-            selectElement.value = selAddr;
-        } else {
-            selectElement.selectedIndex = 0;
-            __systemSetting.address = selectElement.value;
-            __systemSetting.syncToDB().then(() => {
-            });
+        const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
+        itemDiv.style.display = 'block';
+        itemDiv.addEventListener("click", async () => {
+            changeSelectedAccount(parentDiv, itemDiv, wallet);
+        })
+
+        const nameDiv = itemDiv.querySelector(".account-detail-name") as HTMLElement;
+        const addressDiv = itemDiv.querySelector(".account-detail-address") as HTMLElement;
+        nameDiv.textContent = wallet.name ?? "Account";
+        addressDiv.textContent = addr;
+
+        parentDiv.appendChild(itemDiv);
+
+        if (!selAddress) {
+            selAddress = addr;
+            __systemSetting.address = addr;
+            __systemSetting.syncToDB().then();
         }
-    }
+    });
 }
 
 async function setupWalletArea(addr: string): Promise<void> {
@@ -230,4 +245,20 @@ function openAllWallets(): void {
     }).catch(error => {
         console.error('Error sending message:', error);
     });
+}
+
+function newAccount() {
+}
+
+function importAccount() {
+}
+
+function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: MultiAddress) {
+    const allItemDiv = parentDiv.querySelectorAll(".account-detail-item") as NodeListOf<HTMLElement>;
+    allItemDiv.forEach(itemDiv => {
+        itemDiv.classList.remove("active");
+    });
+    itemDiv.classList.add("active");
+    const nameDiv = document.createElement("account-info-name") as HTMLElement;
+    nameDiv.innerText = wallet.name ?? "Account";
 }

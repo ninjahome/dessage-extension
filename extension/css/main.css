@@ -33,12 +33,12 @@ p {
 }
 
 a {
-    color:rgb(113 128 150);
+    color: rgb(113 128 150);
     font-size: 14px;
     font-weight: 600;
 }
 
-a:hover{
+a:hover {
     color: #5ba7fc;
 }
 
@@ -48,9 +48,11 @@ ul {
     font-size: 14px;
     margin: 0;
 }
-.login-container{
+
+.login-container {
     padding: 48px 24px;
 }
+
 .login-header {
     width: 100%;
     margin: 0 auto;
@@ -60,10 +62,11 @@ ul {
     text-align: center; /* 使文本居中对齐 */
 }
 
-.logo{
+.logo {
     width: 72px;
     margin: 0 auto;
 }
+
 .login-header p {
     margin-top: 12px;
 }
@@ -73,7 +76,7 @@ ul {
 }
 
 .login-body input[type="password"],
-.login-body input[type="text"]{
+.login-body input[type="text"] {
     width: 100%;
     padding: 16px 8px;
     font-size: 16px;
@@ -84,6 +87,7 @@ ul {
     letter-spacing: 0.1em; /* Increase the spacing between characters */
     margin: 12px 0;
 }
+
 .primary-button {
     width: 100%;
     padding: 18px 0;
@@ -91,7 +95,7 @@ ul {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #5ba7fc ;
+    background-color: #5ba7fc;
     color: #fff;
     margin-bottom: 12px;
 }
@@ -100,14 +104,17 @@ ul {
     background-color: #cccccc;
     cursor: not-allowed;
 }
-.primary-button:hover{
+
+.primary-button:hover {
     background-color: rgba(91, 167, 252, 0.5);
 }
+
 .login-error {
     color: #f50505;
 }
+
 .login-footer p {
-    text-align: center ;
+    text-align: center;
 }
 
 .tab-container {
@@ -133,12 +140,13 @@ ul {
     font-size: 16px;
     font-weight: 600;
     color: #fff;
-    border-bottom: 2px solid  #fff;
+    border-bottom: 2px solid #fff;
 }
 
 .wallet-content-area > div {
     display: none;
 }
+
 .wallet-content-area > div.active {
     display: block;
 }
@@ -151,7 +159,7 @@ ul {
 }
 
 .account-header {
-   background-color: #5ba7fc;
+    background-color: #5ba7fc;
     height: 24px;
     display: flex;
     justify-content: space-between;
@@ -177,7 +185,8 @@ ul {
     height: 24px;
     fill: #fff;
 }
-.balance{
+
+.balance {
     font-size: 48px;
     font-weight: 600;
 }
@@ -186,21 +195,25 @@ ul {
     font-size: 16px;
     font-weight: 300;
 }
+
 .plugin-setting {
     background-color: transparent;
     border: none;
 }
+
 .btnAll {
     display: flex;
     justify-content: space-around;
     align-content: center;
     margin-top: 44px;
 }
+
 .align-center {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
 .functionbtn {
     width: 42px;
     height: 42px;
@@ -213,14 +226,17 @@ ul {
     justify-content: center;
     cursor: pointer;
 }
-.functionbtn:hover{
+
+.functionbtn:hover {
     background-color: rgba(91, 167, 252, 0.8);
 }
+
 .functionbtn img {
     width: 42px;
     height: 42px;
 }
-.dessage-token-operation span{
+
+.dessage-token-operation span {
     color: rgb(113 128 150);
 }
 
@@ -297,16 +313,19 @@ ul {
     background-size: contain; /* 确保背景图适应按钮 */
     background-repeat: no-repeat; /* 确保背景图不重复 */
 }
+
 .qr-btn img {
     width: 24px;
     height: 24px;
     z-index: 2;
 }
-.qr-btn :hover{
+
+.qr-btn :hover {
     background-color: rgba(204, 204, 204, 0.3);
 }
+
 .ninja-account-info span,
-.account-address span{
+.account-address span {
     font-size: 14px;
     font-weight: normal;
     color: #718096;
@@ -316,8 +335,12 @@ ul {
     border-radius: 5px;
 }
 
-.balance-unit{
+.balance-unit {
     font-size: 12px;
     font-weight: normal;
     color: #718096;
+}
+
+.account-detail-item.active {
+    background-color: rgb(246, 0, 0);
 }
