@@ -255,12 +255,12 @@ ul {
 }
 
 .tooltip {
+    max-width: 90%;
     position: relative;
     display: inline-block;
 }
 
-.tooltip .tooltiptext {
-    height: 18px;
+.tooltiptext {
     visibility: hidden;
     background-color: black;
     color: white;
@@ -269,13 +269,12 @@ ul {
     padding: 5px 12px;
     position: absolute;
     top: -32px;
-    z-index: 1;
-    bottom: 100%;
     left: 50%;
-    margin-left: -60px; /* Adjust as needed */
+    transform: translateX(-50%);
+    z-index: 1;
     opacity: 0;
     transition: opacity 0.5s;
-    font-size: 12px;
+    white-space: nowrap; /* 防止换行 */
 }
 
 .tooltip:hover .tooltiptext {
@@ -357,4 +356,12 @@ ul {
     padding: 20px; /* 可选：增加一些内边距 */
     box-sizing: border-box;
     overflow-y: auto; /* 允许内容超出时滚动 */
+}
+
+.address-val {
+    display: inline-block;
+    max-width: 100%; /* 确保内容不会超出父元素 */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* 超出部分显示省略号 */
 }
