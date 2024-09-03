@@ -1,33 +1,15 @@
-import {__currentDatabaseVersion, __tableSystemSetting, databaseUpdate, getMaxIdRecord, initDatabase} from "./database";
+import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
-import {createQRCodeImg, MsgType, showView, WalletStatus} from './common';
+import {MsgType, showView, WalletStatus} from './common';
 import {MultiAddress} from "./dessage/protocolKey";
-
-class SysSetting {
-    id: number;
-    address: string;
-    network: string;
-
-    constructor(id: number, addr: string, network: string) {
-        this.id = id;
-        this.address = addr;
-        this.network = network;
-    }
-
-    async syncToDB(): Promise<void> {
-        await databaseUpdate(__tableSystemSetting, this.id, this);
-    }
-
-    async changeAddr(addr: string): Promise<void> {
-        this.address = addr;
-        await databaseUpdate(__tableSystemSetting, this.id, this);
-    }
-}
-
-let __systemSetting: SysSetting;
-let __walletMap: Map<string, MultiAddress> = new Map();
+import {__systemSetting, loadLastSystemSetting} from "./main_common";
+import {initDessageArea, setupNinjaDetail} from "./main_ninja";
+import {initEthArea, setupEtherArea} from "./main_eth";
+import {initBtcArea, setupBtcArea} from "./main_btc";
+import {initNostrArea, setupNostr} from "./main_nostr";
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
+export let __walletMap: Map<string, MultiAddress> = new Map();
 
 async function initDessagePlugin(): Promise<void> {
     await initDatabase();
@@ -40,15 +22,6 @@ async function initDessagePlugin(): Promise<void> {
     initBtcArea();
     initNostrArea();
     initQrCodeShowDiv();
-}
-
-async function loadLastSystemSetting(): Promise<void> {
-    const ss = await getMaxIdRecord(__tableSystemSetting);
-    if (ss) {
-        __systemSetting = new SysSetting(ss.id, ss.address, ss.network);
-        return;
-    }
-    __systemSetting = new SysSetting(__currentDatabaseVersion, '', '');
 }
 
 function initDashBoard(): void {
@@ -192,79 +165,6 @@ function notifyBackgroundActiveWallet(address: string): void {
     });
 }
 
-function setupNinjaDetail(): void {
-    const wallet = __walletMap.get(__systemSetting.address);
-    if (!wallet) {
-        return;
-    }
-    const ninjaArea = document.getElementById("ninja-account-area") as HTMLElement;
-    const ninjaAddrDiv = ninjaArea.querySelector(".address-val") as HTMLElement;
-    ninjaAddrDiv.innerText = wallet.address;
-
-    commonAddrAndCode("ninja-account-area", "ninja-address-qr-btn");
-}
-
-function setupEtherArea(): void {
-    const wallet = __walletMap.get(__systemSetting.address);
-    if (!wallet) {
-        return;
-    }
-    const ethArea = document.getElementById("eth-account-area") as HTMLElement;
-    const ethAddressVal = ethArea.querySelector(".address-val") as HTMLElement;
-    ethAddressVal.textContent = wallet.ethAddr;
-
-    commonAddrAndCode("eth-account-area", "eth-address-qr-btn");
-}
-
-function setupBtcArea(): void {
-
-    const wallet = __walletMap.get(__systemSetting.address);
-    if (!wallet) {
-        return;
-    }
-
-    const btcArea = document.getElementById("btc-account-area") as HTMLElement;
-    const btcAddressVal = btcArea.querySelector(".address-val") as HTMLElement;
-    btcAddressVal.textContent = wallet.btcAddr;
-
-    commonAddrAndCode("btc-account-area", "btc-address-qr-btn");
-}
-
-function setupNostr(): void {
-    const wallet = __walletMap.get(__systemSetting.address);
-    if (!wallet) {
-        return;
-    }
-    const nostrArea = document.getElementById("nostr-account-area") as HTMLElement;
-    const nostrAddressVal = nostrArea.querySelector(".address-val") as HTMLElement;
-    nostrAddressVal.textContent = wallet.nostrAddr;
-
-    commonAddrAndCode("nostr-account-area", "nostr-address-qr-btn");
-}
-
-function commonAddrAndCode(valElmId: string, qrBtnId: string) {
-    const area = document.getElementById(valElmId) as HTMLElement;
-    const addrVal = area.querySelector(".address-val") as HTMLElement;
-    const address = addrVal.innerText;
-    addrVal.addEventListener("click", async () => {
-        navigator.clipboard.writeText(address).then(() => {
-            alert("copy success");
-        });
-    })
-
-    const qrBtn = document.getElementById(qrBtnId) as HTMLElement;
-    qrBtn.addEventListener("click", async () => {
-        const data = await createQRCodeImg(address);
-        if (!data) {
-            console.log("------>>> failed to create qr code");
-            return;
-        }
-        const qrDiv = document.getElementById("qr-code-image-div") as HTMLElement
-        const imgElm = qrDiv.querySelector("img");
-        imgElm!.src = data;
-    })
-}
-
 function router(path: string): void {
     if (path === '#onboarding/dashboard') {
         populateDashboard();
@@ -318,22 +218,6 @@ async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElemen
     await __systemSetting.changeAddr(wallet.address);
     notifyBackgroundActiveWallet(__systemSetting.address);
     setupAllAccountArea()
-}
-
-function initDessageArea() {
-
-}
-
-function initEthArea() {
-
-}
-
-function initBtcArea() {
-
-}
-
-function initNostrArea() {
-
 }
 
 function initQrCodeShowDiv() {
