@@ -1,5 +1,6 @@
 import {__systemSetting, commonAddrAndCode} from "./main_common";
 import {__walletMap} from "./main";
+import browser from "webextension-polyfill";
 
 export function initDessageArea() {
 
@@ -15,4 +16,19 @@ export function setupNinjaDetail(): void {
     ninjaAddrDiv.innerText = wallet.address;
 
     commonAddrAndCode("ninja-account-area", "ninja-address-qr-btn");
+}
+
+export function newNinjaAccount() {
+    browser.tabs.create({
+        url: browser.runtime.getURL("home.html#onboarding/welcome")
+    }).then(() => {
+    });
+}
+
+
+export function importNinjaAccount() {
+    browser.tabs.create({
+        url: browser.runtime.getURL("home.html#onboarding/import-wallet")
+    }).then(() => {
+    });
 }

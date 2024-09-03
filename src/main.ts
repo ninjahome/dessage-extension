@@ -3,7 +3,7 @@ import browser from "webextension-polyfill";
 import {MsgType, showView, WalletStatus} from './common';
 import {MultiAddress} from "./dessage/protocolKey";
 import {__systemSetting, loadLastSystemSetting} from "./main_common";
-import {initDessageArea, setupNinjaDetail} from "./main_ninja";
+import {importNinjaAccount, initDessageArea, newNinjaAccount, setupNinjaDetail} from "./main_ninja";
 import {initEthArea, setupEtherArea} from "./main_eth";
 import {initBtcArea, setupBtcArea} from "./main_btc";
 import {initNostrArea, setupNostr} from "./main_nostr";
@@ -41,10 +41,10 @@ function initDashBoard(): void {
     const newAccBtn = accountListDiv.querySelector(".account-list-new-account") as HTMLButtonElement;
     const importAccBtn = accountListDiv.querySelector(".account-list-import-account") as HTMLButtonElement;
     newAccBtn.addEventListener("click", async () => {
-        newAccount();
+        newNinjaAccount();
     });
     importAccBtn.addEventListener("click", async () => {
-        importAccount();
+        importNinjaAccount();
     });
 
     document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => {
@@ -127,7 +127,9 @@ function setAccountSwitchArea(): void {
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
         itemDiv.addEventListener("click", async () => {
+            const accountListDiv = document.getElementById("account-list-area") as HTMLDivElement;
             await changeSelectedAccount(parentDiv, itemDiv, wallet);
+            accountListDiv.style.display = 'none';
         })
 
         const nameDiv = itemDiv.querySelector(".account-detail-name") as HTMLElement;
@@ -198,17 +200,12 @@ function openAllWallets(): void {
     });
 }
 
-function newAccount() {
-}
-
-function importAccount() {
-}
-
 async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: MultiAddress) {
     if (__systemSetting.address === wallet.address) {
         console.log("------>>> no need to change ", __systemSetting.address);
         return;
     }
+    console.log("------>>> changing new ninja account=>", __systemSetting.address);
 
     const allItemDiv = parentDiv.querySelectorAll(".account-detail-item") as NodeListOf<HTMLElement>;
     allItemDiv.forEach(itemDiv => {

@@ -8,6 +8,7 @@ import RIPEMD160 from "crypto-js/ripemd160";
 import WordArray from "crypto-js/lib-typedarrays";
 import {convertBits, encodeHex, decodeHex} from "./util";
 import {bech32} from "bech32";
+import {ed2CurvePri} from "./edwards25519";
 
 
 const DessageAddrPrefix = "NJ";
@@ -18,7 +19,7 @@ export class MultiAddress {
     ethAddr: string;
     nostrAddr: string;
     testBtcAddr: string;
-    name?:string;
+    name?: string;
 
     constructor(address: string, btcAddr: string, ethAddr: string, nostrAddr: string, testBtcAddr: string) {
         this.address = address;
@@ -29,19 +30,19 @@ export class MultiAddress {
     }
 }
 
-
 export class ProtocolKey {
     pri: Uint8Array;
     ecKey: EC.KeyPair;
     dessageKey: nacl.SignKeyPair;
+    readonly curvePriKey: Uint8Array;
 
     constructor(pri: Uint8Array) {
         this.pri = pri;
         this.dessageKey = nacl.sign.keyPair.fromSeed(pri);
         const ec = new EC('secp256k1');
         this.ecKey = ec.keyFromPrivate(pri);
+        this.curvePriKey = ed2CurvePri(this.dessageKey.secretKey);
     }
-
 
     private getPub(): string {
         const publicKeyArray = this.dessageKey.publicKey;
@@ -60,7 +61,6 @@ export class ProtocolKey {
     rawPriKey(): Uint8Array {
         return this.pri;
     }
-
 
     generateBtcAddress(isTestNet: boolean = false): string {
         const pubKey = this.ecKey.getPublic(true, 'hex');
