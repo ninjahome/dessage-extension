@@ -1,7 +1,5 @@
 import { generateMnemonic, mnemonicToSeedSync } from "bip39";
-import { publicToAddress } from 'ethereumjs-util';
-import BIP32Factory, { BIP32Interface } from 'bip32';
-import * as ecc from 'tiny-secp256k1';
+// import * as elliptic from 'elliptic';
 
 /*
  * 比特币地址一般遵循 BIP44 标准，路径格式为：m / 44' / 0' / account' / change / address_index。其中：
@@ -18,23 +16,17 @@ export function testBip44() {
     console.log("--------------->>>>> mnemonic", mnemonic);
     const seedBuffer = mnemonicToSeedSync(mnemonic);
 
-    const bip32 = BIP32Factory(ecc);
 
-    const node: BIP32Interface = bip32.fromSeed(seedBuffer);
+    // // 生成比特币的私钥和地址
+    // const btcPath = "m/44'/0'/0'/0/0";
+    // const btcChild = node.derivePath(btcPath);
+    // const btcPrivateKey = btcChild.privateKey?.toString();
+    // console.log(`--------------->>>>>BTC Private Key: ${btcPrivateKey}`);
+    //
+    // // 生成以太坊的私钥
+    // const ethPath = "m/44'/60'/0'/0/0";
+    // const ethChild = node.derivePath(ethPath);
+    // const ethPrivateKey = ethChild.privateKey?.toString();
+    // console.log(`--------------->>>>>ETH Private Key: ${ethPrivateKey}`);
 
-    // 生成比特币的私钥和地址
-    const btcPath = "m/44'/0'/0'/0/0";
-    const btcChild = node.derivePath(btcPath);
-    const btcPrivateKey = btcChild.privateKey?.toString();
-    console.log(`BTC Private Key: ${btcPrivateKey}`);
-
-    // 生成以太坊的私钥
-    const ethPath = "m/44'/60'/0'/0/0";
-    const ethChild = node.derivePath(ethPath);
-    const ethPrivateKey = ethChild.privateKey?.toString();
-    console.log(`ETH Private Key: ${ethPrivateKey}`);
-
-    // 将 Uint8Array 转换为 Buffer 以生成以太坊地址
-    const ethAddress = publicToAddress(Buffer.from(ethChild.publicKey), true).toString('hex');
-    console.log(`ETH Address: 0x${ethAddress}`);
 }
