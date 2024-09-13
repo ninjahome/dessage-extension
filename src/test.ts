@@ -1,6 +1,5 @@
 import { generateMnemonic, mnemonicToSeedSync } from "bip39";
-// import * as elliptic from 'elliptic';
-
+import { keccak256 } from 'js-sha3';
 /*
  * 比特币地址一般遵循 BIP44 标准，路径格式为：m / 44' / 0' / account' / change / address_index。其中：
  * 44' 表示 BIP44 标准。
@@ -14,19 +13,5 @@ import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 export function testBip44() {
     const mnemonic = generateMnemonic();
     console.log("--------------->>>>> mnemonic", mnemonic);
-    const seedBuffer = mnemonicToSeedSync(mnemonic);
-
-
-    // // 生成比特币的私钥和地址
-    // const btcPath = "m/44'/0'/0'/0/0";
-    // const btcChild = node.derivePath(btcPath);
-    // const btcPrivateKey = btcChild.privateKey?.toString();
-    // console.log(`--------------->>>>>BTC Private Key: ${btcPrivateKey}`);
-    //
-    // // 生成以太坊的私钥
-    // const ethPath = "m/44'/60'/0'/0/0";
-    // const ethChild = node.derivePath(ethPath);
-    // const ethPrivateKey = ethChild.privateKey?.toString();
-    // console.log(`--------------->>>>>ETH Private Key: ${ethPrivateKey}`);
-
+    const seed = mnemonicToSeedSync(mnemonic);
 }

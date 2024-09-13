@@ -51,11 +51,12 @@ module.exports = (env, argv) => {
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],
             fallback: {
-                "buffer": require.resolve("buffer/"),
-                "crypto": require.resolve("crypto-browserify"),
-                "stream": require.resolve("stream-browserify"),
-                "vm": require.resolve("vm-browserify"),
-                "process": require.resolve("process/browser")
+                assert: false,
+                stream: false,
+                crypto: false,
+                buffer: false,
+                process: false,
+                vm: false,
             }
         },
         plugins: plugins,

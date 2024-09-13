@@ -32,7 +32,7 @@
     "typescript": "^4.5.4",
     "vm-browserify": "^1.1.2",
     "webextension-polyfill": "^0.10.0",
-    "webpack": "^5.93.0",
+    "webpack": "^5.94.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
@@ -48,6 +48,7 @@
     "js-sha3": "^0.9.3",
     "js-sha512": "^0.9.0",
     "process": "^0.11.10",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "stream": "^0.0.3"
   }
 }
