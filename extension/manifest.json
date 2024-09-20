@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Dessage",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Social Wallet For Dessage.",
   "action": {
     "default_popup": "main.html",

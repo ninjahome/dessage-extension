@@ -3,7 +3,7 @@ import browser, {Runtime} from "webextension-polyfill";
 import {WalletStatus,loadLocalWallet, MsgType} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
 import {castToMemWallet, DbWallet} from "./dessage/wallet";
-import {testBip44, testNonHardened} from "./test";
+import {testBip44} from "./test";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -143,7 +143,6 @@ async function closeWallet(sendResponse?: (response: any) => void): Promise<void
 
 async function pluginClicked(sendResponse: (response: any) => void): Promise<void> {
     testBip44();
-    testNonHardened();
     try {
         await checkAndInitDatabase();
         let msg = '';
