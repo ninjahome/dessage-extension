@@ -1,15 +1,15 @@
 import {mnemonicToSeedSync} from "bip39";
 import {MultiAddress, ProtocolKey} from "./protocolKey";
-import {decryptAes, encryptAes, CipherData} from "./key_crypto";
+import {decryptAes, encryptAes, MasterKey} from "./key_crypto";
 import {decodeHex} from "./util";
 
 export class DbWallet {
     uuid: string;
     name: string;
     address: MultiAddress;
-    cipherTxt: CipherData;
+    cipherTxt: MasterKey;
 
-    constructor(uuid: string, address: MultiAddress, cipherTxt: CipherData, name?: string) {
+    constructor(uuid: string, address: MultiAddress, cipherTxt: MasterKey, name?: string) {
         this.uuid = uuid;
         this.address = address;
         this.cipherTxt = cipherTxt;
