@@ -1,8 +1,8 @@
 import {initDatabase} from "./database";
-import {MsgType, showView,loadLocalWallet,saveWallet} from "./common";
+import {MsgType, showView, loadLocalWallet, saveWallet} from "./common";
 import {generateMnemonic, validateMnemonic, wordlists} from 'bip39';
-import {newWallet} from "./dessage/wallet";
 import browser from "webextension-polyfill";
+import {NewMasterKey} from "./dessage/master_key";
 
 let __key_for_mnemonic_temp = '__key_for_mnemonic_temp__';
 let ___mnemonic_in_mem: string | null = null;
@@ -48,11 +48,11 @@ function initPasswordDiv(): void {
     const passwordAgreeCheckbox = document.getElementById('password-agree') as HTMLInputElement;
     const createPasswordButton = document.querySelector('#view-create-password .primary-button') as HTMLButtonElement;
     createPasswordButton.disabled = !passwordAgreeCheckbox.checked;
-    createPasswordButton.addEventListener('click', createWallet);
+    createPasswordButton.addEventListener('click', createMasterKey);
 
     passwordAgreeCheckbox.addEventListener('change', checkImportPassword);
 
-    const newPasswordInput = document.getElementById("new-password") as HTMLInputElement ;
+    const newPasswordInput = document.getElementById("new-password") as HTMLInputElement;
     const confirmPasswordInput = document.getElementById("confirm-password") as HTMLInputElement;
     newPasswordInput.addEventListener('input', checkImportPassword);
     confirmPasswordInput.addEventListener('input', checkImportPassword);
@@ -63,7 +63,7 @@ function initPasswordDiv(): void {
     });
 }
 
-async function createWallet(): Promise<void> {
+async function createMasterKey(): Promise<void> {
     const password1 = (document.getElementById("new-password") as HTMLInputElement).value;
     const password2 = (document.getElementById("confirm-password") as HTMLInputElement).value;
 
@@ -77,22 +77,20 @@ async function createWallet(): Promise<void> {
         return;
     }
 
-    const mnemonic = generateMnemonic();
-    ___mnemonic_in_mem = mnemonic;
-    sessionStorage.setItem(__key_for_mnemonic_temp, mnemonic);
-    navigateTo('#onboarding/recovery-phrase');
-    displayMnemonic();
+    try {
+        const mnemonic = generateMnemonic();
+        ___mnemonic_in_mem = mnemonic;
+        sessionStorage.setItem(__key_for_mnemonic_temp, mnemonic);
 
-    const wallet = newWallet(mnemonic, password1);
-    await saveWallet(wallet);
+        const masterKey = NewMasterKey(mnemonic, password1);
+        await masterKey.saveToDb();
+        await browser.runtime.sendMessage({action: MsgType.MasterKeyCreated});
 
-    browser.runtime.sendMessage({action: MsgType.WalletCreated})
-        .then(response => {
-            console.log("Message sent successfully", response);
-        })
-        .catch(error => {
-            console.error("Error sending message:", error);
-        });
+        navigateTo('#onboarding/recovery-phrase');
+    } catch (error) {
+        const err = error as Error
+        alert(err.message);
+    }
 }
 
 function importWallet(): void {
@@ -103,9 +101,9 @@ function importWallet(): void {
 function generateRecoveryPhraseInputs(): void {
     setRecoverPhaseTips(false, '');
 
-    const lengthElement = document.getElementById('recovery-phrase-length') as HTMLInputElement ;
-    const recoveryPhraseInputs = document.getElementById('recovery-phrase-inputs') as HTMLElement ;
-    const template = document.getElementById("recovery-phrase-row-template") as HTMLTemplateElement ;
+    const lengthElement = document.getElementById('recovery-phrase-length') as HTMLInputElement;
+    const recoveryPhraseInputs = document.getElementById('recovery-phrase-inputs') as HTMLElement;
+    const template = document.getElementById("recovery-phrase-row-template") as HTMLTemplateElement;
 
     const length = parseInt(lengthElement.value, 10);
     recoveryPhraseInputs.innerHTML = '';
@@ -118,7 +116,7 @@ function generateRecoveryPhraseInputs(): void {
         rowDiv.querySelectorAll("input").forEach(input => {
             input.addEventListener('input', validateRecoveryPhrase);
             const nextSibling = input.nextElementSibling as HTMLElement;
-                nextSibling.addEventListener('click', changeInputType);
+            nextSibling.addEventListener('click', changeInputType);
         });
     }
 }
@@ -266,12 +264,12 @@ function displayConfirmVal(): void {
             div.classList.add('hidden-word');
             div.dataset.correctWord = wordsArray[index];
             const input = div.querySelector(".recovery-input") as HTMLInputElement;
-                input.addEventListener('input', checkConfirmUserPhrase);
+            input.addEventListener('input', checkConfirmUserPhrase);
         } else {
             const template = document.getElementById("phrase-item-readOnly") as HTMLElement;
             div = template.cloneNode(true) as HTMLElement;
             const input = div.querySelector(".recovery-input") as HTMLInputElement;
-                input.value = word;
+            input.value = word;
         }
         div.id = '';
         div.style.display = 'block';
@@ -476,21 +474,19 @@ async function actionOfWalletImport(): Promise<void> {
         navigateTo('#onboarding/welcome');
         return;
     }
+    try {
 
-    const wallet = newWallet(___mnemonic_in_mem, password);
-    await saveWallet(wallet)
-        .then(key => console.log(`Added item with key: ${key}`))
-        .catch(error => console.error(`Failed to add item: ${error}`));
+        const masterKey = NewMasterKey(___mnemonic_in_mem, password);
+        await masterKey.saveToDb();
+        await browser.runtime.sendMessage({action: MsgType.WalletCreated});
 
-    browser.runtime.sendMessage({action: MsgType.WalletCreated})
-        .then(response => {
-            console.log("Message sent successfully", response);
-        })
-        .catch(error => {
-            console.error("Error sending message:", error);
-        });
+        ___mnemonic_in_mem = null;
+        sessionStorage.removeItem(__key_for_mnemonic_temp);
+        navigateTo('#onboarding/account-home');
 
-    ___mnemonic_in_mem = null;
-    sessionStorage.removeItem(__key_for_mnemonic_temp);
-    navigateTo('#onboarding/account-home');
+    } catch (e) {
+        const err = e as Error
+        alert(err.message)
+    }
+
 }

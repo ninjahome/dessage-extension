@@ -1,53 +1,22 @@
 /// <reference lib="webworker" />
 import browser, {Runtime} from "webextension-polyfill";
-import {WalletStatus,loadLocalWallet, MsgType} from './common';
+import {MasterKeyStatus, loadLocalWallet, MsgType, sessionGet, sessionRemove, sessionSet} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
 import {castToMemWallet, DbWallet} from "./dessage/wallet";
-import {testBip44} from "./test";
+import {loadMasterKey} from "./dessage/master_key";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
-const __key_wallet_status: string = '__key_wallet_status';
+const __key_master_key_status: string = '__key_wallet_status';
 const __key_wallet_map: string = '__key_wallet_map';
 const __key_last_touch: string = '__key_last_touch';
 const __alarm_name__: string = '__alarm_name__timer__';
 let __curActiveWallet: any = null;
 
 const runtime = browser.runtime;
-const storage = browser.storage;
 const alarms = browser.alarms;
 const tabs = browser.tabs;
 
-async function sessionSet(key: string, value: any): Promise<void> {
-    try {
-        await storage.session.set({[key]: value});
-        console.log("[service work] Value was set successfully.", value);
-    } catch (error: unknown) {
-        const err = error as Error;
-        console.error("[service work] Failed to set value:", err);
-    }
-}
-
-async function sessionGet(key: string): Promise<any> {
-    try {
-        const result = await storage.session.get(key);
-        console.log("[service work] Value is:", result[key]);
-        return result[key];
-    } catch (error: unknown) {
-        const err = error as Error;
-        console.error("[service work] Failed to get value:", err);
-        return null;
-    }
-}
-
-async function sessionRemove(key: string): Promise<void> {
-    try {
-        await storage.session.remove(key);
-        console.log("[service work] Value was removed successfully.");
-    } catch (error) {
-        console.error("[service work] Failed to remove value:", error);
-    }
-}
 
 self.addEventListener('install', () => {
     console.log('[service work] Service Worker installing...');
@@ -73,12 +42,12 @@ async function createAlarm(): Promise<void> {
 alarms.onAlarm.addListener(timerTaskWork);
 
 async function timerTaskWork(alarm: any): Promise<void> {
-    let walletStatus = await sessionGet(__key_wallet_status) || WalletStatus.Init;
+    let walletStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
     let keyLastTouch = await sessionGet(__key_last_touch) || 0;
 
     if (alarm.name === __alarm_name__) {
         console.log("[service work] Alarm Triggered!");
-        if (walletStatus !== WalletStatus.Unlocked) {
+        if (walletStatus !== MasterKeyStatus.Unlocked) {
             console.log("[service work] No unlocked wallet");
             return
         }
@@ -128,7 +97,7 @@ function queryBalance(): void {
 async function closeWallet(sendResponse?: (response: any) => void): Promise<void> {
     try {
         await sessionRemove(__key_wallet_map);
-        await sessionRemove(__key_wallet_status);
+        await sessionRemove(__key_master_key_status);
         if (sendResponse) {
             sendResponse({status: 'success'});
         }
@@ -142,37 +111,37 @@ async function closeWallet(sendResponse?: (response: any) => void): Promise<void
 }
 
 async function pluginClicked(sendResponse: (response: any) => void): Promise<void> {
-    testBip44();
     try {
         await checkAndInitDatabase();
         let msg = '';
-        let walletStatus = await sessionGet(__key_wallet_status) || WalletStatus.Init;
-        if (walletStatus === WalletStatus.Init) {
-            const wallets: DbWallet[] = await loadLocalWallet();
-            if (!wallets || wallets.length === 0) {
-                walletStatus = WalletStatus.NoWallet;
+        let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
+        if (keyStatus === MasterKeyStatus.Init) {
+            const masterKey = await loadMasterKey();
+            if (!masterKey) {
+                keyStatus = MasterKeyStatus.NoWallet;
             } else {
-                walletStatus = WalletStatus.Locked;
+                keyStatus = MasterKeyStatus.Locked;
             }
         }
 
-        if (walletStatus === WalletStatus.Unlocked) {
+        if (keyStatus === MasterKeyStatus.Unlocked) {
             const sObj = await sessionGet(__key_wallet_map);
             msg = JSON.stringify(sObj);
         }
 
-        sendResponse({status: walletStatus, message: msg});
-        await sessionSet(__key_wallet_status, walletStatus);
+        sendResponse({status: keyStatus, message: msg});
+        await sessionSet(__key_master_key_status, keyStatus);
+
     } catch (error: unknown) {
         const err = error as Error;
         console.error('[service work] Error in pluginClicked:', err);
-        sendResponse({status: WalletStatus.Error, message: err.toString()});
+        sendResponse({status: MasterKeyStatus.Error, message: err.toString()});
     }
 }
 
 async function createWallet(sendResponse: (response: any) => void): Promise<void> {
     try {
-        await sessionSet(__key_wallet_status, WalletStatus.Init);
+        await sessionSet(__key_master_key_status, MasterKeyStatus.Init);
         sendResponse({status: 'success'});
     } catch (error: unknown) {
         const err = error as Error;
@@ -191,7 +160,7 @@ async function openWallet(pwd: string, sendResponse: (response: any) => void): P
             outerWallet.set(wallet.address.address, memWallet.address);
         });
         const obj = Object.fromEntries(outerWallet);
-        await sessionSet(__key_wallet_status, WalletStatus.Unlocked);
+        await sessionSet(__key_master_key_status, MasterKeyStatus.Unlocked);
         await sessionSet(__key_wallet_map, obj);
         console.log("[service work] outerWallet=>", outerWallet);
         await sessionSet(__key_last_touch, Date.now());

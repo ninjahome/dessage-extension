@@ -1,5 +1,7 @@
 import {mnemonicToSeedSync} from "bip39";
 import {deriveChild, derivePath, fromMasterSeed} from "./dessage/extended_key";
+import {NewMasterKey} from "./dessage/master_key";
+import {__tableNameMasterKey, databaseDelete} from "./database";
 
 // 测试 BIP44 派生路径（完整路径派生）
 export function testBip44() {
@@ -52,3 +54,12 @@ export function testNonHardened() {
     console.log('子私钥2 (Child Private Key):', childKey.privateKey?.toString('hex'));
     console.log('子公钥 (Child Public Key):', childKey.publicKey.toString('hex'));
 }
+
+export async function testNewMasterKey() {
+    const mnemonic = "state motion recall collect wire hold tiny occur flock depend slush hurdle";
+    const masterKey = NewMasterKey(mnemonic, '123');
+    const result = await masterKey.saveToDb();
+    console.log("-------->>>result:", result, masterKey)
+    await databaseDelete(__tableNameMasterKey, masterKey.id);
+}
+

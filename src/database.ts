@@ -1,8 +1,9 @@
 let __databaseObj: IDBDatabase | null = null;
 const __databaseName = 'dessage-database';
-export const __currentDatabaseVersion = 14;
+export const __currentDatabaseVersion = 17;
 export const __tableNameWallet = '__table_wallet__';
 export const __tableSystemSetting = '__table_system_setting__';
+export const __tableNameMasterKey = '__table_master_key__';
 
 export function initDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -30,6 +31,11 @@ export function initDatabase(): Promise<IDBDatabase> {
             if (!db.objectStoreNames.contains(__tableSystemSetting)) {
                 const objectStore = db.createObjectStore(__tableSystemSetting, {keyPath: 'id'});
                 console.log("[Database] Created wallet setting table successfully.");
+            }
+
+            if (!db.objectStoreNames.contains(__tableNameMasterKey)) {
+                const objectStore = db.createObjectStore(__tableNameMasterKey, {keyPath: 'id', autoIncrement: true });
+                console.log("[Database] Created master key  table successfully.");
             }
         };
     });
@@ -98,7 +104,7 @@ function databaseGetByIndex(storeName: string, idx: string, idxVal: any): Promis
     });
 }
 
-function databaseGetByID(storeName: string, id: any): Promise<any> {
+export function databaseGetByID(storeName: string, id: any): Promise<any> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
             reject('[Database]  is not initialized');
@@ -145,7 +151,7 @@ export function databaseUpdate(storeName: string, id: any, newData: any): Promis
     });
 }
 
-function databaseDelete(storeName: string, id: any): Promise<string> {
+export function databaseDelete(storeName: string, id: any): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!__databaseObj) {
             reject('[Database]  is not initialized');
@@ -273,4 +279,37 @@ export async function checkAndInitDatabase(): Promise<void> {
     if (!__databaseObj) {
         await initDatabase();
     }
+}
+
+export function upsertItem(storeName: string, data: any): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // 检查数据库是否初始化
+            if (!__databaseObj) {
+                reject('[Database] is not initialized');
+                return;
+            }
+
+            // 检查数据中是否有 id 字段
+            if (!data.id) {
+                reject('Data must contain an id field for upsert operation.');
+                return;
+            }
+
+            // 通过 id 查找记录
+            const existingRecord = await databaseGetByID(storeName, data.id);
+
+            if (existingRecord) {
+                // 如果记录存在，则更新
+                const updateResult = await databaseUpdate(storeName, data.id, data);
+                resolve(updateResult);
+            } else {
+                // 如果记录不存在，则新增
+                const addResult = await databaseAddItem(storeName, data);
+                resolve(`Data inserted with key: ${addResult}`);
+            }
+        } catch (error) {
+            reject(`Error during upsert operation: ${error}`);
+        }
+    });
 }

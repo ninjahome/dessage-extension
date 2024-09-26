@@ -1,6 +1,5 @@
 import {createQRCodeImg} from "./common";
 import {__currentDatabaseVersion, __tableSystemSetting, databaseUpdate, getMaxIdRecord} from "./database";
-import {MultiAddress} from "./dessage/protocolKey";
 
 
 class SysSetting {

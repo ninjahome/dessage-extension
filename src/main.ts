@@ -1,6 +1,6 @@
 import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
-import {MsgType, showView, WalletStatus} from './common';
+import {MsgType, showView, MasterKeyStatus} from './common';
 import {MultiAddress} from "./dessage/protocolKey";
 import {__systemSetting, loadLastSystemSetting} from "./main_common";
 import {importNinjaAccount, initDessageArea, newNinjaAccount, setupNinjaDetail} from "./main_ninja";
@@ -73,23 +73,23 @@ function checkBackgroundStatus(): void {
         console.log("------>>>response=>", JSON.stringify(response));
 
         switch (response.status) {
-            case WalletStatus.NoWallet:
+            case MasterKeyStatus.NoWallet:
                 browser.tabs.create({
                     url: browser.runtime.getURL("home.html#onboarding/welcome")
                 }).then(() => {
                 });
                 return;
-            case WalletStatus.Locked:
-            case WalletStatus.Expired:
+            case MasterKeyStatus.Locked:
+            case MasterKeyStatus.Expired:
                 showView('#onboarding/unlock-plugin', router);
                 return;
-            case WalletStatus.Unlocked:
+            case MasterKeyStatus.Unlocked:
                 const obj = JSON.parse(response.message);
                 __walletMap = new Map<string, any>(Object.entries(obj));
                 console.log("------------>>>", __walletMap.size);
                 showView('#onboarding/dashboard', router);
                 return;
-            case WalletStatus.Error:
+            case MasterKeyStatus.Error:
                 alert("error:" + response.message);
                 return;
         }

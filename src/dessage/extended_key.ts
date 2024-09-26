@@ -6,12 +6,6 @@ import {Buffer} from "buffer";
 
 const ec = new EC('secp256k1');
 
-interface ExtendedKey {
-    privateKey: Buffer | null;
-    publicKey: Buffer;
-    chainCode: Buffer;
-
-}
 
 export function deriveChild(privateKey: Buffer | null, publicKey: Buffer, chainCode: Buffer, index: number): ExtendedKey {
     const indexBuffer = Buffer.allocUnsafe(4);
@@ -82,7 +76,7 @@ export function fromMasterSeed(seed: Buffer): ExtendedKey {
     const key = ec.keyFromPrivate(privateKey);
     const publicKey = Buffer.from(key.getPublic(true, 'array'));  // 压缩公钥
     const chainCode = I.subarray(32);
-    return new DsgExtendedKey(
+    return new ExtendedKey(
         privateKey,
         publicKey,
         chainCode,
@@ -90,7 +84,7 @@ export function fromMasterSeed(seed: Buffer): ExtendedKey {
 }
 
 // 从种子生成主密钥
-class DsgExtendedKey {
+class ExtendedKey {
     privateKey: Buffer | null ;
     publicKey: Buffer ;
     chainCode: Buffer ;
