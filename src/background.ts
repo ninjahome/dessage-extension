@@ -1,10 +1,9 @@
 /// <reference lib="webworker" />
 import browser, {Runtime} from "webextension-polyfill";
-import {MasterKeyStatus, loadLocalWallet, MsgType, sessionGet, sessionRemove, sessionSet} from './common';
+import {MasterKeyStatus, MsgType, sessionGet, sessionRemove, sessionSet} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
-import {castToMemWallet, DbWallet} from "./dessage/wallet";
 import {loadMasterKey} from "./dessage/master_key";
-import {testNewMasterKey, testRemoveMasterKey} from "./test";
+import {testMasterKeySeed} from "./test";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -114,7 +113,7 @@ async function closeWallet(sendResponse?: (response: any) => void): Promise<void
 async function pluginClicked(sendResponse: (response: any) => void): Promise<void> {
     try {
         await checkAndInitDatabase();
-        // await testRemoveMasterKey();
+        await testMasterKeySeed();
         let msg = '';
         let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
         if (keyStatus === MasterKeyStatus.Init) {
@@ -141,15 +140,17 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
     }
 }
 
-async function openWallet(pwd: string, sendResponse: (response: any) => void): Promise<void> {
+async function openMasterKey(pwd: string, sendResponse: (response: any) => void): Promise<void> {
     try {
         await checkAndInitDatabase();
         const outerWallet = new Map();
-        const wallets: DbWallet[] = await loadLocalWallet();
-        wallets.forEach(wallet => {
-            const memWallet = castToMemWallet(pwd, wallet);
-            outerWallet.set(wallet.address.address, memWallet.address);
-        });
+        const masterKey = await loadMasterKey();
+
+        // wallets.forEach(wallet => {
+        //     const memWallet = castToMemWallet(pwd, wallet);
+        //     outerWallet.set(wallet.address.address, memWallet.address);
+        // });
+
         const obj = Object.fromEntries(outerWallet);
         await sessionSet(__key_master_key_status, MasterKeyStatus.Unlocked);
         await sessionSet(__key_wallet_map, obj);
@@ -213,7 +214,7 @@ runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, send
             });
             return true;
         case MsgType.OpenMasterKey:
-            openWallet(request.password, sendResponse).then(() => {
+            openMasterKey(request.password, sendResponse).then(() => {
             });
             return true;
         case MsgType.CloseMasterKey:

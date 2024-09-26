@@ -175,10 +175,10 @@ function router(path: string): void {
 
 function initLoginDiv(): void {
     const button = document.querySelector(".login-container .primary-button") as HTMLButtonElement;
-    button.addEventListener('click', openAllWallets);
+    button.addEventListener('click', openMasterKey);
 }
 
-function openAllWallets(): void {
+function openMasterKey(): void {
     const inputElement = document.querySelector(".login-container input") as HTMLInputElement;
     const password = inputElement.value;
 

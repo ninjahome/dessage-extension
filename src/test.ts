@@ -1,6 +1,6 @@
 import {mnemonicToSeedSync} from "bip39";
 import {deriveChild, derivePath, fromMasterSeed} from "./dessage/extended_key";
-import {NewMasterKey} from "./dessage/master_key";
+import {loadMasterKey, NewMasterKey} from "./dessage/master_key";
 import {__tableNameMasterKey, databaseDelete} from "./database";
 
 // 测试 BIP44 派生路径（完整路径派生）
@@ -65,4 +65,12 @@ export async function testNewMasterKey() {
 
 export async function testRemoveMasterKey() {
     await databaseDelete(__tableNameMasterKey, 1);
+}
+
+export async function testMasterKeySeed() {
+    const mnemonic = "state motion recall collect wire hold tiny occur flock depend slush hurdle";
+    const masterKey = NewMasterKey(mnemonic, '123');
+    await masterKey.saveToDb();
+    const savedKey = await loadMasterKey();
+    savedKey?.unlock('123');
 }

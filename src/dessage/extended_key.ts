@@ -84,7 +84,7 @@ export function fromMasterSeed(seed: Buffer): ExtendedKey {
 }
 
 // 从种子生成主密钥
-class ExtendedKey {
+export class ExtendedKey {
     privateKey: Buffer | null ;
     publicKey: Buffer ;
     chainCode: Buffer ;
