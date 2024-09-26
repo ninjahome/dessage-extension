@@ -4,6 +4,7 @@ import {MasterKeyStatus, loadLocalWallet, MsgType, sessionGet, sessionRemove, se
 import {checkAndInitDatabase, closeDatabase} from './database';
 import {castToMemWallet, DbWallet} from "./dessage/wallet";
 import {loadMasterKey} from "./dessage/master_key";
+import {testNewMasterKey, testRemoveMasterKey} from "./test";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -113,6 +114,7 @@ async function closeWallet(sendResponse?: (response: any) => void): Promise<void
 async function pluginClicked(sendResponse: (response: any) => void): Promise<void> {
     try {
         await checkAndInitDatabase();
+        // await testRemoveMasterKey();
         let msg = '';
         let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
         if (keyStatus === MasterKeyStatus.Init) {
@@ -136,17 +138,6 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
         const err = error as Error;
         console.error('[service work] Error in pluginClicked:', err);
         sendResponse({status: MasterKeyStatus.Error, message: err.toString()});
-    }
-}
-
-async function createWallet(sendResponse: (response: any) => void): Promise<void> {
-    try {
-        await sessionSet(__key_master_key_status, MasterKeyStatus.Init);
-        sendResponse({status: 'success'});
-    } catch (error: unknown) {
-        const err = error as Error;
-        console.error('[service work] Error in createWallet:', err);
-        sendResponse({status: 'failure', message: err.toString()});
     }
 }
 
@@ -221,19 +212,15 @@ runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, send
             pluginClicked(sendResponse).then(() => {
             });
             return true;
-        case MsgType.WalletOpen:
+        case MsgType.OpenMasterKey:
             openWallet(request.password, sendResponse).then(() => {
             });
             return true;
-        case MsgType.WalletClose:
+        case MsgType.CloseMasterKey:
             closeWallet().then(() => {
             });
             return true;
-        case MsgType.WalletCreated:
-            createWallet(sendResponse).then(() => {
-            });
-            return true;
-        case MsgType.SetActiveWallet:
+        case MsgType.SetActiveAccount:
             setActiveWallet(request.address, sendResponse).then(() => {
             });
             return true;

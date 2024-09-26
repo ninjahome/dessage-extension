@@ -2,7 +2,7 @@ import {initDatabase} from "./database";
 import {MsgType, showView, loadLocalWallet, saveWallet} from "./common";
 import {generateMnemonic, validateMnemonic, wordlists} from 'bip39';
 import browser from "webextension-polyfill";
-import {NewMasterKey} from "./dessage/master_key";
+import {loadMasterKey, NewMasterKey} from "./dessage/master_key";
 
 let __key_for_mnemonic_temp = '__key_for_mnemonic_temp__';
 let ___mnemonic_in_mem: string | null = null;
@@ -84,7 +84,6 @@ async function createMasterKey(): Promise<void> {
 
         const masterKey = NewMasterKey(mnemonic, password1);
         await masterKey.saveToDb();
-        await browser.runtime.sendMessage({action: MsgType.MasterKeyCreated});
 
         navigateTo('#onboarding/recovery-phrase');
     } catch (error) {
@@ -373,7 +372,7 @@ function showPassword(this: HTMLElement): void {
 }
 
 function prepareAccountData() {
-    loadLocalWallet().then((data) => {
+    loadMasterKey().then((data) => {
         console.log(data)
     })
 }
@@ -474,11 +473,11 @@ async function actionOfWalletImport(): Promise<void> {
         navigateTo('#onboarding/welcome');
         return;
     }
+
     try {
 
         const masterKey = NewMasterKey(___mnemonic_in_mem, password);
         await masterKey.saveToDb();
-        await browser.runtime.sendMessage({action: MsgType.WalletCreated});
 
         ___mnemonic_in_mem = null;
         sessionStorage.removeItem(__key_for_mnemonic_temp);

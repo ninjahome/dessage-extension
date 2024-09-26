@@ -63,3 +63,6 @@ export async function testNewMasterKey() {
     await databaseDelete(__tableNameMasterKey, masterKey.id);
 }
 
+export async function testRemoveMasterKey() {
+    await databaseDelete(__tableNameMasterKey, 1);
+}

@@ -152,7 +152,7 @@ function setAccountSwitchArea(): void {
 }
 
 function notifyBackgroundActiveWallet(address: string): void {
-    browser.runtime.sendMessage({action: MsgType.SetActiveWallet, address: address}).then(response => {
+    browser.runtime.sendMessage({action: MsgType.SetActiveAccount, address: address}).then(response => {
         if (response.status) {
             console.log("set active wallet success");
             return;
@@ -182,7 +182,7 @@ function openAllWallets(): void {
     const inputElement = document.querySelector(".login-container input") as HTMLInputElement;
     const password = inputElement.value;
 
-    browser.runtime.sendMessage({action: MsgType.WalletOpen, password: password}).then((response: {
+    browser.runtime.sendMessage({action: MsgType.OpenMasterKey, password: password}).then((response: {
         status: boolean;
         message: string
     }) => {

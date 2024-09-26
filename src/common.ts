@@ -2,7 +2,6 @@ import {DbWallet} from "./dessage/wallet";
 import * as QRCode from 'qrcode';
 import {__tableNameWallet, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
 import browser from "webextension-polyfill";
-
 const storage = browser.storage;
 
 export enum MasterKeyStatus {
@@ -16,11 +15,9 @@ export enum MasterKeyStatus {
 
 export enum MsgType {
     PluginClicked = 'PluginClicked',
-    WalletOpen = 'WalletOpen',
-    WalletClose = 'WalletClose',
-    WalletCreated = 'WalletCreated',
-    SetActiveWallet = 'SetActiveWallet',
-    MasterKeyCreated = 'MasterKeyCreated'
+    OpenMasterKey = 'OpenMasterKey',
+    CloseMasterKey = 'CloseMasterKey',
+    SetActiveAccount = 'SetActiveAccount',
 }
 
 export function showView(hash: string, callback: (hash: string) => void): void {
@@ -34,7 +31,6 @@ export function showView(hash: string, callback: (hash: string) => void): void {
     }
     callback(hash);
 }
-
 
 export async function saveWallet(w: DbWallet): Promise<void> {
     try {
@@ -60,7 +56,6 @@ export async function loadLocalWallet(): Promise<DbWallet[]> {
     return walletObj;
 }
 
-
 export async function createQRCodeImg(data: string) {
     try {
         const url = await QRCode.toDataURL(data, {errorCorrectionLevel: 'H'});
@@ -71,8 +66,6 @@ export async function createQRCodeImg(data: string) {
         return null
     }
 }
-
-
 
 export async function sessionSet(key: string, value: any): Promise<void> {
     try {
