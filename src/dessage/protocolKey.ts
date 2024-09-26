@@ -2,12 +2,7 @@ import {ec as EC} from "elliptic";
 import nacl from "tweetnacl";
 import base58 from "bs58";
 import {keccak256} from "js-sha3";
-import Hex from "crypto-js/enc-hex";
-import SHA256 from "crypto-js/sha256";
-import RIPEMD160 from "crypto-js/ripemd160";
-import WordArray from "crypto-js/lib-typedarrays";
-import {convertBits, encodeHex, decodeHex} from "./util";
-import {bech32} from "bech32";
+import {encodeHex, decodeHex} from "./util";
 import {ed2CurvePri} from "./edwards25519";
 import {toBtcAddress, toNostrAddr} from "./dsg_account";
 

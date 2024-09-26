@@ -1,7 +1,7 @@
 import {mnemonicToSeedSync} from "bip39";
 import {decryptAes, encryptAes} from "./key_crypto";
 import {__tableNameMasterKey, databaseGetByID, upsertItem} from "../database";
-import {ExtendedKey, fromMasterSeed} from "./extended_key";
+import {fromMasterSeed} from "./extended_key";
 import {DsgAccount} from "./dsg_account";
 
 const __master_key_static_id = 1;

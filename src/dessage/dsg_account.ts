@@ -30,18 +30,18 @@ export class DsgAccount {
         const result = toNostrAddr(ecKeyNostr);
         this.nostrAddr = result.publicKey;
 
-        console.log('DSG 子私钥1 (Child Private Key):', dsgKey.privateKey?.toString('hex'));
-        console.log('DSG 子公钥1 (Child Public Key):', dsgKey.publicKey.toString('hex'));
-        console.log('DSG Address:', this.address);
-
-        console.log('BTC 子私钥1 (Child Private Key):', btcKey.privateKey?.toString('hex'));
-        console.log('BTC 子公钥1 (Child Public Key):', btcKey.publicKey.toString('hex'));
-        console.log('BTC Address:', this.btcAddress);
-
-        console.log('ETH 子私钥1 (Child Private Key):', ethKey.privateKey?.toString('hex'));
-        console.log('ETH 子公钥1 (Child Public Key):', ethKey.publicKey.toString('hex'));
-        console.log('ETH Address:', this.ethAddress);
-        console.log('Nostr Address:', this.nostrAddr);
+        // console.log('DSG 子私钥1 (Child Private Key):', dsgKey.privateKey?.toString('hex'));
+        // console.log('DSG 子公钥1 (Child Public Key):', dsgKey.publicKey.toString('hex'));
+        // console.log('DSG Address:', this.address);
+        //
+        // console.log('BTC 子私钥1 (Child Private Key):', btcKey.privateKey?.toString('hex'));
+        // console.log('BTC 子公钥1 (Child Public Key):', btcKey.publicKey.toString('hex'));
+        // console.log('BTC Address:', this.btcAddress);
+        //
+        // console.log('ETH 子私钥1 (Child Private Key):', ethKey.privateKey?.toString('hex'));
+        // console.log('ETH 子公钥1 (Child Public Key):', ethKey.publicKey.toString('hex'));
+        // console.log('ETH Address:', this.ethAddress);
+        // console.log('Nostr Address:', this.nostrAddr);
     }
 }
 
@@ -79,12 +79,13 @@ export function toEthAddress(ecKey: EC.KeyPair): string {
 }
 
 const DessageAddrPrefix = "NJ";
+
 export function toAddress(publicKey: Buffer): string {
     const encodedAddress = base58.encode(publicKey.subarray(1));
     return DessageAddrPrefix + encodedAddress;
 }
 
-export function toNostrAddr(ecKey: EC.KeyPair){
+export function toNostrAddr(ecKey: EC.KeyPair) {
     const publicKeyHex = ecKey.getPublic(true, 'hex');
     const privateKeyBN = ecKey.getPrivate();
 
