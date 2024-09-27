@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Simple Menu</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://ajax.googleapis.com;">
@@ -15,7 +15,8 @@
     <div class="login-body">
         <form>
             <div class="input-group">
-                <h2 for="login-password">Password</h2>
+                <h2>Password</h2>
+                <label for="login-password"></label>
                 <input type="password" id="login-password" name="password" required minlength="8"
                        placeholder="********">
                 <br> <span class="login-error"></span>
@@ -52,8 +53,10 @@
                     <ul class="account-list-content" id="account-list-content"></ul>
                 </div>
                 <div>
-                    <button class="account-list-new-account"><span id="btn-add-new-account-txt">Add New Account</span></button>
-                    <button class="account-list-import-account"><span id="btn-import-new-account-txt">Import Account</span></button>
+                    <button class="account-list-new-account"><span id="btn-add-new-account-txt">Add New Account</span>
+                    </button>
+                    <button class="account-list-import-account"><span
+                            id="btn-import-new-account-txt">Import Account</span></button>
                 </div>
             </div>
 
@@ -97,25 +100,25 @@
                     </div>
                     <div class="align-center">
                         <button class="dessage-token-op-buy-send function-btn">
-                            <img src="file/send.png">
+                            <img src="file/send.png" alt="send image">
                         </button>
                         <span>Send</span>
                     </div>
                     <div class="align-center">
                         <button class="dessage-token-op-buy-swap function-btn">
-                            <img src="file/swap.png">
+                            <img src="file/swap.png" alt="swap image">
                         </button>
                         <span>Swap</span>
                     </div>
                     <div class="align-center">
                         <button class="dessage-token-op-buy-chat function-btn">
-                            <img src="file/chat.png">
+                            <img src="file/chat.png" alt="chat image">
                         </button>
                         <span>Chat</span>
                     </div>
                     <div class="align-center">
                         <button class="dessage-token-op-buy-chat function-btn">
-                            <img src="file/tweets.png">
+                            <img src="file/tweets.png" alt="tweets image">
                         </button>
                         <span>Tweets</span>
                     </div>
@@ -127,15 +130,15 @@
             <div class="eth-accountInfo">
                 <div style="display: flex; justify-content: space-between; align-items: center">
                     <span class="eth-area-tittle">Ethereum Area</span>
-                    <select id="eth-network-switch" class="eth-network-switch">
-                        <option value="1" class="eth-network-item" id="eth-network-item-main">Ethereum Main</option>
-                        <option value="2" class="eth-network-item" id="eth-network-item-linea-main">Linea Main</option>
-                        <option value="3" class="eth-network-item" id="eth-network-item-arbitrum-one">Arbitrum One
-                        </option>
-                        <option value="4" class="eth-network-item" id="eth-network-item-sepolia">Sepolia</option>
-                        <option value="5" class="eth-network-item" id="eth-network-item-linea-sepolia">Linea Sepolia
-                        </option>
-                    </select>
+                    <label for="eth-network-switch"></label><select id="eth-network-switch" class="eth-network-switch">
+                    <option value="1" class="eth-network-item" id="eth-network-item-main">Ethereum Main</option>
+                    <option value="2" class="eth-network-item" id="eth-network-item-linea-main">Linea Main</option>
+                    <option value="3" class="eth-network-item" id="eth-network-item-arbitrum-one">Arbitrum One
+                    </option>
+                    <option value="4" class="eth-network-item" id="eth-network-item-sepolia">Sepolia</option>
+                    <option value="5" class="eth-network-item" id="eth-network-item-linea-sepolia">Linea Sepolia
+                    </option>
+                </select>
                 </div>
                 <div class="eth-address account-address">
                     <div class="tooltip">
@@ -159,19 +162,19 @@
             <div class="eth-operation btnAll">
                 <div class="align-center">
                     <button class="eth-operation-send function-btn">
-                        <img src="file/send.png">
+                        <img src="file/send.png" alt="send image">
                     </button>
                     <span>Send</span>
                 </div>
                 <div class="align-center">
                     <button class="eth-operation-erc20 function-btn">
-                        <img src="file/erc.png">
+                        <img src="file/erc.png" alt="erc image">
                     </button>
                     <span>ERC 20</span>
                 </div>
                 <div class="align-center">
                     <button class="eth-op-more function-btn">
-                        <img src="file/more.png">
+                        <img src="file/more.png" alt="more image">
                     </button>
                     <span>More</span>
                 </div>
@@ -182,6 +185,7 @@
             <div class="btc-accountInfo">
                 <div style="display: flex; justify-content: space-between; align-items: center">
                     <span class="btc-area-tittle">BTC Area</span>
+                    <label for="btc-network-switch"></label>
                     <select id="btc-network-switch" class="btc-network-switch">
                         <option value="1" class="btc-network-item" id="btc-network-item-main">main</option>
                         <option value="2" class="btc-network-item" id="btc-network-item-test">test</option>
@@ -206,25 +210,25 @@
             <div class="btc-operation btnAll">
                 <div class="align-center">
                     <button class="btc-operation-send function-btn">
-                        <img src="file/send.png">
+                        <img src="file/send.png" alt="send image">
                     </button>
                     <span>Send</span>
                 </div>
                 <div class="align-center">
                     <button class="eth-operation-receive function-btn">
-                        <img src="file/buysell.png">
+                        <img src="file/buysell.png" alt="buy image">
                     </button>
                     <span>Receive</span>
                 </div>
                 <div class="align-center">
                     <button class="btc-operation-brc20 function-btn">
-                        <img src="file/erc.png">
+                        <img src="file/erc.png" alt="erc image">
                     </button>
                     <span>BRC 20</span>
                 </div>
                 <div class="align-center">
                     <button class="btc-operation-more function-btn">
-                        <img src="file/more.png">
+                        <img src="file/more.png" alt="more image">
                     </button>
                     <span>More</span>
                 </div>
@@ -235,6 +239,7 @@
             <div class="nostr-accountInfo">
                 <div style="display: flex; justify-content: space-between; align-items: center">
                     <span class="nostr-area-tittle">Nostr Area</span>
+                    <label for="nostr-relay-switch"></label>
                     <select id="nostr-relay-switch" class="nostr-relay-switch">
                         <option value="wss://lightningrelay.com" class="nostr-relay-item">wss://lightningrelay.com
                         </option>
@@ -261,13 +266,13 @@
             <div class="nostr-operation btnAll">
                 <div class="align-center">
                     <button class="nostr-op-show-private-password function-btn">
-                        <img src="file/key.png">
+                        <img src="file/key.png" alt="key image">
                     </button>
                     <span>Show Private Key</span>
                 </div>
                 <div class="align-center">
                     <button class="nostr-op-more function-btn">
-                        <img src="file/more.png">
+                        <img src="file/more.png" alt="more image">
                     </button>
                     <span>More</span>
                 </div>
