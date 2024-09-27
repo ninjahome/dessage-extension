@@ -37,15 +37,14 @@ You can check the BIP44 standard and its specification [here](https://github.com
 import {ec, ec as EC} from "elliptic";
 import {derivePath, ExtendedKey} from "./extended_key";
 import {Address, toAddress, toBtcAddress, toEthAddress, toNostrAddr} from "./address";
-import {Buffer} from "buffer";
 
 class DsgPrivate {
-    dsgPri: Buffer;
-    ethPri: ec.KeyPair
+    dsgPri: string;
+    ethPri: string
     btcPri: string
     nostrPri: string
 
-    constructor(dsg: Buffer, eth: ec.KeyPair, btc: string, nostr: string) {
+    constructor(dsg: string, eth: string, btc: string, nostr: string) {
         this.dsgPri = dsg;
         this.ethPri = eth;
         this.nostrPri = nostr;
@@ -77,7 +76,10 @@ export class DsgKeyPair {
         const nostr_addr = result.publicKey;
 
         this.address = new Address(dsg_addr, btc_addr, eth_addr, nostr_addr, idx);
-        this.priKey = new DsgPrivate(dsgKey.privateKey!, ecKeyEth, btcKey.privateKey!.toString('hex'), result.privateKey);
+        this.priKey = new DsgPrivate(dsgKey.privateKey!.toString('hex'),
+            ethKey.privateKey!.toString('hex'),
+            btcKey.privateKey!.toString('hex'),
+            result.privateKey);
         this.name = "Address:" + idx;
         this.idx = idx;
     }

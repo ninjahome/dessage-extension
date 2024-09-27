@@ -21,11 +21,13 @@ export class EncryptedSeed {
 class MasterKey {
     id: number = __master_key_static_id;
     seedCipherTxt: EncryptedSeed;
-    accIndex: number = 0;
+    accountSize: number = 1;
+    publicKey: string;
 
-    constructor(cipherTxt: EncryptedSeed, accIndex?: number) {
+    constructor(cipherTxt: EncryptedSeed, accountSize: number, publicKey?: string) {
         this.seedCipherTxt = cipherTxt;
-        this.accIndex = accIndex ?? 0;
+        this.accountSize = accountSize;
+        this.publicKey = publicKey ?? "";
     }
 
     async saveToDb() {
@@ -33,13 +35,18 @@ class MasterKey {
     }
 
     unlock(pwd: string): Map<string, DsgKeyPair> {
+
         const decryptedSeedStr = decryptAes(this.seedCipherTxt, pwd);
-        const seedBuffer = Buffer.from(decryptedSeedStr, 'hex');
+        const seed = Buffer.from(decryptedSeedStr, 'hex');
         // console.log("--------------->>>>>>seed load:=>",seedBuffer.toString('hex'))
-        const seedKey = fromMasterSeed(seedBuffer);
+
+        const seedKey = fromMasterSeed(seed);
+        if (seedKey.publicKey.toString('hex') !== this.publicKey) {
+            throw new Error('invalid password');
+        }
 
         const keyPairMap = new Map();
-        for (let i = 0; i <= this.accIndex; i++) {
+        for (let i = 0; i < this.accountSize; i++) {
             const keyPair = new DsgKeyPair(seedKey, i)
             keyPairMap.set(keyPair.address, keyPair);
         }
@@ -50,9 +57,9 @@ class MasterKey {
 
 export function NewMasterKey(mnemonic: string, password: string): MasterKey {
     const seed = mnemonicToSeedSync(mnemonic);
-    // console.log("--------------->>>>>>seed created:=>",seed.toString('hex'))
     const seedTxt = encryptAes(seed.toString('hex'), password);
-    return new MasterKey(seedTxt);
+    const seedKey = fromMasterSeed(seed);
+    return new MasterKey(seedTxt, 1, seedKey.publicKey.toString('hex'));
 }
 
 export async function loadMasterKey(): Promise<MasterKey | null> {
@@ -62,5 +69,5 @@ export async function loadMasterKey(): Promise<MasterKey | null> {
         return null;
     }
 
-    return new MasterKey(key_obj.seedCipherTxt, key_obj.accIndex);
+    return new MasterKey(key_obj.seedCipherTxt, key_obj.accountSize, key_obj.publicKey);
 }

@@ -1,6 +1,6 @@
 let __databaseObj: IDBDatabase | null = null;
 const __databaseName = 'dessage-database';
-export const __currentDatabaseVersion = 17;
+export const __currentDatabaseVersion = 18;
 export const __tableNameWallet = '__table_wallet__';
 export const __tableSystemSetting = '__table_system_setting__';
 export const __tableNameMasterKey = '__table_master_key__';

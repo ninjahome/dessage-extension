@@ -3,11 +3,10 @@ import browser, {Runtime} from "webextension-polyfill";
 import {MasterKeyStatus, MsgType, sessionGet, sessionRemove, sessionSet} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
 import {loadMasterKey} from "./dessage/master_key";
-import {testMasterKeySeed} from "./test";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
-const __key_master_key_status: string = '__key_wallet_status__';
+const __key_master_key_status: string = '__key_account_status__';
 const __key_key_pair_map: string = '__key_wallet_map__';
 const __key_last_touch: string = '__key_last_touch__';
 const __alarm_name__: string = '__alarm_name__timer__';
@@ -94,26 +93,16 @@ function queryBalance(): void {
         });
 }
 
-async function closeWallet(sendResponse?: (response: any) => void): Promise<void> {
-    try {
+async function closeWallet(): Promise<void> {
         await sessionRemove(__key_key_pair_map);
         await sessionRemove(__key_master_key_status);
-        if (sendResponse) {
-            sendResponse({status: 'success'});
-        }
-    } catch (error) {
-        const err = error as Error;
-        console.error('[service work] Error in closeWallet:', err);
-        if (sendResponse) {
-            sendResponse({status: 'failure', message: err.toString()});
-        }
-    }
+        await sessionRemove(__key_last_touch);
 }
 
 async function pluginClicked(sendResponse: (response: any) => void): Promise<void> {
     try {
         await checkAndInitDatabase();
-        await testMasterKeySeed();
+        // await testEncrypt();
 
         let msg = '';
         let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
@@ -152,18 +141,20 @@ async function openMasterKey(pwd: string, sendResponse: (response: any) => void)
 
         const allKeyPairs = masterKey?.unlock(pwd);
         const obj = Object.fromEntries(allKeyPairs);
+        const objStr = JSON.stringify(obj)
 
         await sessionSet(__key_master_key_status, MasterKeyStatus.Unlocked);
-        await sessionSet(__key_key_pair_map, obj);
-        console.log(`[service work] all key pair size(${allKeyPairs?.size})`);
+        await sessionSet(__key_key_pair_map, objStr);
         await sessionSet(__key_last_touch, Date.now());
 
-        sendResponse({status: true, message: JSON.stringify(obj)});
+        console.log(`[service work] all key pair size(${allKeyPairs?.size}) string size=${objStr.length}`);
+        sendResponse({status: true, message: objStr});
+
     } catch (error) {
         const err = error as Error;
         console.error('[service work] Error in open wallet:', err);
         let msg = err.toString();
-        if (msg.includes("Malformed")) {
+        if (msg.includes("Malformed") || msg.includes("bad size")) {
             msg = "invalid password";
         }
         sendResponse({status: false, message: msg});
@@ -172,16 +163,16 @@ async function openMasterKey(pwd: string, sendResponse: (response: any) => void)
 
 async function setActiveWallet(address: string, sendResponse: (response: any) => void): Promise<void> {
     try {
-        const sObj = await sessionGet(__key_key_pair_map);
-        const obj = new Map(Object.entries(sObj));
+        const objStr = await sessionGet(__key_key_pair_map);
+        const keypairMap = new Map(Object.entries(JSON.parse(objStr)));
 
-        const outerWallet = obj.get(address);
-        console.log("[service work] obj is:", obj, " have a try:", outerWallet, "for:", address);
-        if (!outerWallet) {
+        const keypair = keypairMap.get(address);
+        console.log("[service work] keypairMap is:", keypairMap, " have a try:", keypair, "for:", address);
+        if (!keypair) {
             sendResponse({status: false, message: 'no such outer wallet'});
             return;
         }
-        __curActiveWallet = outerWallet;
+        __curActiveWallet = keypair;
         sendResponse({status: true, message: 'success'});
     } catch (error) {
         console.error('[service work] Error in setActiveWallet:', error);

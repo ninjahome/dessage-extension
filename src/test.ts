@@ -2,6 +2,7 @@ import {mnemonicToSeedSync} from "bip39";
 import {deriveChild, derivePath, fromMasterSeed} from "./dessage/extended_key";
 import {loadMasterKey, NewMasterKey} from "./dessage/master_key";
 import {__tableNameMasterKey, databaseDelete} from "./database";
+import {decryptAes} from "./dessage/key_crypto";
 
 // 测试 BIP44 派生路径（完整路径派生）
 export function testBip44() {
@@ -73,4 +74,13 @@ export async function testMasterKeySeed() {
     await masterKey.saveToDb();
     const savedKey = await loadMasterKey();
     savedKey?.unlock('123');
+}
+
+export async function testEncrypt() {
+    const mnemonic = "state motion recall collect wire hold tiny occur flock depend slush hurdle";
+    const masterKey = NewMasterKey(mnemonic, '123');
+    console.log("------------>>>>>", masterKey.seedCipherTxt);
+
+    const decryptedSeed = decryptAes(masterKey.seedCipherTxt, '123');
+    console.log("------------>>>>>", decryptedSeed);
 }
