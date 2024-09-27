@@ -90,7 +90,7 @@ export async function sessionGet(key: string): Promise<any> {
 export async function sessionRemove(key: string): Promise<void> {
     try {
         await storage.session.remove(key);
-        console.log("[service work] Value was removed successfully.");
+        // console.log("[service work] Value was removed successfully.");
     } catch (error) {
         console.error("[service work] Failed to remove value:", error);
     }

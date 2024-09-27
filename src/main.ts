@@ -33,6 +33,11 @@ function initDashBoard(): void {
         accountListDiv.style.display = "block";
     });
 
+    const quitBtn = document.getElementById("exit_dashboard_btn") as HTMLButtonElement;
+    quitBtn.addEventListener("click", async () => {
+        await quitFromDashboard();
+    })
+
     const listCloseBtn = accountListDiv.querySelector(".account-list-header-btn") as HTMLButtonElement;
     listCloseBtn.addEventListener("click", async () => {
         accountListDiv.style.display = "none";
@@ -227,4 +232,9 @@ function initQrCodeShowDiv() {
     closeBtn.addEventListener('click', () => {
         qrDiv.style.display = 'none';
     });
+}
+
+async function quitFromDashboard() {
+    showView('#onboarding/unlock-plugin', router);
+    await browser.runtime.sendMessage({ action: MsgType.CloseMasterKey});
 }

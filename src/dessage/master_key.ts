@@ -47,7 +47,7 @@ class MasterKey {
         const keyPairMap = new Map();
         for (let i = 0; i < this.accountSize; i++) {
             const keyPair = new DsgKeyPair(seedKey, i)
-            keyPairMap.set(keyPair.address, keyPair);
+            keyPairMap.set(keyPair.address.dsgAddr, keyPair);
         }
 
         return keyPairMap;
