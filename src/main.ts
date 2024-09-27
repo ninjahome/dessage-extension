@@ -6,10 +6,10 @@ import {importNinjaAccount, initDessageArea, newNinjaAccount, setupNinjaDetail} 
 import {initEthArea, setupEtherArea} from "./main_eth";
 import {initBtcArea, setupBtcArea} from "./main_btc";
 import {initNostrArea, setupNostr} from "./main_nostr";
-import {Address} from "./dessage/address";
+import {DsgKeyPair} from "./dessage/dsg_keypair";
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
-export let __walletMap: Map<string, Address> = new Map();
+export let __keypairMap: Map<string, DsgKeyPair> = new Map();
 
 async function initDessagePlugin(): Promise<void> {
     await initDatabase();
@@ -85,8 +85,8 @@ function checkBackgroundStatus(): void {
                 return;
             case MasterKeyStatus.Unlocked:
                 const obj = JSON.parse(response.message);
-                __walletMap = new Map<string, any>(Object.entries(obj));
-                console.log("------------>>>", __walletMap.size);
+                __keypairMap = new Map<string, DsgKeyPair>(Object.entries(obj));
+                console.log("------------>>>keypair size=", __keypairMap.size);
                 showView('#onboarding/dashboard', router);
                 return;
             case MasterKeyStatus.Error:
@@ -104,13 +104,13 @@ function populateDashboard() {
 }
 
 function setupAllAccountArea() {
-    const wallet = __walletMap.get(__systemSetting.address);
-    if (!wallet) {
+    const keypair = __keypairMap.get(__systemSetting.address);
+    if (!keypair) {
         return;
     }
 
     const nameDiv = document.getElementById("account-info-name") as HTMLElement;
-    nameDiv.innerText = wallet.name ?? "Account";
+    nameDiv.innerText = keypair.name ?? "Account";
     setupNinjaDetail();
     setupEtherArea();
     setupBtcArea();
@@ -123,18 +123,18 @@ function setAccountSwitchArea(): void {
     const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
     let selAddress = __systemSetting.address;
 
-    __walletMap.forEach((wallet, addr) => {
+    __keypairMap.forEach((keypair, addr) => {
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
         itemDiv.addEventListener("click", async () => {
             const accountListDiv = document.getElementById("account-list-area") as HTMLDivElement;
-            await changeSelectedAccount(parentDiv, itemDiv, wallet);
+            await changeSelectedAccount(parentDiv, itemDiv, keypair);
             accountListDiv.style.display = 'none';
         })
 
         const nameDiv = itemDiv.querySelector(".account-detail-name") as HTMLElement;
         const addressDiv = itemDiv.querySelector(".account-detail-address") as HTMLElement;
-        nameDiv.textContent = wallet.name ?? "Account";
+        nameDiv.textContent = keypair.name ?? "Account";
         addressDiv.textContent = addr;
 
         parentDiv.appendChild(itemDiv);
@@ -178,30 +178,34 @@ function initLoginDiv(): void {
     button.addEventListener('click', openMasterKey);
 }
 
-function openMasterKey(): void {
+async function openMasterKey(): Promise<void> {
     const inputElement = document.querySelector(".login-container input") as HTMLInputElement;
     const password = inputElement.value;
 
-    browser.runtime.sendMessage({action: MsgType.OpenMasterKey, password: password}).then((response: {
-        status: boolean;
-        message: string
-    }) => {
-        if (response.status) {
-            const obj = JSON.parse(response.message);
-            console.log("------------>>>", response.message, obj);
-            __walletMap = new Map<string, Address>(Object.entries(obj));
-            showView('#onboarding/dashboard', router);
+    try {
+        const response = await browser.runtime.sendMessage({
+            action: MsgType.OpenMasterKey,
+            password: password
+        });
+
+        if (!response.status) {
+            const errTips = document.querySelector(".login-container .login-error") as HTMLElement;
+            errTips.innerText = response.message;
             return;
         }
-        const errTips = document.querySelector(".login-container .login-error") as HTMLElement;
-        errTips.innerText = response.message;
-    }).catch(error => {
+
+        const obj = JSON.parse(response.message);
+        __keypairMap = new Map<string, DsgKeyPair>(Object.entries(obj));
+        console.log("------------>>>keypair size=", __keypairMap.size);
+        showView('#onboarding/dashboard', router);
+
+    } catch (error) {
         console.error('Error sending message:', error);
-    });
+    }
 }
 
-async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: Address) {
-    if (__systemSetting.address === wallet.address) {
+async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, keyPair: DsgKeyPair) {
+    if (__systemSetting.address === keyPair.address.dsgAddr) {
         console.log("------>>> no need to change ", __systemSetting.address);
         return;
     }
@@ -212,7 +216,7 @@ async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElemen
         itemDiv.classList.remove("active");
     });
     itemDiv.classList.add("active");
-    await __systemSetting.changeAddr(wallet.address);
+    await __systemSetting.changeAddr(keyPair.address.dsgAddr);
     notifyBackgroundActiveWallet(__systemSetting.address);
     setupAllAccountArea()
 }

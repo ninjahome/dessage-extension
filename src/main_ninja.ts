@@ -1,5 +1,5 @@
 import {__systemSetting, commonAddrAndCode} from "./main_common";
-import {__walletMap} from "./main";
+import {__keypairMap} from "./main";
 import browser from "webextension-polyfill";
 
 export function initDessageArea() {
@@ -7,13 +7,13 @@ export function initDessageArea() {
 }
 
 export function setupNinjaDetail(): void {
-    const wallet = __walletMap.get(__systemSetting.address);
-    if (!wallet) {
+    const keypair = __keypairMap.get(__systemSetting.address);
+    if (!keypair) {
         return;
     }
     const ninjaArea = document.getElementById("ninja-account-area") as HTMLElement;
     const ninjaAddrDiv = ninjaArea.querySelector(".address-val") as HTMLElement;
-    ninjaAddrDiv.innerText = wallet.address;
+    ninjaAddrDiv.innerText = keypair.address.dsgAddr;
 
     commonAddrAndCode("ninja-account-area", "ninja-address-qr-btn");
 }

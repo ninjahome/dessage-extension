@@ -34,7 +34,6 @@ For **Ethereum**, the derivation path `m/44'/60'/0'/0/0` generates the first Eth
 
 You can check the BIP44 standard and its specification [here](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki).
 */
-
 import {ec, ec as EC} from "elliptic";
 import {derivePath, ExtendedKey} from "./extended_key";
 import {Address, toAddress, toBtcAddress, toEthAddress, toNostrAddr} from "./address";
@@ -66,17 +65,20 @@ export class DsgKeyPair {
         const ethKey = derivePath(seedKey, "m/44'/60'/0'/0/" + idx);
 
         const dsg_addr = toAddress(dsgKey.publicKey);
+
         const btc_addr = toBtcAddress(btcKey.publicKey.toString('hex'));
         const ec = new EC('secp256k1');
+
         const ecKeyEth = ec.keyFromPrivate(ethKey.privateKey!);
         const eth_addr = toEthAddress(ecKeyEth);
+
         const ecKeyNostr = ec.keyFromPrivate(dsgKey.privateKey!);
         const result = toNostrAddr(ecKeyNostr);
         const nostr_addr = result.publicKey;
+
         this.address = new Address(dsg_addr, btc_addr, eth_addr, nostr_addr, idx);
         this.priKey = new DsgPrivate(dsgKey.privateKey!, ecKeyEth, btcKey.privateKey!.toString('hex'), result.privateKey);
         this.name = "Address:" + idx;
         this.idx = idx;
     }
-
 }

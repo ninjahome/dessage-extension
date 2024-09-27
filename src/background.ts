@@ -7,9 +7,9 @@ import {testMasterKeySeed} from "./test";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
-const __key_master_key_status: string = '__key_wallet_status';
-const __key_wallet_map: string = '__key_wallet_map';
-const __key_last_touch: string = '__key_last_touch';
+const __key_master_key_status: string = '__key_wallet_status__';
+const __key_key_pair_map: string = '__key_wallet_map__';
+const __key_last_touch: string = '__key_last_touch__';
 const __alarm_name__: string = '__alarm_name__timer__';
 let __curActiveWallet: any = null;
 
@@ -96,7 +96,7 @@ function queryBalance(): void {
 
 async function closeWallet(sendResponse?: (response: any) => void): Promise<void> {
     try {
-        await sessionRemove(__key_wallet_map);
+        await sessionRemove(__key_key_pair_map);
         await sessionRemove(__key_master_key_status);
         if (sendResponse) {
             sendResponse({status: 'success'});
@@ -114,6 +114,7 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
     try {
         await checkAndInitDatabase();
         await testMasterKeySeed();
+
         let msg = '';
         let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
         if (keyStatus === MasterKeyStatus.Init) {
@@ -126,7 +127,7 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
         }
 
         if (keyStatus === MasterKeyStatus.Unlocked) {
-            const sObj = await sessionGet(__key_wallet_map);
+            const sObj = await sessionGet(__key_key_pair_map);
             msg = JSON.stringify(sObj);
         }
 
@@ -143,19 +144,20 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
 async function openMasterKey(pwd: string, sendResponse: (response: any) => void): Promise<void> {
     try {
         await checkAndInitDatabase();
-        const outerWallet = new Map();
         const masterKey = await loadMasterKey();
+        if (!masterKey) {
+            sendResponse({status: false, message: "no valid account found"});
+            return;
+        }
 
-        // wallets.forEach(wallet => {
-        //     const memWallet = castToMemWallet(pwd, wallet);
-        //     outerWallet.set(wallet.address.address, memWallet.address);
-        // });
+        const allKeyPairs = masterKey?.unlock(pwd);
+        const obj = Object.fromEntries(allKeyPairs);
 
-        const obj = Object.fromEntries(outerWallet);
         await sessionSet(__key_master_key_status, MasterKeyStatus.Unlocked);
-        await sessionSet(__key_wallet_map, obj);
-        console.log("[service work] outerWallet=>", outerWallet);
+        await sessionSet(__key_key_pair_map, obj);
+        console.log(`[service work] all key pair size(${allKeyPairs?.size})`);
         await sessionSet(__key_last_touch, Date.now());
+
         sendResponse({status: true, message: JSON.stringify(obj)});
     } catch (error) {
         const err = error as Error;
@@ -170,7 +172,7 @@ async function openMasterKey(pwd: string, sendResponse: (response: any) => void)
 
 async function setActiveWallet(address: string, sendResponse: (response: any) => void): Promise<void> {
     try {
-        const sObj = await sessionGet(__key_wallet_map);
+        const sObj = await sessionGet(__key_key_pair_map);
         const obj = new Map(Object.entries(sObj));
 
         const outerWallet = obj.get(address);
