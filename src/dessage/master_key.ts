@@ -38,7 +38,6 @@ class MasterKey {
 
         const decryptedSeedStr = decryptAes(this.seedCipherTxt, pwd);
         const seed = Buffer.from(decryptedSeedStr, 'hex');
-        // console.log("--------------->>>>>>seed load:=>",seedBuffer.toString('hex'))
 
         const seedKey = fromMasterSeed(seed);
         if (seedKey.publicKey.toString('hex') !== this.publicKey) {
