@@ -2,7 +2,7 @@ import {mnemonicToSeedSync} from "bip39";
 import {decryptAes, encryptAes} from "./key_crypto";
 import {__tableNameMasterKey, databaseGetByID, upsertItem} from "../database";
 import {fromMasterSeed} from "./extended_key";
-import {DsgAccount} from "./dsg_account";
+import {DsgKeyPair} from "./dsg_account";
 
 const __master_key_static_id = 1;
 
@@ -32,18 +32,15 @@ class MasterKey {
         return await upsertItem(__tableNameMasterKey, this)
     }
 
-    unlock(pwd: string): Map<string, DsgAccount> {
+    unlock(pwd: string): Map<string, DsgKeyPair> {
 
         const decryptedSeedStr = decryptAes(this.seedCipherTxt, pwd);
         const seedBuffer = Buffer.from(decryptedSeedStr, 'hex');
         // console.log("--------------->>>>>>seed load:=>",seedBuffer.toString('hex'))
         const seedKey = fromMasterSeed(seedBuffer);
-        //
-        // console.log('主私钥 (Master Private Key):', seedKey.privateKey!.toString('hex'));
-        // console.log('主公钥 (Master Private Key):', seedKey.publicKey!.toString('hex'));
         const outerWallet = new Map();
         for (let i = 0; i <= this.accIndex; i++) {
-            const account = new DsgAccount(seedKey, i)
+            const account = new DsgKeyPair(seedKey, i)
             outerWallet.set(account.address, account);
         }
 

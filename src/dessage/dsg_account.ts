@@ -1,108 +1,82 @@
-import {ec as EC} from "elliptic";
-import {derivePath, ExtendedKey} from "./extended_key";
-import Hex from "crypto-js/enc-hex";
-import SHA256 from "crypto-js/sha256";
-import RIPEMD160 from "crypto-js/ripemd160";
-import WordArray from "crypto-js/lib-typedarrays";
-import base58 from "bs58";
-import {keccak256} from "js-sha3";
-import {Buffer} from "buffer";
-import {convertBits, decodeHex} from "./util";
-import {bech32} from "bech32";
+/*
+In the **BIP44** standard, which is used for hierarchical deterministic wallets (HD wallets), the path `m/44'/60'/0'/0/0` is a commonly used derivation path for generating blockchain addresses. Here's what each part of the path means:
 
-export class DsgAccount {
-    address: string;
-    btcAddress: string;
-    ethAddress: string;
-    nostrAddr: string;
+1. **`m`**: This refers to the master node (the root of the HD wallet tree), derived from the seed.
+
+2. **`44'`**: The first number represents the purpose of the wallet and in this case, `44'` corresponds to the **BIP44** standard. The apostrophe (`'`) indicates that this is a **hardened** derivation, meaning that this level adds extra security by preventing child nodes from compromising the parent node.
+
+3. **`60'`**: This number is the **coin type**. Each cryptocurrency has a different number assigned to it.
+   - `60'` is assigned to **Ethereum**.
+   - `0'` is assigned to **Bitcoin**.
+
+4. **`0'`**: This number is the **account index**. In a BIP44-compliant wallet, you can have multiple accounts. `0'` refers to the first account. Like the previous numbers, this is a hardened derivation.
+
+5. **`0`**: This number represents the **change**:
+   - `0` refers to **external addresses** (used for receiving funds).
+   - `1` refers to **internal addresses** (used for change from transactions).
+
+6. **`0`**: This is the **address index**. It indicates the index number of the generated address. Each new address generated increments this number (e.g., `0`, `1`, `2`, etc.).
+
+### Summary:
+- **m**: Master node (root of the HD wallet).
+- **44'**: Follows the BIP44 standard.
+- **60'**: Coin type (60' is Ethereum, 0' is Bitcoin).
+- **0'**: Account number (first account).
+- **0**: External addresses for receiving.
+- **0**: First address under this account.
+
+### Example Use:
+For **Ethereum**, the derivation path `m/44'/60'/0'/0/0` generates the first Ethereum address in the first account, while `m/44'/60'/0'/0/1` would generate the second address.
+
+### More Information:
+- **BIP44**: It is a specification for HD wallets allowing multiple cryptocurrencies to be managed from a single seed.
+- **Hardened Derivation**: Adds an extra layer of security, especially between parent and child keys.
+
+You can check the BIP44 standard and its specification [here](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki).
+*/
+
+import {ec, ec as EC} from "elliptic";
+import {derivePath, ExtendedKey} from "./extended_key";
+import {Address, toAddress, toBtcAddress, toEthAddress, toNostrAddr} from "./address";
+import {Buffer} from "buffer";
+
+class DsgPrivate {
+    dsgPri: Buffer;
+    ethPri: ec.KeyPair
+    btcPri: string
+    nostrPri: string
+
+    constructor(dsg: Buffer, eth: ec.KeyPair, btc: string, nostr: string) {
+        this.dsgPri = dsg;
+        this.ethPri = eth;
+        this.nostrPri = nostr;
+        this.btcPri = btc;
+    }
+}
+
+export class DsgKeyPair {
+    address: Address;
+    priKey?: DsgPrivate;
+    idx: number;
+    name?: string;
 
     constructor(seedKey: ExtendedKey, idx: number) {
         const dsgKey = derivePath(seedKey, "m/44'/1286'/0'/0/" + idx);
         const btcKey = derivePath(seedKey, "m/44'/0'/0'/0/" + idx);
         const ethKey = derivePath(seedKey, "m/44'/60'/0'/0/" + idx);
 
-        this.address = toAddress(dsgKey.publicKey);
-        this.btcAddress = toBtcAddress(btcKey.publicKey.toString('hex'));
+        const dsg_addr = toAddress(dsgKey.publicKey);
+        const btc_addr = toBtcAddress(btcKey.publicKey.toString('hex'));
         const ec = new EC('secp256k1');
         const ecKeyEth = ec.keyFromPrivate(ethKey.privateKey!);
-        this.ethAddress = toEthAddress(ecKeyEth);
+        const eth_addr = toEthAddress(ecKeyEth);
         const ecKeyNostr = ec.keyFromPrivate(dsgKey.privateKey!);
         const result = toNostrAddr(ecKeyNostr);
-        this.nostrAddr = result.publicKey;
-
-        // console.log('DSG 子私钥1 (Child Private Key):', dsgKey.privateKey?.toString('hex'));
-        // console.log('DSG 子公钥1 (Child Public Key):', dsgKey.publicKey.toString('hex'));
-        // console.log('DSG Address:', this.address);
-        //
-        // console.log('BTC 子私钥1 (Child Private Key):', btcKey.privateKey?.toString('hex'));
-        // console.log('BTC 子公钥1 (Child Public Key):', btcKey.publicKey.toString('hex'));
-        // console.log('BTC Address:', this.btcAddress);
-        //
-        // console.log('ETH 子私钥1 (Child Private Key):', ethKey.privateKey?.toString('hex'));
-        // console.log('ETH 子公钥1 (Child Public Key):', ethKey.publicKey.toString('hex'));
-        // console.log('ETH Address:', this.ethAddress);
-        // console.log('Nostr Address:', this.nostrAddr);
+        const nostr_addr = result.publicKey;
+        this.address = new Address(dsg_addr, btc_addr, eth_addr, nostr_addr, idx);
+        this.priKey = new DsgPrivate(dsgKey.privateKey!, ecKeyEth, btcKey.privateKey!.toString('hex'), result.privateKey);
+        this.name = "Address:" + idx;
+        this.idx = idx;
     }
-}
 
-export function toBtcAddress(pubKey: string, isTestNet: boolean = false): string {
-    const publicKeyBytes = Hex.parse(pubKey);
-    const sha256Hash = SHA256(publicKeyBytes);
-    const ripemd160Hash = RIPEMD160(sha256Hash);
-    let version = isTestNet ? '6f' : '00'; // Choose version based on network
-    const versionByte = new Uint8Array([parseInt(version, 16)]);
-    const ripemd160Bytes = Uint8Array.from(Hex.parse(ripemd160Hash.toString()).words.map(word => [
-        (word >> 24) & 0xFF, (word >> 16) & 0xFF, (word >> 8) & 0xFF, word & 0xFF
-    ]).flat());
-
-    const versionedPayload = new Uint8Array(versionByte.length + ripemd160Bytes.length);
-    versionedPayload.set(versionByte, 0);
-    versionedPayload.set(ripemd160Bytes, versionByte.length);
-
-    const wordPayload = WordArray.create(versionedPayload);
-    const doubleSHA256 = SHA256(SHA256(wordPayload));
-    const checkSumArray = Uint8Array.from(Hex.parse(doubleSHA256.toString()).words.map(word => [
-        (word >> 24) & 0xFF, (word >> 16) & 0xFF, (word >> 8) & 0xFF, word & 0xFF
-    ]).flat()).slice(0, 4);
-
-    const finalPayload = new Uint8Array(versionedPayload.length + 4);
-    finalPayload.set(versionedPayload, 0);
-    finalPayload.set(checkSumArray, versionedPayload.length);
-    return base58.encode(Buffer.from(finalPayload));
-}
-
-export function toEthAddress(ecKey: EC.KeyPair): string {
-    const publicKey = ecKey.getPublic();
-    const publicKeyBytes = Buffer.from(publicKey.encode('array', false).slice(1));
-    const hashedPublicKey = keccak256(publicKeyBytes);
-    return '0x' + hashedPublicKey.slice(-40);
-}
-
-const DessageAddrPrefix = "NJ";
-
-export function toAddress(publicKey: Buffer): string {
-    const encodedAddress = base58.encode(publicKey.subarray(1));
-    return DessageAddrPrefix + encodedAddress;
-}
-
-export function toNostrAddr(ecKey: EC.KeyPair) {
-    const publicKeyHex = ecKey.getPublic(true, 'hex');
-    const privateKeyBN = ecKey.getPrivate();
-
-    const privateKeyBytes = new Uint8Array(privateKeyBN.toArray('be', 32));
-    const publicKeyBytes = decodeHex(publicKeyHex).slice(1);
-
-    const publicWords = convertBits(publicKeyBytes, 8, 5);
-    const privateWords = convertBits(privateKeyBytes, 8, 5);
-
-    const encodedPublicKey = bech32.encode('npub', publicWords);
-    const encodedPrivateKey = bech32.encode('nsec', privateWords);
-
-    // console.log("-------->>> pub=>", encodedPublicKey);
-    // console.log("-------->>> pri=>", encodedPrivateKey);
-
-    return {
-        publicKey: encodedPublicKey,
-        privateKey: encodedPrivateKey
-    };
 }

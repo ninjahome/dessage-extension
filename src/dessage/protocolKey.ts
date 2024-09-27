@@ -2,29 +2,9 @@ import {ec as EC} from "elliptic";
 import nacl from "tweetnacl";
 import base58 from "bs58";
 import {keccak256} from "js-sha3";
-import {encodeHex, decodeHex} from "./util";
+import {decodeHex, encodeHex} from "./util";
 import {ed2CurvePri} from "./edwards25519";
-import {toBtcAddress, toNostrAddr} from "./dsg_account";
-
-
-const DessageAddrPrefix = "NJ";
-
-export class MultiAddress {
-    address: string;
-    btcAddr: string;
-    ethAddr: string;
-    nostrAddr: string;
-    testBtcAddr: string;
-    name?: string;
-
-    constructor(address: string, btcAddr: string, ethAddr: string, nostrAddr: string, testBtcAddr: string) {
-        this.address = address;
-        this.btcAddr = btcAddr;
-        this.ethAddr = ethAddr;
-        this.nostrAddr = nostrAddr;
-        this.testBtcAddr = testBtcAddr;
-    }
-}
+import {DessageAddrPrefix, Address, toBtcAddress, toNostrAddr} from "./address";
 
 export class ProtocolKey {
     pri: Uint8Array;
@@ -99,13 +79,12 @@ export class ProtocolKey {
         return true;
     }
 
-    driveAddress(): MultiAddress {
+    driveAddress(): Address {
         const address = this.getPub()
         const btcAddr = this.generateBtcAddress();
         const ethAddr = this.getEthPub();
         const nostrKey = this.encodeKeysWithBech32();
-        const btcTestAddr = this.generateBtcAddress(true);
-        return new MultiAddress(address, btcAddr, ethAddr, nostrKey.publicKey, btcTestAddr);
+        return new Address(address, btcAddr, ethAddr, nostrKey.publicKey, 0);
     }
 }
 

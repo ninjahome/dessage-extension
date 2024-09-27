@@ -1,16 +1,17 @@
 import {mnemonicToSeedSync} from "bip39";
-import {MultiAddress, ProtocolKey} from "./protocolKey";
+import {ProtocolKey} from "./protocolKey";
 import {decryptAes, encryptAes} from "./key_crypto";
 import {decodeHex} from "./util";
 import {EncryptedSeed} from "./master_key";
+import {Address} from "./address";
 
 export class DbWallet {
     uuid: string;
     name: string;
-    address: MultiAddress;
-    cipherTxt:EncryptedSeed;
+    address: Address;
+    cipherTxt: EncryptedSeed;
 
-    constructor(uuid: string, address: MultiAddress, cipherTxt: EncryptedSeed, name?: string) {
+    constructor(uuid: string, address: Address, cipherTxt: EncryptedSeed, name?: string) {
         this.uuid = uuid;
         this.address = address;
         this.cipherTxt = cipherTxt;
@@ -23,10 +24,10 @@ export class DbWallet {
 }
 
 export class MemWallet {
-    address: MultiAddress;
+    address: Address;
     key: ProtocolKey;
 
-    constructor(address: MultiAddress, key: ProtocolKey) {
+    constructor(address: Address, key: ProtocolKey) {
         this.address = address;
         this.key = key;
     }
@@ -57,6 +58,5 @@ export function castToMemWallet(pwd: string, wallet: DbWallet): MemWallet {
     const priArray = decodeHex(decryptedPri);
     const key = new ProtocolKey(priArray);
     const address = key.driveAddress();
-    address.name = wallet.name;
     return new MemWallet(address, key);
 }

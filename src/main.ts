@@ -1,15 +1,15 @@
 import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
 import {MsgType, showView, MasterKeyStatus} from './common';
-import {MultiAddress} from "./dessage/protocolKey";
 import {__systemSetting, loadLastSystemSetting} from "./main_common";
 import {importNinjaAccount, initDessageArea, newNinjaAccount, setupNinjaDetail} from "./main_ninja";
 import {initEthArea, setupEtherArea} from "./main_eth";
 import {initBtcArea, setupBtcArea} from "./main_btc";
 import {initNostrArea, setupNostr} from "./main_nostr";
+import {Address} from "./dessage/address";
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
-export let __walletMap: Map<string, MultiAddress> = new Map();
+export let __walletMap: Map<string, Address> = new Map();
 
 async function initDessagePlugin(): Promise<void> {
     await initDatabase();
@@ -189,7 +189,7 @@ function openMasterKey(): void {
         if (response.status) {
             const obj = JSON.parse(response.message);
             console.log("------------>>>", response.message, obj);
-            __walletMap = new Map<string, MultiAddress>(Object.entries(obj));
+            __walletMap = new Map<string, Address>(Object.entries(obj));
             showView('#onboarding/dashboard', router);
             return;
         }
@@ -200,7 +200,7 @@ function openMasterKey(): void {
     });
 }
 
-async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: MultiAddress) {
+async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, wallet: Address) {
     if (__systemSetting.address === wallet.address) {
         console.log("------>>> no need to change ", __systemSetting.address);
         return;

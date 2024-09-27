@@ -20,6 +20,7 @@ class FieldElement {
     get(index: number): number {
         return this.values[index];
     }
+
     setZero(): void {
         this.values.fill(0);
     }
@@ -221,6 +222,7 @@ function FeFromBytes(dst: FieldElement, src: Uint8Array): void {
 
     FeCombine(dst, h0, h1, h2, h3, h4, h5, h6, h7, h8, h9);
 }
+
 function feSquare(f: FieldElement): [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint] {
     const f0 = BigInt(f.get(0));
     const f1 = BigInt(f.get(1));
@@ -266,6 +268,7 @@ function FeSquare(h: FieldElement, f: FieldElement): void {
     const [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9] = feSquare(f);
     FeCombine(h, h0, h1, h2, h3, h4, h5, h6, h7, h8, h9);
 }
+
 function FeMul(h: FieldElement, f: FieldElement, g: FieldElement): void {
     const f0 = BigInt(f.get(0));
     const f1 = BigInt(f.get(1));

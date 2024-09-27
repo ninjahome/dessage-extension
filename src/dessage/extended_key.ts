@@ -64,7 +64,8 @@ export function derivePath(masterKey: ExtendedKey, path: string): ExtendedKey {
         }
         derivedKey = deriveChild(derivedKey.privateKey, derivedKey.publicKey, derivedKey.chainCode, index);
     });
-
+    // console.log('${path} 子私钥1 (Child Private Key):', derivedKey.privateKey?.toString('hex'));
+    // console.log('${path}  子公钥1 (Child Public Key):', derivedKey.publicKey.toString('hex'));
     return derivedKey;
 }
 
@@ -76,6 +77,8 @@ export function fromMasterSeed(seed: Buffer): ExtendedKey {
     const key = ec.keyFromPrivate(privateKey);
     const publicKey = Buffer.from(key.getPublic(true, 'array'));  // 压缩公钥
     const chainCode = I.subarray(32);
+    // console.log('主私钥 (Master Private Key):', privateKey!.toString('hex'));
+    // console.log('主公钥 (Master Private Key):', publicKey!.toString('hex'));
     return new ExtendedKey(
         privateKey,
         publicKey,
@@ -85,11 +88,11 @@ export function fromMasterSeed(seed: Buffer): ExtendedKey {
 
 // 从种子生成主密钥
 export class ExtendedKey {
-    privateKey: Buffer | null ;
-    publicKey: Buffer ;
-    chainCode: Buffer ;
+    privateKey: Buffer | null;
+    publicKey: Buffer;
+    chainCode: Buffer;
 
-    constructor(priKey:Buffer, pubKey:Buffer, chainCode:Buffer ) {
+    constructor(priKey: Buffer, pubKey: Buffer, chainCode: Buffer) {
         this.privateKey = priKey;
         this.publicKey = pubKey;
         this.chainCode = chainCode;
