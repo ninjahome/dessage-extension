@@ -127,7 +127,7 @@ function setAccountSwitchArea(): void {
     parentDiv.innerHTML = '';
     const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
     let selAddress = __systemSetting.address;
-
+    console.log("--------------->>>>>>", __keypairMap);
     __keypairMap.forEach((keypair, addr) => {
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
@@ -236,5 +236,5 @@ function initQrCodeShowDiv() {
 
 async function quitFromDashboard() {
     showView('#onboarding/unlock-plugin', router);
-    await browser.runtime.sendMessage({ action: MsgType.CloseMasterKey});
+    await browser.runtime.sendMessage({action: MsgType.CloseMasterKey});
 }

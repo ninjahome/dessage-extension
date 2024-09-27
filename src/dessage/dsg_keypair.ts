@@ -1,5 +1,6 @@
 /*
 In the **BIP44** standard, which is used for hierarchical deterministic wallets (HD wallets), the path `m/44'/60'/0'/0/0` is a commonly used derivation path for generating blockchain addresses. Here's what each part of the path means:
+m / purpose' / coin_type' / account' / change / address_index
 
 1. **`m`**: This refers to the master node (the root of the HD wallet tree), derived from the seed.
 
@@ -34,7 +35,7 @@ For **Ethereum**, the derivation path `m/44'/60'/0'/0/0` generates the first Eth
 
 You can check the BIP44 standard and its specification [here](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki).
 */
-import {ec, ec as EC} from "elliptic";
+import {ec as EC} from "elliptic";
 import {derivePath, ExtendedKey} from "./extended_key";
 import {Address, toAddress, toBtcAddress, toEthAddress, toNostrAddr} from "./address";
 

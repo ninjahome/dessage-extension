@@ -116,8 +116,7 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
         }
 
         if (keyStatus === MasterKeyStatus.Unlocked) {
-            const sObj = await sessionGet(__key_key_pair_map);
-            msg = JSON.stringify(sObj);
+            msg = await sessionGet(__key_key_pair_map);
         }
 
         sendResponse({status: keyStatus, message: msg});
@@ -152,7 +151,7 @@ async function openMasterKey(pwd: string, sendResponse: (response: any) => void)
 
     } catch (error) {
         const err = error as Error;
-        console.error('[service work] Error in open wallet:', err);
+        console.log('[service work] Error in open wallet:', err);
         let msg = err.toString();
         if (msg.includes("Malformed") || msg.includes("bad size")) {
             msg = "invalid password";
