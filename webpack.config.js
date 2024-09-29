@@ -34,7 +34,7 @@ module.exports = (env, argv) => {
         },
         output: {
             filename: 'js/[name].js',
-            path: path.resolve(__dirname, 'extension'),
+            path: path.resolve(__dirname, 'dsg_ext'),
         },
         module: {
             rules: [

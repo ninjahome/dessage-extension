@@ -1,5 +1,5 @@
 /package-lock.json
 /node_modules/
 /.idea/
-/extension/js/
+/dsg_ext/js/
 /stats.html

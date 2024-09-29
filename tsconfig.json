@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./extension/js",
+    "outDir": "./dsg_ext/js",
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*"]
