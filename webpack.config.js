@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (env, argv) => {
     const mode = argv.mode || 'development';
@@ -24,7 +25,7 @@ module.exports = (env, argv) => {
 
     return {
         mode: mode,
-        devtool: mode === 'development' ? 'source-map' : 'inline-source-map',  // 确保开发模式下生成Source Map
+        devtool: mode === 'development' ? 'source-map' : false, // 生产模式下不生成 Source Map
         entry: {
             background: path.resolve(__dirname, './src/background.ts'),
             home: path.resolve(__dirname, './src/home.ts'),
@@ -46,7 +47,21 @@ module.exports = (env, argv) => {
             ],
         },
         optimization: {
+            minimize: mode === 'production',
             usedExports: true,
+            minimizer: [
+                new TerserPlugin({
+                    terserOptions: {
+                        compress: {
+                            drop_console: true, // 可选：移除 console.log
+                        },
+                        format: {
+                            comments: false, // 移除注释
+                        },
+                    },
+                    extractComments: false,
+                }),
+            ],
         },
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],

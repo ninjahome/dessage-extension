@@ -18,6 +18,7 @@ export enum MsgType {
     OpenMasterKey = 'OpenMasterKey',
     CloseMasterKey = 'CloseMasterKey',
     SetActiveAccount = 'SetActiveAccount',
+    OpenPopMainPage = 'OpenPopMainPage',
 }
 
 export function showView(hash: string, callback: (hash: string) => void): void {
@@ -94,4 +95,41 @@ export async function sessionRemove(key: string): Promise<void> {
     } catch (error) {
         console.error("[service work] Failed to remove value:", error);
     }
+}
+
+
+
+function observeAction(target: HTMLElement, idleThreshold: number,
+                       foundFunc: () => HTMLElement | null, callback: () => Promise<void>,
+                       options: MutationObserverInit, continueMonitor?: boolean) {
+    const cb: MutationCallback = (mutationsList, observer) => {
+        const element = foundFunc();
+        if (!element) {
+            return;
+        }
+        if (!continueMonitor) {
+            observer.disconnect();
+        }
+        let idleTimer = setTimeout(() => {
+            callback().then();
+            clearTimeout(idleTimer);
+            console.log('---------->>> observer action finished:=> continue=>', continueMonitor);
+        }, idleThreshold);
+    };
+
+    const observer = new MutationObserver(cb);
+    observer.observe(target, options);
+}
+
+export function observeForElement(target: HTMLElement, idleThreshold: number,
+                                  foundFunc: () => HTMLElement | null, callback: () => Promise<void>,
+                                  continueMonitor?: boolean) {
+
+    observeAction(target, idleThreshold, foundFunc, callback, {childList: true, subtree: true}, continueMonitor);
+}
+
+export function observeForElementDirect(target: HTMLElement, idleThreshold: number,
+                                        foundFunc: () => HTMLElement | null, callback: () => Promise<void>,
+                                        continueMonitor?: boolean) {
+    observeAction(target, idleThreshold, foundFunc, callback, {childList: true, subtree: false}, continueMonitor);
 }

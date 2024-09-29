@@ -217,6 +217,16 @@ runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, send
             setActiveWallet(request.address, sendResponse).then(() => {
             });
             return true;
+
+        case MsgType.OpenPopMainPage:
+            browser.action.openPopup().then(() => {
+                sendResponse({success: true});
+            }).catch((error) => {
+                console.error("[service work] openPopup action failed:", error);
+                sendResponse({success: false, error: error.message});
+            });
+
+            return true;
         default:
             sendResponse({status: 'unknown action'});
             return;

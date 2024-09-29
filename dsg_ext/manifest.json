@@ -51,7 +51,13 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "js/inject.js"
+        "css/content_twitter.css",
+        "inject_twitter.html",
+        "js/inject.js",
+        "file/logo_16.png",
+        "file/logo_48.png",
+        "file/logo_128.png",
+        "img/*"
       ],
       "matches": [
         "<all_urls>"
