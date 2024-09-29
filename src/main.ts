@@ -203,7 +203,7 @@ async function openMasterKey(): Promise<void> {
         __keypairMap = new Map<string, DsgKeyPair>(Object.entries(obj));
         console.log("------------>>>keypair size=", __keypairMap.size);
         showView('#onboarding/dashboard', router);
-
+        inputElement.value = '';
     } catch (error) {
         console.error('Error sending message:', error);
     }

@@ -33,26 +33,36 @@ export async function loadLastSystemSetting(): Promise<void> {
     }
     __systemSetting = new SysSetting(__currentDatabaseVersion, '', '');
 }
-
 export function commonAddrAndCode(valElmId: string, qrBtnId: string) {
     const area = document.getElementById(valElmId) as HTMLElement;
     const addrVal = area.querySelector(".address-val") as HTMLElement;
     const address = addrVal.innerText;
-    addrVal.addEventListener("click", async () => {
-        navigator.clipboard.writeText(address).then(() => {
-            alert("copy success");
+
+    // 检查是否已经有监听器存在，如果没有才添加
+    if (!addrVal.dataset.listenerAdded) {
+        addrVal.addEventListener("click", async () => {
+            navigator.clipboard.writeText(address).then(() => {
+                alert("copy success");
+            });
         });
-    })
+        // 设置标记，表示已添加监听器
+        addrVal.dataset.listenerAdded = "true";
+    }
 
     const qrBtn = document.getElementById(qrBtnId) as HTMLElement;
-    qrBtn.addEventListener("click", async () => {
-        const data = await createQRCodeImg(address);
-        if (!data) {
-            console.log("------>>> failed to create qr code");
-            return;
-        }
-        const qrDiv = document.getElementById("qr-code-image-div") as HTMLElement
-        const imgElm = qrDiv.querySelector("img");
-        imgElm!.src = data;
-    })
+
+    if (!qrBtn.dataset.listenerAdded) {
+        qrBtn.addEventListener("click", async () => {
+            const data = await createQRCodeImg(address);
+            if (!data) {
+                console.log("------>>> failed to create qr code");
+                return;
+            }
+            const qrDiv = document.getElementById("qr-code-image-div") as HTMLElement;
+            const imgElm = qrDiv.querySelector("img");
+            imgElm!.src = data;
+        });
+        // 设置标记
+        qrBtn.dataset.listenerAdded = "true";
+    }
 }
