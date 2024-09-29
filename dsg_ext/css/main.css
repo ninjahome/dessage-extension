@@ -260,7 +260,7 @@ ul {
     display: inline-block;
 }
 
-.tooltiptext {
+.toolTipText {
     visibility: hidden;
     background-color: black;
     color: white;
@@ -277,7 +277,7 @@ ul {
     white-space: nowrap; /* 防止换行 */
 }
 
-.tooltip:hover .tooltiptext {
+.tooltip:hover .toolTipText {
     visibility: visible;
     opacity: 1;
 }

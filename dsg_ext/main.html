@@ -55,8 +55,6 @@
                 <div>
                     <button class="account-list-new-account"><span id="btn-add-new-account-txt">Add New Account</span>
                     </button>
-                    <button class="account-list-import-account"><span
-                            id="btn-import-new-account-txt">Import Account</span></button>
                 </div>
             </div>
 
@@ -70,200 +68,27 @@
         <button id="exit_dashboard_btn">quit</button>
     </header>
     <div class="tab-container">
-        <div class="tab active" data-target="ninja-account-area">Dessage</div>
-        <div class="tab" data-target="eth-account-area">ETH</div>
-        <div class="tab" data-target="btc-account-area">BTC</div>
-        <div class="tab" data-target="nostr-account-area">Nostr</div>
+        <div class="tab active" data-target="web2-account-area">Web2</div>
+        <div class="tab" data-target="web3-account-area">Web3</div>
+        <div class="tab" data-target="blockchain-account-area">BlockChain</div>
+        <div class="tab" data-target="account-setting-area">Setting</div>
     </div>
 
     <div id="wallet-content-area" class="wallet-content-area">
-        <div id="ninja-account-area" class="ninja-account-area active">
-            <div class="ninja-account-switch-area">
-                <div class="ninja-account-info accountInfo">
-                    <div class="tooltip">
-                        <span class="ninja-address-val address-val">0x87A4387A487A4487A487A48...c8649</span>
-                        <span class="tooltiptext">Copy to Clipboard</span>
-                    </div>
-                    <button class="qr-btn" id="ninja-address-qr-btn">
-                        <img src="file/qr.png" alt="QR Image Test">
-                    </button>
-                </div>
-                <div class="dessage-token-infos">
-                    <span class="dessage-token-val balance">0.00</span>
-                    <span class="dessage-token-unit balance-unit">DSG</span>
-                </div>
-                <div class="dessage-token-operation btnAll">
-                    <div class="align-center">
-                        <button class="dessage-token-op-buy-sell function-btn">
-                            <img src="file/buysell.png" alt="buy btn image">
-                        </button>
-                        <span>Buy/Sell</span>
-                    </div>
-                    <div class="align-center">
-                        <button class="dessage-token-op-buy-send function-btn">
-                            <img src="file/send.png" alt="send image">
-                        </button>
-                        <span>Send</span>
-                    </div>
-                    <div class="align-center">
-                        <button class="dessage-token-op-buy-swap function-btn">
-                            <img src="file/swap.png" alt="swap image">
-                        </button>
-                        <span>Swap</span>
-                    </div>
-                    <div class="align-center">
-                        <button class="dessage-token-op-buy-chat function-btn">
-                            <img src="file/chat.png" alt="chat image">
-                        </button>
-                        <span>Chat</span>
-                    </div>
-                    <div class="align-center">
-                        <button class="dessage-token-op-buy-chat function-btn">
-                            <img src="file/tweets.png" alt="tweets image">
-                        </button>
-                        <span>Tweets</span>
-                    </div>
-                </div>
-            </div>
+        <div id="web2-account-area" class="web2-account-area active">
         </div>
+        <div id="web3-account-area" class="web3-account-area">
+            <div class="web-tittle">nostr</div>
+            <div class="nostr-address account-address">
+                <div class="tooltip">
+                    <span class="nostr-address-val address-val"></span>
+                    <span class="toolTipText">Copy to Clipboard</span>
+                </div>
+                <button class="qr-btn" id="nostr-address-qr-btn">
+                    <img src="file/qr.png" alt="QR Image Test">
+                </button>
+            </div>
 
-        <div id="eth-account-area" class="eth-account-area">
-            <div class="eth-accountInfo">
-                <div style="display: flex; justify-content: space-between; align-items: center">
-                    <span class="eth-area-tittle">Ethereum Area</span>
-                    <label for="eth-network-switch"></label><select id="eth-network-switch" class="eth-network-switch">
-                    <option value="1" class="eth-network-item" id="eth-network-item-main">Ethereum Main</option>
-                    <option value="2" class="eth-network-item" id="eth-network-item-linea-main">Linea Main</option>
-                    <option value="3" class="eth-network-item" id="eth-network-item-arbitrum-one">Arbitrum One
-                    </option>
-                    <option value="4" class="eth-network-item" id="eth-network-item-sepolia">Sepolia</option>
-                    <option value="5" class="eth-network-item" id="eth-network-item-linea-sepolia">Linea Sepolia
-                    </option>
-                </select>
-                </div>
-                <div class="eth-address account-address">
-                    <div class="tooltip">
-                        <span class="eth-address-val address-val"></span>
-                        <span class="tooltiptext">Copy to Clipboard</span>
-                    </div>
-                    <button class="qr-btn" id="eth-address-qr-btn">
-                        <img src="file/qr.png" alt="QR Image Test">
-                    </button>
-                </div>
-            </div>
-            <ul class="eth-balance-info balanceInfo">
-                <li>
-                    <span class="eth-token-val balance">0.00</span> <span class="eth-token-unit balance-unit">ETH</span>
-                </li>
-                <li>
-                    <span class="eth-token-to-usdt balanceUsd">0.00</span> <span
-                        class="eth-token-to-usdt-unit balance-unit ">USD</span>
-                </li>
-            </ul>
-            <div class="eth-operation btnAll">
-                <div class="align-center">
-                    <button class="eth-operation-send function-btn">
-                        <img src="file/send.png" alt="send image">
-                    </button>
-                    <span>Send</span>
-                </div>
-                <div class="align-center">
-                    <button class="eth-operation-erc20 function-btn">
-                        <img src="file/erc.png" alt="erc image">
-                    </button>
-                    <span>ERC 20</span>
-                </div>
-                <div class="align-center">
-                    <button class="eth-op-more function-btn">
-                        <img src="file/more.png" alt="more image">
-                    </button>
-                    <span>More</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="btc-account-area" class="btc-account-area">
-            <div class="btc-accountInfo">
-                <div style="display: flex; justify-content: space-between; align-items: center">
-                    <span class="btc-area-tittle">BTC Area</span>
-                    <label for="btc-network-switch"></label>
-                    <select id="btc-network-switch" class="btc-network-switch">
-                        <option value="1" class="btc-network-item" id="btc-network-item-main">main</option>
-                        <option value="2" class="btc-network-item" id="btc-network-item-test">test</option>
-                    </select>
-                </div>
-                <div class="btc-address account-address">
-                    <div class="tooltip">
-                        <span class="btc-address-val address-val"></span>
-                        <span class="tooltiptext">Copy to Clipboard</span>
-                    </div>
-                    <button class="qr-btn" id="btc-address-qr-btn">
-                        <img src="file/qr.png" alt="QR Image Test">
-                    </button>
-                </div>
-            </div>
-            <div class="btc-balance-info balanceInfo">
-                <span class="btc-token-val balance">0.00</span> <span class="btc-token-unit">BTC</span>
-                <br>
-                <span class="btc-token-to-usdt balanceUsd">0.00</span> <span
-                    class="btc-token-to-usdt-unit balance-unit">USD</span>
-            </div>
-            <div class="btc-operation btnAll">
-                <div class="align-center">
-                    <button class="btc-operation-send function-btn">
-                        <img src="file/send.png" alt="send image">
-                    </button>
-                    <span>Send</span>
-                </div>
-                <div class="align-center">
-                    <button class="eth-operation-receive function-btn">
-                        <img src="file/buysell.png" alt="buy image">
-                    </button>
-                    <span>Receive</span>
-                </div>
-                <div class="align-center">
-                    <button class="btc-operation-brc20 function-btn">
-                        <img src="file/erc.png" alt="erc image">
-                    </button>
-                    <span>BRC 20</span>
-                </div>
-                <div class="align-center">
-                    <button class="btc-operation-more function-btn">
-                        <img src="file/more.png" alt="more image">
-                    </button>
-                    <span>More</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="nostr-account-area" class="nostr-account-area">
-            <div class="nostr-accountInfo">
-                <div style="display: flex; justify-content: space-between; align-items: center">
-                    <span class="nostr-area-tittle">Nostr Area</span>
-                    <label for="nostr-relay-switch"></label>
-                    <select id="nostr-relay-switch" class="nostr-relay-switch">
-                        <option value="wss://lightningrelay.com" class="nostr-relay-item">wss://lightningrelay.com
-                        </option>
-                        <option value="wss://at.nostrworks.com" class="nostr-relay-item">wss://at.nostrworks.com
-                        </option>
-                        <option value="wss://btc.klendazu.com" class="nostr-relay-item">wss://btc.klendazu.com</option>
-                        <option value="wss://relay.damus.io" class="nostr-relay-item">wss://relay.damus.io</option>
-                        <option value="wss://bitcoiner.social" class="nostr-relay-item">wss://bitcoiner.social</option>
-                        <option value="wss://cache2.primal.net/v1" class="nostr-relay-item">wss://cache2.primal.net/v1
-                        </option>
-                        <option value="wss://relay.nostr.nu" class="nostr-relay-item">wss://relay.nostr.nu</option>
-                    </select>
-                </div>
-                <div class="nostr-address account-address">
-                    <div class="tooltip">
-                        <span class="nostr-address-val address-val"></span>
-                        <span class="tooltiptext">Copy to Clipboard</span>
-                    </div>
-                    <button class="qr-btn" id="nostr-address-qr-btn">
-                        <img src="file/qr.png" alt="QR Image Test">
-                    </button>
-                </div>
-            </div>
             <div class="nostr-operation btnAll">
                 <div class="align-center">
                     <button class="nostr-op-show-private-password function-btn">
@@ -279,8 +104,63 @@
                 </div>
             </div>
         </div>
+        <div id="blockchain-account-area" class="blockchain-account-area">
+            <div id="blockchain-dsg-info" class="blockchain-dsg-info">
+                <div class="blockchain-tittle">Dessage</div>
+                <div class="ninja-account-info accountInfo">
+                    <div class="tooltip">
+                        <span class="ninja-address-val address-val">0x87A4387A487A4487A487A48...c8649</span>
+                        <span class="toolTipText">Copy to Clipboard</span>
+                    </div>
+                    <button class="qr-btn" id="ninja-address-qr-btn">
+                        <img src="file/qr.png" alt="QR Image Test">
+                    </button>
+                </div>
+                <div class="dessage-token-infos">
+                    <span class="dessage-token-val balance">0.00</span>
+                    <span class="dessage-token-unit balance-unit">DSG</span>
+                </div>
+            </div>
+            <hr style="border: 1px solid black; width: 80%;">
+            <div id="blockchain-eth-info" class="blockchain-eth-info">
+                <div class="blockchain-tittle">ETH</div>
+                <div class="eth-address account-address">
+                    <div class="tooltip">
+                        <span class="eth-address-val address-val"></span>
+                        <span class="toolTipText">Copy to Clipboard</span>
+                    </div>
+                    <button class="qr-btn" id="eth-address-qr-btn">
+                        <img src="file/qr.png" alt="QR Image Test">
+                    </button>
+                </div>
+                <div class="eth-account-info">
+                    <span class="eth-token-val balance">0.00</span>
+                    <span class="eth-token-unit balance-unit">ETH</span>
+                </div>
+            </div>
+            <hr style="border: 1px solid black; width: 80%;">
+            <div id="blockchain-btc-info" class="blockchain-btc-info">
+                <div class="blockchain-tittle">BTC</div>
+                <div class="btc-address account-address">
+                    <div class="tooltip">
+                        <span class="btc-address-val address-val"></span>
+                        <span class="toolTipText">Copy to Clipboard</span>
+                    </div>
+                    <button class="qr-btn" id="btc-address-qr-btn">
+                        <img src="file/qr.png" alt="QR Image Test">
+                    </button>
+                </div>
+
+                <div class="btc-balance-info balanceInfo">
+                    <span class="btc-token-val balance">0.00</span>
+                    <span class="btc-token-unit">BTC</span>
+                </div>
+
+            </div>
+        </div>
+        <div id="account-setting-area" class="account-setting-area">
+        </div>
     </div>
-    <div id="ninja-operation-area" class="ninja-operation-area"></div>
 </div>
 
 <div class="qr-code-image-div" id="qr-code-image-div" style="display: none">

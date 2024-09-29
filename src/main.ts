@@ -2,10 +2,10 @@ import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
 import {MsgType, showView, MasterKeyStatus} from './common';
 import {__systemSetting, loadLastSystemSetting} from "./main_common";
-import {importNinjaAccount, initDessageArea, newNinjaAccount, setupNinjaDetail} from "./main_ninja";
-import {initEthArea, setupEtherArea} from "./main_eth";
-import {initBtcArea, setupBtcArea} from "./main_btc";
-import {initNostrArea, setupNostr} from "./main_nostr";
+import {initWeb2Area, newNinjaAccount, setupWeb2Area} from "./main_web2";
+import {initWeb3Area, setupWeb3Area} from "./main_web3";
+import {initBlockChainArea, setupBlockChainArea} from "./main_blockchain";
+import {initSettingArea, setupSettingArea} from "./main_setting";
 import {DsgKeyPair} from "./dessage/dsg_keypair";
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
@@ -17,10 +17,10 @@ async function initDessagePlugin(): Promise<void> {
     checkBackgroundStatus();
     initLoginDiv();
     initDashBoard();
-    initDessageArea();
-    initEthArea();
-    initBtcArea();
-    initNostrArea();
+    initWeb2Area();
+    initWeb3Area();
+    initBlockChainArea();
+    initSettingArea();
     initQrCodeShowDiv();
 }
 
@@ -44,15 +44,14 @@ function initDashBoard(): void {
     })
 
     const newAccBtn = accountListDiv.querySelector(".account-list-new-account") as HTMLButtonElement;
-    const importAccBtn = accountListDiv.querySelector(".account-list-import-account") as HTMLButtonElement;
     newAccBtn.addEventListener("click", async () => {
         newNinjaAccount();
     });
-    importAccBtn.addEventListener("click", async () => {
-        importNinjaAccount();
-    });
 
     document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => {
+        if (tab.dataset.listenerAdded) {
+            return;
+        }
         tab.addEventListener('click', function (this: HTMLDivElement) {
             document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll<HTMLDivElement>('.wallet-content-area > div').forEach(content => content.classList.remove('active'));
@@ -63,6 +62,7 @@ function initDashBoard(): void {
                 document.getElementById(targetId)?.classList.add('active');
             }
         });
+        tab.dataset.listenerAdded = 'true';
     });
 }
 
@@ -105,29 +105,17 @@ function checkBackgroundStatus(): void {
 
 function populateDashboard() {
     setAccountSwitchArea();
-    setupAllAccountArea()
+    setupContentArea()
+
 }
 
-function setupAllAccountArea() {
-    const keypair = __keypairMap.get(__systemSetting.address);
-    if (!keypair) {
-        return;
-    }
-
-    const nameDiv = document.getElementById("account-info-name") as HTMLElement;
-    nameDiv.innerText = keypair.name ?? "Account";
-    setupNinjaDetail();
-    setupEtherArea();
-    setupBtcArea();
-    setupNostr();
-}
 
 function setAccountSwitchArea(): void {
     const parentDiv = document.getElementById("account-list-content") as HTMLElement;
     parentDiv.innerHTML = '';
     const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
     let selAddress = __systemSetting.address;
-    console.log("--------------->>>>>>", __keypairMap);
+    console.log("--------------->>>>>>account size:=>", __keypairMap.size);
     __keypairMap.forEach((keypair, addr) => {
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
@@ -223,7 +211,7 @@ async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElemen
     itemDiv.classList.add("active");
     await __systemSetting.changeAddr(keyPair.address.dsgAddr);
     notifyBackgroundActiveWallet(__systemSetting.address);
-    setupAllAccountArea()
+    setupContentArea()
 }
 
 function initQrCodeShowDiv() {
@@ -237,4 +225,19 @@ function initQrCodeShowDiv() {
 async function quitFromDashboard() {
     showView('#onboarding/unlock-plugin', router);
     await browser.runtime.sendMessage({action: MsgType.CloseMasterKey});
+}
+
+function setupContentArea(){
+    const keypair = __keypairMap.get(__systemSetting.address);
+    if (!keypair) {
+        console.log("=======>>> must have a selected address:=?", __keypairMap, __systemSetting)
+        return;
+    }
+    const nameDiv = document.getElementById("account-info-name") as HTMLElement;
+    nameDiv.innerText = keypair.name ?? "Account";
+
+    setupWeb2Area(keypair);
+    setupBlockChainArea(keypair);
+    setupWeb3Area(keypair);
+    setupSettingArea(keypair);
 }
