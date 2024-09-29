@@ -8,7 +8,3 @@ export function setupWeb2Area(keypair:DsgKeyPair): void {
 
 
 }
-
-export function newNinjaAccount() {
-
-}

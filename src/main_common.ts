@@ -61,6 +61,7 @@ export function commonAddrAndCode(valElmId: string, qrBtnId: string) {
             const qrDiv = document.getElementById("qr-code-image-div") as HTMLElement;
             const imgElm = qrDiv.querySelector("img");
             imgElm!.src = data;
+            qrDiv.style.display = "block";
         });
         // 设置标记
         qrBtn.dataset.listenerAdded = "true";

@@ -2,7 +2,7 @@ import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
 import {MsgType, showView, MasterKeyStatus} from './common';
 import {__systemSetting, loadLastSystemSetting} from "./main_common";
-import {initWeb2Area, newNinjaAccount, setupWeb2Area} from "./main_web2";
+import {initWeb2Area, setupWeb2Area} from "./main_web2";
 import {initWeb3Area, setupWeb3Area} from "./main_web3";
 import {initBlockChainArea, setupBlockChainArea} from "./main_blockchain";
 import {initSettingArea, setupSettingArea} from "./main_setting";
@@ -240,4 +240,8 @@ function setupContentArea(){
     setupBlockChainArea(keypair);
     setupWeb3Area(keypair);
     setupSettingArea(keypair);
+}
+
+function newNinjaAccount() {
+
 }
