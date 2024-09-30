@@ -1,4 +1,3 @@
-document.addEventListener('DOMContentLoaded', initTwitterInfo);
-function initTwitterInfo() {
+export function initTwitterInfo() {
     console.log("------------->>>>>>>>>>>>>>>>>twitter injection")
 }
