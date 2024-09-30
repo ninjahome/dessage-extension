@@ -54,6 +54,7 @@
         "css/content_twitter.css",
         "inject_twitter.html",
         "js/inject.js",
+        "js/inject_twitter.js",
         "file/logo_16.png",
         "file/logo_48.png",
         "file/logo_128.png",

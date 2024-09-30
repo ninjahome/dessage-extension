@@ -21,16 +21,13 @@ function addCustomStyles(cssFilePath: string): void {
 
 document.addEventListener('DOMContentLoaded', async () => {
     addInjectJS('js/inject.js');
-
     const hostname = window.location.hostname;
     console.log('----------------->>>>>>>hostname', hostname);
-
     if (hostname.includes("x.com")) {
         addCustomStyles('css/content_twitter.css');
         const template = await parseHtmlContent('inject_twitter.html');
         addTwitterElements(template).then();
     }
-
 });
 
 async function parseHtmlContent(htmlFilePath: string): Promise<HTMLTemplateElement> {

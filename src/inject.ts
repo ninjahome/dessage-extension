@@ -19,6 +19,7 @@ interface Window {
 }
 
 interface Nostr {
+    version: string;
     _pubkey: string | null;
     getPublicKey: () => Promise<string | null>;
     signEvent: (event: any) => Promise<any>;
@@ -87,7 +88,7 @@ interface NIP44 {
 
     // 设置 dessage 对象
     window.dessage = {
-        version: '1.0.0',
+        version: '1.0.5',
         connect: function () {
             console.log('Connecting to Dessage...');
             window.postMessage({ source: "dessage", action: "someAction", data: "some data" }, "*");
@@ -96,7 +97,7 @@ interface NIP44 {
 
     window.nostr = {
         _pubkey: null,
-
+        version:'1.0.2',
         async getPublicKey() {
             if (this._pubkey) return this._pubkey;
             this._pubkey = await __injectCall('getPublicKey', {});
@@ -131,6 +132,14 @@ interface NIP44 {
             }
         }
     };
-
-    console.log(`------>>>>Dessage inject success domain:[${window.location.host}] dessage obj:[${window.dessage}] nostr obj:[${window.nostr}]`);
+    const hostname = window.location.hostname;
+    console.log('----------------->>>>>>>hostname', hostname);
+    if (hostname.includes("x.com")) {
+        initTwitterInfo();
+    }
+    console.log(`------>>>>Dessage inject success domain:[${window.location.host}]
+     dessage obj:[${window.dessage}] nostr obj:[${window.nostr}]
+    dessage version: ${window.dessage.version} nostr version:${window.nostr.version}
+     `);
 })();
+
