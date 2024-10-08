@@ -20,9 +20,9 @@ function addLeftMenuItem(template: HTMLTemplateElement) {
         return;
     }
     const clone = dsgLink.cloneNode(true) as HTMLElement;
-    clone.addEventListener('click', function (event) {
+    clone.addEventListener('click', async function (event) {
         event.preventDefault(); // 阻止链接的默认跳转
-        showDessageMainPopPage(); // 调用你自定义的函数
+        await showDessageMainPopPage(); // 调用你自定义的函数
     });
 
     const navElement = document.querySelector('nav[aria-label="Primary"][role="navigation"]');
@@ -34,10 +34,8 @@ function addLeftMenuItem(template: HTMLTemplateElement) {
     navElement.insertBefore(clone, navElement.lastChild);
 }
 
-function showDessageMainPopPage() {
-    browser.runtime.sendMessage({action: MsgType.OpenPopMainPage}).catch((error: any) => {
-        console.warn('------>>>pop up main home err:', error);
-    });
+async function showDessageMainPopPage() {
+    await browser.runtime.sendMessage({action:MsgType.PopupMainPage});
 }
 
 function parsePersonalInfo() {

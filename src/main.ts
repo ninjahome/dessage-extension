@@ -4,21 +4,22 @@ import {
     MsgType,
     showView,
     MasterKeyStatus,
-    loadSystemSetting,
-    getKeyStatus, sessionGet, updateSetting
+    sessionGet,
 } from './common';
 import {initWeb2Area, setupWeb2Area} from "./main_web2";
 import {initWeb3Area, setupWeb3Area} from "./main_web3";
 import {initBlockChainArea, setupBlockChainArea} from "./main_blockchain";
-import {initSettingArea, setupSettingArea} from "./main_setting";
-import {__key_sub_account_address_list, wrapKeyPairKey} from "./background";
+import {initSettingArea, loadSystemSetting, setupSettingArea, updateSetting} from "./main_setting";
 import {Address} from "./dessage/address";
+import {wrapKeyPairKey} from "./background";
+import {closeWallet, getKeyStatus, loadAccountList, newNinjaAccount, openMasterKey} from "./main_key";
+
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
 
 async function initDessagePlugin(): Promise<void> {
     await initDatabase();
-    await checkBackgroundStatus();
+    await checkWalletStatus();
     initLoginDiv();
     initDashBoard();
     initWeb2Area();
@@ -49,7 +50,8 @@ function initDashBoard(): void {
 
     const newAccBtn = accountListDiv.querySelector(".account-list-new-account") as HTMLButtonElement;
     newAccBtn.addEventListener("click", async () => {
-        await newNinjaAccount();
+        await  createNewAccount();
+
     });
 
     document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => {
@@ -70,16 +72,16 @@ function initDashBoard(): void {
     });
 }
 
-async function checkBackgroundStatus(): Promise<void> {
+async function checkWalletStatus(): Promise<void> {
     const status = await getKeyStatus();
 
     switch (status) {
         case MasterKeyStatus.NoWallet:
-
             browser.tabs.create({
                 url: browser.runtime.getURL("home.html#onboarding/welcome")
             }).then(() => {
             });
+
             return;
 
         case MasterKeyStatus.Locked:
@@ -109,13 +111,12 @@ async function setAccountSwitchArea(): Promise<void> {
     const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
     const ss = await loadSystemSetting();
     let selAddress = ss.address;
-    const accStr = await sessionGet(__key_sub_account_address_list);
-    const accountAddressList = JSON.parse(accStr) as Address[];
 
-    console.log("--------------->>>>>>account size:=>", accountAddressList.length);
+    const addressList = await loadAccountList();
+    console.log("--------------->>>>>>account size:=>", addressList.length);
 
-    for (const address of accountAddressList) {
-        const idx = accountAddressList.indexOf(address);
+    for (let idx = 0; idx < addressList.length; idx++) {
+        const address = addressList[idx];
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
         itemDiv.addEventListener("click", async () => {
@@ -143,22 +144,6 @@ async function setAccountSwitchArea(): Promise<void> {
     }
 }
 
-function notifyBackgroundActiveWallet(address: string): void {
-    browser.runtime.sendMessage({action: MsgType.SetActiveAccount, address: address}).then(response => {
-        if (response.status) {
-            console.log("set active wallet success");
-            return;
-        }
-        // TODO::show errors to user
-        const errTips = document.querySelector(".login-container .login-error") as HTMLElement;
-        if (errTips) {
-            errTips.innerText = response.message;
-        }
-    }).catch(error => {
-        console.error('Error sending message:', error);
-    });
-}
-
 function router(path: string): void {
     if (path === '#onboarding/dashboard') {
         populateDashboard().then();
@@ -167,29 +152,24 @@ function router(path: string): void {
 
 function initLoginDiv(): void {
     const button = document.querySelector(".login-container .primary-button") as HTMLButtonElement;
-    button.addEventListener('click', openMasterKey);
+    button.addEventListener('click', login);
 }
 
-async function openMasterKey(): Promise<void> {
+async function login(): Promise<void> {
     const inputElement = document.querySelector(".login-container input") as HTMLInputElement;
     const password = inputElement.value;
-
     try {
-        const response = await browser.runtime.sendMessage({
-            action: MsgType.OpenMasterKey,
-            password: password
-        });
-
-        if (!response.status) {
-            const errTips = document.querySelector(".login-container .login-error") as HTMLElement;
-            errTips.innerText = response.message;
-            return;
-        }
-
+        await openMasterKey(password);
         showView('#onboarding/dashboard', router);
         inputElement.value = '';
     } catch (error) {
-        console.error('Error sending message:', error);
+        const err = error as Error;
+        let msg = err.toString();
+        if (msg.includes("Malformed") || msg.includes("bad size")) {
+            msg = "invalid password";
+        }
+        const errTips = document.querySelector(".login-container .login-error") as HTMLElement;
+        errTips.innerText = msg;
     }
 }
 
@@ -208,7 +188,6 @@ async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElemen
     itemDiv.classList.add("active");
     ss.address = address.dsgAddr;
     await updateSetting(ss);
-    notifyBackgroundActiveWallet(ss.address);
     setupContentArea().then();
 }
 
@@ -222,7 +201,7 @@ function initQrCodeShowDiv() {
 
 async function quitFromDashboard() {
     showView('#onboarding/unlock-plugin', router);
-    await browser.runtime.sendMessage({action: MsgType.CloseMasterKey});
+    await closeWallet();
 }
 
 async function setupContentArea() {
@@ -248,10 +227,12 @@ async function setupContentArea() {
     setupSettingArea();
 }
 
-async function newNinjaAccount() {
-    const response = await browser.runtime.sendMessage({action: MsgType.NewSubAccount});
-    if (response.status <= 0) {
-        alert(response.message);
-        return;
+async function createNewAccount(){
+    try{
+        await newNinjaAccount();
+        await setupContentArea();
+    }catch (e) {
+        const err = e as Error;
+        alert(err.message);
     }
 }

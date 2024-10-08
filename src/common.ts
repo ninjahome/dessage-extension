@@ -1,17 +1,5 @@
-import {DbWallet} from "./dessage/wallet";
 import * as QRCode from 'qrcode';
-import {
-    __currentDatabaseVersion,
-    __tableNameWallet,
-    __tableSystemSetting,
-    checkAndInitDatabase,
-    databaseAddItem,
-    databaseQueryAll,
-    databaseUpdate,
-    getMaxIdRecord
-} from "./database";
 import browser from "webextension-polyfill";
-import {loadMasterKey} from "./dessage/master_key";
 
 const storage = browser.storage;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -25,11 +13,8 @@ export enum MasterKeyStatus {
 }
 
 export enum MsgType {
-    OpenMasterKey = 'OpenMasterKey',
-    CloseMasterKey = 'CloseMasterKey',
-    SetActiveAccount = 'SetActiveAccount',
-    OpenPopMainPage = 'OpenPopMainPage',
-    NewSubAccount = 'NewSubAccount',
+    QueryBindings = 'QueryBindings',
+    PopupMainPage = 'PopupMainPage',
 }
 
 export function showView(hash: string, callback: (hash: string) => void): void {
@@ -42,30 +27,6 @@ export function showView(hash: string, callback: (hash: string) => void): void {
         targetView.style.display = 'block';
     }
     callback(hash);
-}
-
-export async function saveWallet(w: DbWallet): Promise<void> {
-    try {
-        const result = await databaseAddItem(__tableNameWallet, w);
-        console.log("save wallet result=>", result, w.uuid);
-        w.updateName(result as string);
-        await databaseUpdate(__tableNameWallet, result, w);
-    } catch (error) {
-        console.error("Error saving wallet:", error);
-    }
-}
-
-export async function loadLocalWallet(): Promise<DbWallet[]> {
-    const wallets = await databaseQueryAll(__tableNameWallet);
-    if (!wallets) {
-        return [];
-    }
-    const walletObj: DbWallet[] = [];
-    for (const dbWallet of wallets) {
-        console.log("load wallet success:=>", dbWallet.address);
-        walletObj.push(dbWallet);
-    }
-    return walletObj;
 }
 
 export async function createQRCodeImg(data: string) {
@@ -144,7 +105,7 @@ export function observeForElementDirect(target: HTMLElement, idleThreshold: numb
 }
 
 
-export function queryEthBalance(ethAddr:string){
+export function queryEthBalance(ethAddr: string) {
     console.log(`start to query eth[${ethAddr}] balance for:`);
     fetch(`https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}`, {
         method: 'POST',
@@ -170,30 +131,6 @@ export function queryEthBalance(ethAddr:string){
         .catch(error => {
             console.error('[service work] Ping failed:', error);
         });
-}
-
-export class SysSetting {
-    id: number;
-    address: string;
-    network: string;
-
-    constructor(id: number, addr: string, network: string) {
-        this.id = id;
-        this.address = addr;
-        this.network = network;
-    }
-
-    async syncToDB(): Promise<void> {
-        await databaseUpdate(__tableSystemSetting, this.id, this);
-    }
-}
-
-export async function loadSystemSettingFromDB(): Promise<SysSetting> {
-    const ss = await getMaxIdRecord(__tableSystemSetting);
-    if (ss) {
-        return new SysSetting(ss.id, ss.address, ss.network);
-    }
-    return new SysSetting(__currentDatabaseVersion, '', '');
 }
 
 export function commonAddrAndCode(valElmId: string, qrBtnId: string) {
@@ -231,42 +168,3 @@ export function commonAddrAndCode(valElmId: string, qrBtnId: string) {
     }
 }
 
-export async function loadSystemSetting(): Promise<SysSetting> {
-
-    const settingString = await sessionGet(__key_system_setting);
-    if (settingString) {
-        return JSON.parse(settingString) as SysSetting;
-    }
-
-    const obj = await loadSystemSettingFromDB();
-    await sessionSet(__key_system_setting, JSON.stringify(obj));
-
-    return obj;
-}
-
-export async function updateSetting(setting:SysSetting): Promise<void> {
-    await sessionSet(__key_system_setting, JSON.stringify(setting));
-    await setting.syncToDB();
-}
-
-export const __key_system_setting: string = '__key_system_setting__';
-export const __key_master_key_status: string = '__key_account_status__';
-
-export async function getKeyStatus(): Promise<MasterKeyStatus> {
-
-    await checkAndInitDatabase();
-
-    let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
-    if (keyStatus === MasterKeyStatus.Init) {
-        const masterKey = await loadMasterKey();
-        if (!masterKey) {
-            keyStatus = MasterKeyStatus.NoWallet;
-        } else {
-            keyStatus = MasterKeyStatus.Locked;
-        }
-    }
-
-    await sessionSet(__key_master_key_status, keyStatus);
-
-    return keyStatus;
-}

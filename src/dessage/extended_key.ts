@@ -7,10 +7,9 @@ import {Buffer} from "buffer";
 const ec = new EC('secp256k1');
 
 
-export function deriveChild(privateKey: Buffer | null, publicKey: Buffer, chainCode: Buffer, index: number): ExtendedKey {
+export function deriveChild(privateKey: Buffer, publicKey: Buffer, chainCode: Buffer, index: number): ExtendedKey {
     const indexBuffer = Buffer.allocUnsafe(4);
     indexBuffer.writeUInt32BE(index, 0);
-
     let data: Buffer;
     if (index >= 0x80000000) {
         if (privateKey === null) {
@@ -46,7 +45,7 @@ export function deriveChild(privateKey: Buffer | null, publicKey: Buffer, chainC
     }
 
     return {
-        privateKey: childPrivateKey,
+        privateKey: childPrivateKey!,
         publicKey: childPublicKey,
         chainCode: IR,
     };
@@ -64,6 +63,7 @@ export function derivePath(masterKey: ExtendedKey, path: string): ExtendedKey {
         }
         derivedKey = deriveChild(derivedKey.privateKey, derivedKey.publicKey, derivedKey.chainCode, index);
     });
+
     // console.log('${path} 子私钥1 (Child Private Key):', derivedKey.privateKey?.toString('hex'));
     // console.log('${path}  子公钥1 (Child Public Key):', derivedKey.publicKey.toString('hex'));
     return derivedKey;
@@ -88,7 +88,7 @@ export function fromMasterSeed(seed: Buffer): ExtendedKey {
 
 // 从种子生成主密钥
 export class ExtendedKey {
-    privateKey: Buffer | null;
+    privateKey: Buffer;
     publicKey: Buffer;
     chainCode: Buffer;
 
