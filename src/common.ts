@@ -1,8 +1,16 @@
 import {DbWallet} from "./dessage/wallet";
 import * as QRCode from 'qrcode';
-import {__tableNameWallet, checkAndInitDatabase, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
+import {
+    __currentDatabaseVersion,
+    __tableNameWallet,
+    __tableSystemSetting,
+    checkAndInitDatabase,
+    databaseAddItem,
+    databaseQueryAll,
+    databaseUpdate,
+    getMaxIdRecord
+} from "./database";
 import browser from "webextension-polyfill";
-import {loadSystemSettingFromDB, SysSetting} from "./main_common";
 import {loadMasterKey} from "./dessage/master_key";
 
 const storage = browser.storage;
@@ -164,6 +172,65 @@ export function queryEthBalance(ethAddr:string){
         });
 }
 
+export class SysSetting {
+    id: number;
+    address: string;
+    network: string;
+
+    constructor(id: number, addr: string, network: string) {
+        this.id = id;
+        this.address = addr;
+        this.network = network;
+    }
+
+    async syncToDB(): Promise<void> {
+        await databaseUpdate(__tableSystemSetting, this.id, this);
+    }
+}
+
+export async function loadSystemSettingFromDB(): Promise<SysSetting> {
+    const ss = await getMaxIdRecord(__tableSystemSetting);
+    if (ss) {
+        return new SysSetting(ss.id, ss.address, ss.network);
+    }
+    return new SysSetting(__currentDatabaseVersion, '', '');
+}
+
+export function commonAddrAndCode(valElmId: string, qrBtnId: string) {
+    const area = document.getElementById(valElmId) as HTMLElement;
+    const addrVal = area.querySelector(".address-val") as HTMLElement;
+    const address = addrVal.innerText;
+
+    // 检查是否已经有监听器存在，如果没有才添加
+    if (!addrVal.dataset.listenerAdded) {
+        addrVal.addEventListener("click", async () => {
+            navigator.clipboard.writeText(address).then(() => {
+                alert("copy success");
+            });
+        });
+        // 设置标记，表示已添加监听器
+        addrVal.dataset.listenerAdded = "true";
+    }
+
+    const qrBtn = document.getElementById(qrBtnId) as HTMLElement;
+
+    if (!qrBtn.dataset.listenerAdded) {
+        qrBtn.addEventListener("click", async () => {
+            const data = await createQRCodeImg(address);
+            if (!data) {
+                console.log("------>>> failed to create qr code");
+                return;
+            }
+            const qrDiv = document.getElementById("qr-code-image-div") as HTMLElement;
+            const imgElm = qrDiv.querySelector("img");
+            imgElm!.src = data;
+            qrDiv.style.display = "block";
+        });
+        // 设置标记
+        qrBtn.dataset.listenerAdded = "true";
+    }
+}
+
 export async function loadSystemSetting(): Promise<SysSetting> {
 
     const settingString = await sessionGet(__key_system_setting);
@@ -175,6 +242,11 @@ export async function loadSystemSetting(): Promise<SysSetting> {
     await sessionSet(__key_system_setting, JSON.stringify(obj));
 
     return obj;
+}
+
+export async function updateSetting(setting:SysSetting): Promise<void> {
+    await sessionSet(__key_system_setting, JSON.stringify(setting));
+    await setting.syncToDB();
 }
 
 export const __key_system_setting: string = '__key_system_setting__';

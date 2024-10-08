@@ -5,13 +5,12 @@ import {
     showView,
     MasterKeyStatus,
     loadSystemSetting,
-    getKeyStatus, sessionGet
+    getKeyStatus, sessionGet, updateSetting
 } from './common';
 import {initWeb2Area, setupWeb2Area} from "./main_web2";
 import {initWeb3Area, setupWeb3Area} from "./main_web3";
 import {initBlockChainArea, setupBlockChainArea} from "./main_blockchain";
 import {initSettingArea, setupSettingArea} from "./main_setting";
-import {DsgKeyPair} from "./dessage/dsg_keypair";
 import {__key_sub_account_address_list, wrapKeyPairKey} from "./background";
 import {Address} from "./dessage/address";
 
@@ -98,9 +97,9 @@ async function checkBackgroundStatus(): Promise<void> {
     }
 }
 
-function populateDashboard() {
-    setAccountSwitchArea().then();
-    setupContentArea().then();
+async function populateDashboard() {
+    await setAccountSwitchArea();
+    await setupContentArea();
 }
 
 async function setAccountSwitchArea(): Promise<void> {
@@ -115,7 +114,8 @@ async function setAccountSwitchArea(): Promise<void> {
 
     console.log("--------------->>>>>>account size:=>", accountAddressList.length);
 
-    accountAddressList.forEach((address, idx) => {
+    for (const address of accountAddressList) {
+        const idx = accountAddressList.indexOf(address);
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
         itemDiv.addEventListener("click", async () => {
@@ -133,13 +133,14 @@ async function setAccountSwitchArea(): Promise<void> {
 
         if (!selAddress) {
             selAddress = address.dsgAddr;
-            ss.changeAddr(address.dsgAddr);
+            ss.address = address.dsgAddr;
+            await updateSetting(ss);
         }
 
         if (selAddress == address.dsgAddr) {
             itemDiv.classList.add("active");
         }
-    });
+    }
 }
 
 function notifyBackgroundActiveWallet(address: string): void {
@@ -160,7 +161,7 @@ function notifyBackgroundActiveWallet(address: string): void {
 
 function router(path: string): void {
     if (path === '#onboarding/dashboard') {
-        populateDashboard();
+        populateDashboard().then();
     }
 }
 
@@ -205,7 +206,8 @@ async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElemen
         itemDiv.classList.remove("active");
     });
     itemDiv.classList.add("active");
-    await ss.changeAddr(address.dsgAddr);
+    ss.address = address.dsgAddr;
+    await updateSetting(ss);
     notifyBackgroundActiveWallet(ss.address);
     setupContentArea().then();
 }
@@ -240,10 +242,10 @@ async function setupContentArea() {
     const nameDiv = document.getElementById("account-info-name") as HTMLElement;
     nameDiv.innerText = keypair.name ?? "Account";
 
-    setupWeb2Area(keypair);
-    setupBlockChainArea(keypair);
-    setupWeb3Area(keypair);
-    setupSettingArea(keypair);
+    setupWeb2Area(keypair.address);
+    setupBlockChainArea(keypair.address);
+    setupWeb3Area(keypair.address);
+    setupSettingArea();
 }
 
 async function newNinjaAccount() {

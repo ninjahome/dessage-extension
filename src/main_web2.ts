@@ -1,10 +1,8 @@
-import {DsgKeyPair} from "./dessage/dsg_keypair";
+import {Address} from "./dessage/address";
 
 export function initWeb2Area() {
 
 }
 
-export function setupWeb2Area(keypair:DsgKeyPair): void {
-
-
+export function setupWeb2Area(keypair:Address): void {
 }

@@ -9,7 +9,7 @@ import {
     queryEthBalance,
     sessionGet,
     sessionRemove,
-    sessionSet
+    sessionSet, updateSetting
 } from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
 import {loadMasterKey, MasterKey} from "./dessage/master_key";
@@ -219,7 +219,8 @@ async function createNewKey(sendResponse: ResponseFunc) {
         await masterKey.saveToDb();
 
         const ss = await loadSystemSetting();
-        await ss.changeAddr(keyPair.address.dsgAddr);
+        ss.address = keyPair.address.dsgAddr;
+        await updateSetting(ss);
 
     } catch (e) {
         const err = e as Error;
