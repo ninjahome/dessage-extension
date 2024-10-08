@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 import browser, {Runtime} from "webextension-polyfill";
 import {
+    __key_master_key_status,
     __key_system_setting,
     loadSystemSetting,
     MasterKeyStatus,
@@ -16,18 +17,17 @@ import {Address} from "./dessage/address";
 import {DsgKeyPair} from "./dessage/dsg_keypair";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
-const __key_master_key_status: string = '__key_account_status__';
 const __key_last_touch: string = '__key_last_touch__';
 const __alarm_name__: string = '__alarm_name__timer__';
 const __key_master_key: string = '__key_master_key__';
 const __key_sub_account_prefix: string = '__key_sub_account_prefix__';
-const __key_sub_account_address_list: string = '__key_sub_account_list__';
+export const __key_sub_account_address_list: string = '__key_sub_account_list__';
 
 const runtime = browser.runtime;
 const alarms = browser.alarms;
 const tabs = browser.tabs;
 type ResponseFunc = (response: any) => void
-const wrapKeyPairKey = (address: string) => __key_sub_account_prefix + address;
+export const wrapKeyPairKey = (address: string) => __key_sub_account_prefix + address;
 
 self.addEventListener('install', () => {
     console.log('[service work] Service Worker installing...');
@@ -99,36 +99,6 @@ async function closeWallet(): Promise<void> {
     await sessionRemove(__key_sub_account_prefix);
     await sessionRemove(__key_sub_account_address_list);
     await sessionRemove(__key_system_setting);
-}
-
-async function pluginClicked(sendResponse: ResponseFunc): Promise<void> {
-    try {
-        await checkAndInitDatabase();
-        // await testEncrypt();
-
-        let msg = '';
-        let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
-        if (keyStatus === MasterKeyStatus.Init) {
-            const masterKey = await loadMasterKey();
-            if (!masterKey) {
-                keyStatus = MasterKeyStatus.NoWallet;
-            } else {
-                keyStatus = MasterKeyStatus.Locked;
-            }
-        }
-
-        if (keyStatus === MasterKeyStatus.Unlocked) {
-            msg = await sessionGet(__key_sub_account_address_list);
-        }
-
-        sendResponse({status: keyStatus, message: msg});
-        await sessionSet(__key_master_key_status, keyStatus);
-
-    } catch (error: unknown) {
-        const err = error as Error;
-        console.error('[service work] Error in pluginClicked:', err);
-        sendResponse({status: MasterKeyStatus.Error, message: err.toString()});
-    }
 }
 
 async function cacheHDAccounts(masterKey: MasterKey): Promise<string> {
@@ -248,7 +218,7 @@ async function createNewKey(sendResponse: ResponseFunc) {
         await sessionSet(__key_master_key, JSON.stringify(masterKey));
         await masterKey.saveToDb();
 
-        const  ss = await loadSystemSetting();
+        const ss = await loadSystemSetting();
         await ss.changeAddr(keyPair.address.dsgAddr);
 
     } catch (e) {
@@ -261,10 +231,6 @@ runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, send
     console.log("[service work] action :=>", request.action, sender.tab, sender.url);
 
     switch (request.action) {
-        case MsgType.PluginClicked:
-            pluginClicked(sendResponse).then(() => {
-            });
-            return true;
 
         case MsgType.OpenMasterKey:
             openMasterKey(request.password, sendResponse).then();

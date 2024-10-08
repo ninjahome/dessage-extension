@@ -1,19 +1,25 @@
 import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
-import {MsgType, showView, MasterKeyStatus, loadSystemSetting} from './common';
-import {loadSystemSettingFromDB} from "./main_common";
+import {
+    MsgType,
+    showView,
+    MasterKeyStatus,
+    loadSystemSetting,
+    getKeyStatus, sessionGet
+} from './common';
 import {initWeb2Area, setupWeb2Area} from "./main_web2";
 import {initWeb3Area, setupWeb3Area} from "./main_web3";
 import {initBlockChainArea, setupBlockChainArea} from "./main_blockchain";
 import {initSettingArea, setupSettingArea} from "./main_setting";
 import {DsgKeyPair} from "./dessage/dsg_keypair";
+import {__key_sub_account_address_list, wrapKeyPairKey} from "./background";
+import {Address} from "./dessage/address";
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
-export let __keypairMap: Map<string, DsgKeyPair> = new Map();
 
 async function initDessagePlugin(): Promise<void> {
     await initDatabase();
-    checkBackgroundStatus();
+    await checkBackgroundStatus();
     initLoginDiv();
     initDashBoard();
     initWeb2Area();
@@ -65,77 +71,72 @@ function initDashBoard(): void {
     });
 }
 
-function checkBackgroundStatus(): void {
-    const request = {action: MsgType.PluginClicked};
+async function checkBackgroundStatus(): Promise<void> {
+    const status = await getKeyStatus();
 
-    browser.runtime.sendMessage(request).then((response: any) => {
-        console.log("request=>", JSON.stringify(request));
-        if (!response) {
-            console.error('Error: Response is undefined or null.');
+    switch (status) {
+        case MasterKeyStatus.NoWallet:
+
+            browser.tabs.create({
+                url: browser.runtime.getURL("home.html#onboarding/welcome")
+            }).then(() => {
+            });
             return;
-        }
-        console.log("------>>>response=>", JSON.stringify(response));
 
-        switch (response.status) {
-            case MasterKeyStatus.NoWallet:
-                browser.tabs.create({
-                    url: browser.runtime.getURL("home.html#onboarding/welcome")
-                }).then(() => {
-                });
-                return;
-            case MasterKeyStatus.Locked:
-            case MasterKeyStatus.Expired:
-                showView('#onboarding/unlock-plugin', router);
-                return;
-            case MasterKeyStatus.Unlocked:
-                const obj = JSON.parse(response.message);
-                __keypairMap = new Map<string, DsgKeyPair>(Object.entries(obj));
-                console.log("------------>>>keypair size=", __keypairMap.size);
-                showView('#onboarding/dashboard', router);
-                return;
-            case MasterKeyStatus.Error:
-                alert("error:" + response.message);
-                return;
-        }
-    }).catch((error: any) => {
-        console.error('Error sending message:', error);
-    });
+        case MasterKeyStatus.Locked:
+        case MasterKeyStatus.Expired:
+            showView('#onboarding/unlock-plugin', router);
+            return;
+
+        case MasterKeyStatus.Unlocked:
+            showView('#onboarding/dashboard', router);
+            return;
+
+        default:
+            alert("error:invalid status of key:" + status);
+            return;
+    }
 }
 
 function populateDashboard() {
     setAccountSwitchArea().then();
-    setupContentArea()
+    setupContentArea().then();
 }
 
 async function setAccountSwitchArea(): Promise<void> {
     const parentDiv = document.getElementById("account-list-content") as HTMLElement;
     parentDiv.innerHTML = '';
+
     const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
     const ss = await loadSystemSetting();
     let selAddress = ss.address;
-    console.log("--------------->>>>>>account size:=>", __keypairMap.size);
-    __keypairMap.forEach((keypair, addr) => {
+    const accStr = await sessionGet(__key_sub_account_address_list);
+    const accountAddressList = JSON.parse(accStr) as Address[];
+
+    console.log("--------------->>>>>>account size:=>", accountAddressList.length);
+
+    accountAddressList.forEach((address, idx) => {
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
         itemDiv.style.display = 'block';
         itemDiv.addEventListener("click", async () => {
             const accountListDiv = document.getElementById("account-list-area") as HTMLDivElement;
-            await changeSelectedAccount(parentDiv, itemDiv, keypair);
+            await changeSelectedAccount(parentDiv, itemDiv, address);
             accountListDiv.style.display = 'none';
         });
 
         const nameDiv = itemDiv.querySelector(".account-detail-name") as HTMLElement;
         const addressDiv = itemDiv.querySelector(".account-detail-address") as HTMLElement;
-        nameDiv.textContent = keypair.name ?? "Account";
-        addressDiv.textContent = addr;
+        nameDiv.textContent = "Account " + idx;
+        addressDiv.textContent = address.dsgAddr;
 
         parentDiv.appendChild(itemDiv);
 
         if (!selAddress) {
-            selAddress = addr;
-            ss.changeAddr(addr);
+            selAddress = address.dsgAddr;
+            ss.changeAddr(address.dsgAddr);
         }
 
-        if (selAddress == addr) {
+        if (selAddress == address.dsgAddr) {
             itemDiv.classList.add("active");
         }
     });
@@ -184,9 +185,6 @@ async function openMasterKey(): Promise<void> {
             return;
         }
 
-        const obj = JSON.parse(response.message);
-        __keypairMap = new Map<string, DsgKeyPair>(Object.entries(obj));
-        console.log("------------>>>keypair size=", __keypairMap.size);
         showView('#onboarding/dashboard', router);
         inputElement.value = '';
     } catch (error) {
@@ -194,9 +192,9 @@ async function openMasterKey(): Promise<void> {
     }
 }
 
-async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, keyPair: DsgKeyPair) {
-    const  ss = await loadSystemSetting();
-    if (ss.address === keyPair.address.dsgAddr) {
+async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, address: Address) {
+    const ss = await loadSystemSetting();
+    if (ss.address === address.dsgAddr) {
         console.log("------>>> no need to change ", ss.address);
         return;
     }
@@ -207,9 +205,9 @@ async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElemen
         itemDiv.classList.remove("active");
     });
     itemDiv.classList.add("active");
-    await ss.changeAddr(keyPair.address.dsgAddr);
+    await ss.changeAddr(address.dsgAddr);
     notifyBackgroundActiveWallet(ss.address);
-    setupContentArea()
+    setupContentArea().then();
 }
 
 function initQrCodeShowDiv() {
@@ -227,11 +225,18 @@ async function quitFromDashboard() {
 
 async function setupContentArea() {
     const ss = await loadSystemSetting();
-    const keypair = __keypairMap.get(ss.address);
-    if (!keypair) {
-        console.log("=======>>> must have a selected address:=?", __keypairMap, ss)
+    if (!ss.address) {
+        console.log("no selected account found for content area");
         return;
     }
+
+    const accStr = await sessionGet(wrapKeyPairKey(ss.address));
+    const keypair = JSON.parse(accStr);
+    if (!keypair) {
+        console.log("=======>>> must have a selected address:=?", ss)
+        return;
+    }
+
     const nameDiv = document.getElementById("account-info-name") as HTMLElement;
     nameDiv.innerText = keypair.name ?? "Account";
 
@@ -243,11 +248,8 @@ async function setupContentArea() {
 
 async function newNinjaAccount() {
     const response = await browser.runtime.sendMessage({action: MsgType.NewSubAccount});
-    if (response.status <= 0){
+    if (response.status <= 0) {
         alert(response.message);
         return;
     }
-
-    const obj = JSON.parse(response.message);
-    __keypairMap = new Map<string, DsgKeyPair>(Object.entries(obj));
 }

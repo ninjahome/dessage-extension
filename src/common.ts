@@ -1,8 +1,9 @@
 import {DbWallet} from "./dessage/wallet";
 import * as QRCode from 'qrcode';
-import {__tableNameWallet, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
+import {__tableNameWallet, checkAndInitDatabase, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
 import browser from "webextension-polyfill";
 import {loadSystemSettingFromDB, SysSetting} from "./main_common";
+import {loadMasterKey} from "./dessage/master_key";
 
 const storage = browser.storage;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
@@ -13,11 +14,9 @@ export enum MasterKeyStatus {
     Locked = 'Locked',
     Unlocked = 'Unlocked',
     Expired = 'Expired',
-    Error = 'error'
 }
 
 export enum MsgType {
-    PluginClicked = 'PluginClicked',
     OpenMasterKey = 'OpenMasterKey',
     CloseMasterKey = 'CloseMasterKey',
     SetActiveAccount = 'SetActiveAccount',
@@ -179,3 +178,23 @@ export async function loadSystemSetting(): Promise<SysSetting> {
 }
 
 export const __key_system_setting: string = '__key_system_setting__';
+export const __key_master_key_status: string = '__key_account_status__';
+
+export async function getKeyStatus(): Promise<MasterKeyStatus> {
+
+    await checkAndInitDatabase();
+
+    let keyStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
+    if (keyStatus === MasterKeyStatus.Init) {
+        const masterKey = await loadMasterKey();
+        if (!masterKey) {
+            keyStatus = MasterKeyStatus.NoWallet;
+        } else {
+            keyStatus = MasterKeyStatus.Locked;
+        }
+    }
+
+    await sessionSet(__key_master_key_status, keyStatus);
+
+    return keyStatus;
+}
