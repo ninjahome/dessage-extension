@@ -32,6 +32,7 @@ module.exports = (env, argv) => {
             main: path.resolve(__dirname, './src/main.ts'),
             inject: path.resolve(__dirname, './src/inject.ts'),
             content: path.resolve(__dirname, './src/content.ts'),
+            content_twitter: path.resolve(__dirname, './src/content_twitter.ts'),
         },
         output: {
             filename: 'js/[name].js',

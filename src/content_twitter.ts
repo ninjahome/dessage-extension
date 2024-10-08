@@ -1,6 +1,7 @@
 import {MsgType, observeForElement} from "./common";
 import browser from "webextension-polyfill";
 import {ProfilePage} from "./twitter_profile";
+import {addCustomStyles, parseHtmlContent} from "./content_common";
 
 export async function addTwitterElements(template: HTMLTemplateElement) {
     observeForElement(document.body, 1000,
@@ -35,7 +36,7 @@ function addLeftMenuItem(template: HTMLTemplateElement) {
 }
 
 async function showDessageMainPopPage() {
-    await browser.runtime.sendMessage({action:MsgType.PopupMainPage});
+    await browser.runtime.sendMessage({action: MsgType.PopupMainPage});
 }
 
 function parsePersonalInfo() {
@@ -57,5 +58,11 @@ function parsePersonalInfo() {
     } else {
         console.log('Target script tag not found.');
     }
-
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    addCustomStyles('css/content_twitter.css');
+    const template = await parseHtmlContent('inject_twitter.html');
+    await addTwitterElements(template);
+    console.log("-------->>> twitters content success")
+});
