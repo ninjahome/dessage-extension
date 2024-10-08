@@ -24,7 +24,7 @@ export class SysSetting {
 }
 
 
-export async function loadLastSystemSetting(): Promise<SysSetting> {
+export async function loadSystemSettingFromDB(): Promise<SysSetting> {
     const ss = await getMaxIdRecord(__tableSystemSetting);
     if (ss) {
         return new SysSetting(ss.id, ss.address, ss.network);

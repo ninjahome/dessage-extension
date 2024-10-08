@@ -2,6 +2,8 @@ import {DbWallet} from "./dessage/wallet";
 import * as QRCode from 'qrcode';
 import {__tableNameWallet, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
 import browser from "webextension-polyfill";
+import {loadSystemSettingFromDB, SysSetting} from "./main_common";
+
 const storage = browser.storage;
 const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
 
@@ -162,3 +164,18 @@ export function queryEthBalance(ethAddr:string){
             console.error('[service work] Ping failed:', error);
         });
 }
+
+export async function loadSystemSetting(): Promise<SysSetting> {
+
+    const settingString = await sessionGet(__key_system_setting);
+    if (settingString) {
+        return JSON.parse(settingString) as SysSetting;
+    }
+
+    const obj = await loadSystemSettingFromDB();
+    await sessionSet(__key_system_setting, JSON.stringify(obj));
+
+    return obj;
+}
+
+export const __key_system_setting: string = '__key_system_setting__';

@@ -1,10 +1,18 @@
 /// <reference lib="webworker" />
 import browser, {Runtime} from "webextension-polyfill";
-import {MasterKeyStatus, MsgType, queryEthBalance, sessionGet, sessionRemove, sessionSet} from './common';
+import {
+    __key_system_setting,
+    loadSystemSetting,
+    MasterKeyStatus,
+    MsgType,
+    queryEthBalance,
+    sessionGet,
+    sessionRemove,
+    sessionSet
+} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
 import {loadMasterKey, MasterKey} from "./dessage/master_key";
 import {Address} from "./dessage/address";
-import {loadLastSystemSetting, SysSetting} from "./main_common";
 import {DsgKeyPair} from "./dessage/dsg_keypair";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
@@ -14,7 +22,6 @@ const __alarm_name__: string = '__alarm_name__timer__';
 const __key_master_key: string = '__key_master_key__';
 const __key_sub_account_prefix: string = '__key_sub_account_prefix__';
 const __key_sub_account_address_list: string = '__key_sub_account_list__';
-const __key_system_setting: string = '__key_system_setting__';
 
 const runtime = browser.runtime;
 const alarms = browser.alarms;
@@ -64,22 +71,9 @@ async function timerTaskWork(alarm: any): Promise<void> {
     }
 }
 
-async function __loadSystemSetting(): Promise<SysSetting> {
-
-    const settingString = await sessionGet(__key_system_setting);
-    if (settingString) {
-        return JSON.parse(settingString) as SysSetting;
-    }
-
-    const obj = await loadLastSystemSetting();
-    await sessionSet(__key_system_setting, JSON.stringify(obj));
-
-    return obj;
-}
-
 async function queryBalance(): Promise<void> {
 
-    const ss = await __loadSystemSetting();
+    const ss = await loadSystemSetting();
     if (!ss.address) {
         console.log("[service work] no active wallet right now");
         return;
@@ -187,7 +181,7 @@ async function openMasterKey(pwd: string, sendResponse: ResponseFunc): Promise<v
 async function setActiveWallet(address: string, sendResponse: ResponseFunc): Promise<void> {
     try {
 
-        const ss = await __loadSystemSetting();
+        const ss = await loadSystemSetting();
         ss.address = address;
 
         await sessionSet(__key_system_setting, ss);
@@ -221,10 +215,45 @@ runtime.onSuspend.addListener(() => {
 });
 
 async function createNewKey(sendResponse: ResponseFunc) {
+
     let walletStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
     if (walletStatus !== MasterKeyStatus.Unlocked) {
         sendResponse({status: false, message: "unlocked account first"});
         return;
+    }
+
+    const masterKeyStr = await sessionGet(__key_master_key);
+    if (!masterKeyStr) {
+        sendResponse({status: false, message: "no master key found"});
+        return;
+    }
+
+    try {
+        const masterKey = JSON.parse(masterKeyStr) as MasterKey;
+        if (!masterKey.seedKey) {
+            sendResponse({status: false, message: "no seed of master key found"});
+            return;
+        }
+
+        const keyPair = new DsgKeyPair(masterKey.seedKey, masterKey.accountSize + 1);
+        await sessionSet(wrapKeyPairKey(keyPair.address.dsgAddr), JSON.stringify(keyPair));
+
+        const addrListStr = await sessionGet(__key_sub_account_address_list);
+        const addrList = JSON.parse(addrListStr) as Address[];
+        addrList.push(keyPair.address);
+        await sessionSet(__key_sub_account_address_list, JSON.stringify(addrList));
+
+        masterKey.accountSize += 1;
+
+        await sessionSet(__key_master_key, JSON.stringify(masterKey));
+        await masterKey.saveToDb();
+
+        const  ss = await loadSystemSetting();
+        await ss.changeAddr(keyPair.address.dsgAddr);
+
+    } catch (e) {
+        const err = e as Error;
+        sendResponse({status: false, message: err.message});
     }
 }
 

@@ -1,7 +1,7 @@
 import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
-import {MsgType, showView, MasterKeyStatus} from './common';
-import {loadLastSystemSetting, SysSetting} from "./main_common";
+import {MsgType, showView, MasterKeyStatus, loadSystemSetting} from './common';
+import {loadSystemSettingFromDB} from "./main_common";
 import {initWeb2Area, setupWeb2Area} from "./main_web2";
 import {initWeb3Area, setupWeb3Area} from "./main_web3";
 import {initBlockChainArea, setupBlockChainArea} from "./main_blockchain";
@@ -10,11 +10,9 @@ import {DsgKeyPair} from "./dessage/dsg_keypair";
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
 export let __keypairMap: Map<string, DsgKeyPair> = new Map();
-export let __systemSetting: SysSetting;
 
 async function initDessagePlugin(): Promise<void> {
     await initDatabase();
-    __systemSetting =  await loadLastSystemSetting();
     checkBackgroundStatus();
     initLoginDiv();
     initDashBoard();
@@ -105,15 +103,16 @@ function checkBackgroundStatus(): void {
 }
 
 function populateDashboard() {
-    setAccountSwitchArea();
+    setAccountSwitchArea().then();
     setupContentArea()
 }
 
-function setAccountSwitchArea(): void {
+async function setAccountSwitchArea(): Promise<void> {
     const parentDiv = document.getElementById("account-list-content") as HTMLElement;
     parentDiv.innerHTML = '';
     const itemTemplate = document.getElementById("account-detail-item-template") as HTMLElement;
-    let selAddress = __systemSetting.address;
+    const ss = await loadSystemSetting();
+    let selAddress = ss.address;
     console.log("--------------->>>>>>account size:=>", __keypairMap.size);
     __keypairMap.forEach((keypair, addr) => {
         const itemDiv = itemTemplate.cloneNode(true) as HTMLElement;
@@ -122,7 +121,7 @@ function setAccountSwitchArea(): void {
             const accountListDiv = document.getElementById("account-list-area") as HTMLDivElement;
             await changeSelectedAccount(parentDiv, itemDiv, keypair);
             accountListDiv.style.display = 'none';
-        })
+        });
 
         const nameDiv = itemDiv.querySelector(".account-detail-name") as HTMLElement;
         const addressDiv = itemDiv.querySelector(".account-detail-address") as HTMLElement;
@@ -133,8 +132,7 @@ function setAccountSwitchArea(): void {
 
         if (!selAddress) {
             selAddress = addr;
-            __systemSetting.address = addr;
-            __systemSetting.syncToDB().then();
+            ss.changeAddr(addr);
         }
 
         if (selAddress == addr) {
@@ -197,19 +195,20 @@ async function openMasterKey(): Promise<void> {
 }
 
 async function changeSelectedAccount(parentDiv: HTMLElement, itemDiv: HTMLElement, keyPair: DsgKeyPair) {
-    if (__systemSetting.address === keyPair.address.dsgAddr) {
-        console.log("------>>> no need to change ", __systemSetting.address);
+    const  ss = await loadSystemSetting();
+    if (ss.address === keyPair.address.dsgAddr) {
+        console.log("------>>> no need to change ", ss.address);
         return;
     }
-    console.log("------>>> changing new ninja account=>", __systemSetting.address);
+    console.log("------>>> changing new ninja account=>", ss.address);
 
     const allItemDiv = parentDiv.querySelectorAll(".account-detail-item") as NodeListOf<HTMLElement>;
     allItemDiv.forEach(itemDiv => {
         itemDiv.classList.remove("active");
     });
     itemDiv.classList.add("active");
-    await __systemSetting.changeAddr(keyPair.address.dsgAddr);
-    notifyBackgroundActiveWallet(__systemSetting.address);
+    await ss.changeAddr(keyPair.address.dsgAddr);
+    notifyBackgroundActiveWallet(ss.address);
     setupContentArea()
 }
 
@@ -226,10 +225,11 @@ async function quitFromDashboard() {
     await browser.runtime.sendMessage({action: MsgType.CloseMasterKey});
 }
 
-function setupContentArea(){
-    const keypair = __keypairMap.get(__systemSetting.address);
+async function setupContentArea() {
+    const ss = await loadSystemSetting();
+    const keypair = __keypairMap.get(ss.address);
     if (!keypair) {
-        console.log("=======>>> must have a selected address:=?", __keypairMap, __systemSetting)
+        console.log("=======>>> must have a selected address:=?", __keypairMap, ss)
         return;
     }
     const nameDiv = document.getElementById("account-info-name") as HTMLElement;
@@ -248,4 +248,6 @@ async function newNinjaAccount() {
         return;
     }
 
+    const obj = JSON.parse(response.message);
+    __keypairMap = new Map<string, DsgKeyPair>(Object.entries(obj));
 }
