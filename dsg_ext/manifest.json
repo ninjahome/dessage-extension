@@ -19,8 +19,7 @@
   "permissions": [
     "storage",
     "activeTab",
-    "alarms",
-    "tabs"
+    "alarms"
   ],
   "host_permissions": [
     "https://mainnet.infura.io/*",
