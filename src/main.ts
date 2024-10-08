@@ -1,7 +1,6 @@
 import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
 import {
-    MsgType,
     showView,
     MasterKeyStatus,
     sessionGet,
@@ -50,7 +49,7 @@ function initDashBoard(): void {
 
     const newAccBtn = accountListDiv.querySelector(".account-list-new-account") as HTMLButtonElement;
     newAccBtn.addEventListener("click", async () => {
-        await  createNewAccount();
+        await createNewAccount();
 
     });
 
@@ -227,11 +226,12 @@ async function setupContentArea() {
     setupSettingArea();
 }
 
-async function createNewAccount(){
-    try{
+async function createNewAccount() {
+    try {
         await newNinjaAccount();
+        await setAccountSwitchArea();
         await setupContentArea();
-    }catch (e) {
+    } catch (e) {
         const err = e as Error;
         alert(err.message);
     }

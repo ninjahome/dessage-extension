@@ -87,7 +87,7 @@ export async function newNinjaAccount() {
     }
 
     const masterKey = await masterKeyFromCache();
-    const keyPair = new DsgKeyPair(masterKey.seedKey!, masterKey.accountSize + 1);
+    const keyPair = new DsgKeyPair(masterKey.seedKey!, masterKey.accountSize);
     await sessionSet(wrapKeyPairKey(keyPair.address.dsgAddr), JSON.stringify(keyPair));
 
     const addrListStr = await sessionGet(__key_sub_account_address_list);
