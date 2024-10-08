@@ -1,21 +1,26 @@
 /// <reference lib="webworker" />
 import browser, {Runtime} from "webextension-polyfill";
-import {MasterKeyStatus, MsgType, sessionGet, sessionRemove, sessionSet} from './common';
+import {MasterKeyStatus, MsgType, queryEthBalance, sessionGet, sessionRemove, sessionSet} from './common';
 import {checkAndInitDatabase, closeDatabase} from './database';
-import {loadMasterKey} from "./dessage/master_key";
+import {loadMasterKey, MasterKey} from "./dessage/master_key";
+import {Address} from "./dessage/address";
+import {loadLastSystemSetting, SysSetting} from "./main_common";
+import {DsgKeyPair} from "./dessage/dsg_keypair";
 
 const __timeOut: number = 6 * 60 * 60 * 1000;
-const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
 const __key_master_key_status: string = '__key_account_status__';
-const __key_key_pair_map: string = '__key_wallet_map__';
 const __key_last_touch: string = '__key_last_touch__';
 const __alarm_name__: string = '__alarm_name__timer__';
-let __curActiveWallet: any = null;
+const __key_master_key: string = '__key_master_key__';
+const __key_sub_account_prefix: string = '__key_sub_account_prefix__';
+const __key_sub_account_address_list: string = '__key_sub_account_list__';
+const __key_system_setting: string = '__key_system_setting__';
 
 const runtime = browser.runtime;
 const alarms = browser.alarms;
 const tabs = browser.tabs;
-
+type ResponseFunc = (response: any) => void
+const wrapKeyPairKey = (address: string) => __key_sub_account_prefix + address;
 
 self.addEventListener('install', () => {
     console.log('[service work] Service Worker installing...');
@@ -50,7 +55,7 @@ async function timerTaskWork(alarm: any): Promise<void> {
             console.log("[service work] No unlocked wallet");
             return
         }
-        queryBalance();
+        queryBalance().then();
         console.log("[service work] time out:", keyLastTouch, __timeOut, "now:", Date.now());
         if (keyLastTouch + __timeOut < Date.now()) {
             console.log('[service work] time out to close wallet...');
@@ -59,47 +64,50 @@ async function timerTaskWork(alarm: any): Promise<void> {
     }
 }
 
-function queryBalance(): void {
-    if (!__curActiveWallet || !__curActiveWallet.ethAddr) {
+async function __loadSystemSetting(): Promise<SysSetting> {
+
+    const settingString = await sessionGet(__key_system_setting);
+    if (settingString) {
+        return JSON.parse(settingString) as SysSetting;
+    }
+
+    const obj = await loadLastSystemSetting();
+    await sessionSet(__key_system_setting, JSON.stringify(obj));
+
+    return obj;
+}
+
+async function queryBalance(): Promise<void> {
+
+    const ss = await __loadSystemSetting();
+    if (!ss.address) {
         console.log("[service work] no active wallet right now");
         return;
     }
+    const keyPairStr = await sessionGet(wrapKeyPairKey(ss.address));
+    if (!keyPairStr) {
+        console.log("[service work] no key pair found for address=>", ss.address);
+        return;
+    }
+    const keyPair = JSON.parse(keyPairStr) as DsgKeyPair;
+    if (!keyPair) {
+        console.log("[service work] parse key pair failed from string:", keyPairStr);
+        return;
+    }
 
-    const ethAddr = __curActiveWallet.ethAddr;
-    console.log(`start to query eth[${ethAddr}] balance for:`);
-    fetch(`https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            jsonrpc: '2.0',
-            method: 'eth_getBalance',
-            params: [ethAddr, 'latest'],
-            id: 1
-        })
-    }).then(response => response.json())
-        .then(result => {
-            if (result.error) {
-                console.error('[service work] Error:', result.error.message);
-            } else {
-                const balanceInWei = result.result;
-                const balanceInEth = parseInt(balanceInWei, 16) / (10 ** 18);
-                console.log(`[service work] Address: ${ethAddr}`, `Balance: ${balanceInEth} ETH`);
-            }
-        })
-        .catch(error => {
-            console.error('[service work] Ping failed:', error);
-        });
+    queryEthBalance(keyPair.address.ethAddr);
 }
 
 async function closeWallet(): Promise<void> {
-        await sessionRemove(__key_key_pair_map);
-        await sessionRemove(__key_master_key_status);
-        await sessionRemove(__key_last_touch);
+    await sessionRemove(__key_master_key);
+    await sessionRemove(__key_master_key_status);
+    await sessionRemove(__key_last_touch);
+    await sessionRemove(__key_sub_account_prefix);
+    await sessionRemove(__key_sub_account_address_list);
+    await sessionRemove(__key_system_setting);
 }
 
-async function pluginClicked(sendResponse: (response: any) => void): Promise<void> {
+async function pluginClicked(sendResponse: ResponseFunc): Promise<void> {
     try {
         await checkAndInitDatabase();
         // await testEncrypt();
@@ -116,7 +124,7 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
         }
 
         if (keyStatus === MasterKeyStatus.Unlocked) {
-            msg = await sessionGet(__key_key_pair_map);
+            msg = await sessionGet(__key_sub_account_address_list);
         }
 
         sendResponse({status: keyStatus, message: msg});
@@ -129,7 +137,25 @@ async function pluginClicked(sendResponse: (response: any) => void): Promise<voi
     }
 }
 
-async function openMasterKey(pwd: string, sendResponse: (response: any) => void): Promise<void> {
+async function cacheHDAccounts(masterKey: MasterKey): Promise<string> {
+
+    const allKeyPairs = masterKey.parseAccountListFromMasterSeed();
+    console.log(`[service work] all key pair size(${allKeyPairs?.length}) `)
+
+    let accountList: Address[] = []
+    for (let i = 0; i < allKeyPairs.length; i++) {
+        const keyPair = allKeyPairs[i];
+        await sessionSet(wrapKeyPairKey(keyPair.address.dsgAddr), JSON.stringify(keyPair));
+        accountList.push(keyPair.address);
+    }
+
+    const objStr = JSON.stringify(accountList);
+    await sessionSet(__key_sub_account_address_list, objStr);
+
+    return objStr;
+}
+
+async function openMasterKey(pwd: string, sendResponse: ResponseFunc): Promise<void> {
     try {
         await checkAndInitDatabase();
         const masterKey = await loadMasterKey();
@@ -138,17 +164,15 @@ async function openMasterKey(pwd: string, sendResponse: (response: any) => void)
             return;
         }
 
-        const allKeyPairs = masterKey?.unlock(pwd);
-        const obj = Object.fromEntries(allKeyPairs);
-        const objStr = JSON.stringify(obj)
-
+        masterKey.unlock(pwd);
+        await sessionSet(__key_master_key, JSON.stringify(masterKey));
         await sessionSet(__key_master_key_status, MasterKeyStatus.Unlocked);
-        await sessionSet(__key_key_pair_map, objStr);
         await sessionSet(__key_last_touch, Date.now());
 
-        console.log(`[service work] all key pair size(${allKeyPairs?.size}) string size=${objStr.length}`);
-        sendResponse({status: true, message: objStr});
+        const objStr = await cacheHDAccounts(masterKey);
+        console.log(`[service work] string size=${objStr.length}`);
 
+        sendResponse({status: true, message: objStr});
     } catch (error) {
         const err = error as Error;
         console.log('[service work] Error in open wallet:', err);
@@ -160,19 +184,17 @@ async function openMasterKey(pwd: string, sendResponse: (response: any) => void)
     }
 }
 
-async function setActiveWallet(address: string, sendResponse: (response: any) => void): Promise<void> {
+async function setActiveWallet(address: string, sendResponse: ResponseFunc): Promise<void> {
     try {
-        const objStr = await sessionGet(__key_key_pair_map);
-        const keypairMap = new Map(Object.entries(JSON.parse(objStr)));
 
-        const keypair = keypairMap.get(address);
-        console.log("[service work] keypairMap is:", keypairMap, " have a try:", keypair, "for:", address);
-        if (!keypair) {
-            sendResponse({status: false, message: 'no such outer wallet'});
-            return;
-        }
-        __curActiveWallet = keypair;
+        const ss = await __loadSystemSetting();
+        ss.address = address;
+
+        await sessionSet(__key_system_setting, ss);
+        await ss.syncToDB();
+
         sendResponse({status: true, message: 'success'});
+
     } catch (error) {
         console.error('[service work] Error in setActiveWallet:', error);
         sendResponse({status: false, message: error});
@@ -198,24 +220,33 @@ runtime.onSuspend.addListener(() => {
     closeDatabase();
 });
 
+async function createNewKey(sendResponse: ResponseFunc) {
+    let walletStatus = await sessionGet(__key_master_key_status) || MasterKeyStatus.Init;
+    if (walletStatus !== MasterKeyStatus.Unlocked) {
+        sendResponse({status: false, message: "unlocked account first"});
+        return;
+    }
+}
+
 runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, sendResponse: (response?: any) => void): true | void => {
     console.log("[service work] action :=>", request.action, sender.tab, sender.url);
+
     switch (request.action) {
         case MsgType.PluginClicked:
             pluginClicked(sendResponse).then(() => {
             });
             return true;
+
         case MsgType.OpenMasterKey:
-            openMasterKey(request.password, sendResponse).then(() => {
-            });
+            openMasterKey(request.password, sendResponse).then();
             return true;
+
         case MsgType.CloseMasterKey:
-            closeWallet().then(() => {
-            });
+            closeWallet().then();
             return true;
+
         case MsgType.SetActiveAccount:
-            setActiveWallet(request.address, sendResponse).then(() => {
-            });
+            setActiveWallet(request.address, sendResponse).then();
             return true;
 
         case MsgType.OpenPopMainPage:
@@ -225,8 +256,12 @@ runtime.onMessage.addListener((request: any, sender: Runtime.MessageSender, send
                 console.error("[service work] openPopup action failed:", error);
                 sendResponse({success: false, error: error.message});
             });
-
             return true;
+
+        case MsgType.NewSubAccount:
+            createNewKey(sendResponse).then();
+            return true;
+
         default:
             sendResponse({status: 'unknown action'});
             return;

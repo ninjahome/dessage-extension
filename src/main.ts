@@ -1,7 +1,7 @@
 import {initDatabase} from "./database";
 import browser from "webextension-polyfill";
 import {MsgType, showView, MasterKeyStatus} from './common';
-import {__systemSetting, loadLastSystemSetting} from "./main_common";
+import {loadLastSystemSetting, SysSetting} from "./main_common";
 import {initWeb2Area, setupWeb2Area} from "./main_web2";
 import {initWeb3Area, setupWeb3Area} from "./main_web3";
 import {initBlockChainArea, setupBlockChainArea} from "./main_blockchain";
@@ -10,10 +10,11 @@ import {DsgKeyPair} from "./dessage/dsg_keypair";
 
 document.addEventListener("DOMContentLoaded", initDessagePlugin as EventListener);
 export let __keypairMap: Map<string, DsgKeyPair> = new Map();
+export let __systemSetting: SysSetting;
 
 async function initDessagePlugin(): Promise<void> {
     await initDatabase();
-    await loadLastSystemSetting();
+    __systemSetting =  await loadLastSystemSetting();
     checkBackgroundStatus();
     initLoginDiv();
     initDashBoard();
@@ -45,7 +46,7 @@ function initDashBoard(): void {
 
     const newAccBtn = accountListDiv.querySelector(".account-list-new-account") as HTMLButtonElement;
     newAccBtn.addEventListener("click", async () => {
-        newNinjaAccount();
+        await newNinjaAccount();
     });
 
     document.querySelectorAll<HTMLDivElement>('.tab').forEach(tab => {
@@ -106,9 +107,7 @@ function checkBackgroundStatus(): void {
 function populateDashboard() {
     setAccountSwitchArea();
     setupContentArea()
-
 }
-
 
 function setAccountSwitchArea(): void {
     const parentDiv = document.getElementById("account-list-content") as HTMLElement;
@@ -242,6 +241,11 @@ function setupContentArea(){
     setupSettingArea(keypair);
 }
 
-function newNinjaAccount() {
+async function newNinjaAccount() {
+    const response = await browser.runtime.sendMessage({action: MsgType.NewSubAccount});
+    if (response.status <= 0){
+        alert(response.message);
+        return;
+    }
 
 }

@@ -3,6 +3,7 @@ import * as QRCode from 'qrcode';
 import {__tableNameWallet, databaseAddItem, databaseQueryAll, databaseUpdate} from "./database";
 import browser from "webextension-polyfill";
 const storage = browser.storage;
+const INFURA_PROJECT_ID: string = 'eced40c03c2a447887b73369aee4fbbe';
 
 export enum MasterKeyStatus {
     Init = 'Init',
@@ -19,6 +20,7 @@ export enum MsgType {
     CloseMasterKey = 'CloseMasterKey',
     SetActiveAccount = 'SetActiveAccount',
     OpenPopMainPage = 'OpenPopMainPage',
+    NewSubAccount = 'NewSubAccount',
 }
 
 export function showView(hash: string, callback: (hash: string) => void): void {
@@ -97,8 +99,6 @@ export async function sessionRemove(key: string): Promise<void> {
     }
 }
 
-
-
 function observeAction(target: HTMLElement, idleThreshold: number,
                        foundFunc: () => HTMLElement | null, callback: () => Promise<void>,
                        options: MutationObserverInit, continueMonitor?: boolean) {
@@ -132,4 +132,33 @@ export function observeForElementDirect(target: HTMLElement, idleThreshold: numb
                                         foundFunc: () => HTMLElement | null, callback: () => Promise<void>,
                                         continueMonitor?: boolean) {
     observeAction(target, idleThreshold, foundFunc, callback, {childList: true, subtree: false}, continueMonitor);
+}
+
+
+export function queryEthBalance(ethAddr:string){
+    console.log(`start to query eth[${ethAddr}] balance for:`);
+    fetch(`https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'eth_getBalance',
+            params: [ethAddr, 'latest'],
+            id: 1
+        })
+    }).then(response => response.json())
+        .then(result => {
+            if (result.error) {
+                console.error('[service work] Error:', result.error.message);
+            } else {
+                const balanceInWei = result.result;
+                const balanceInEth = parseInt(balanceInWei, 16) / (10 ** 18);
+                console.log(`[service work] Address: ${ethAddr}`, `Balance: ${balanceInEth} ETH`);
+            }
+        })
+        .catch(error => {
+            console.error('[service work] Ping failed:', error);
+        });
 }

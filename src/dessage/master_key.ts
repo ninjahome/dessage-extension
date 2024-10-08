@@ -1,7 +1,7 @@
 import {mnemonicToSeedSync} from "bip39";
 import {decryptAes, encryptAes} from "./key_crypto";
 import {__tableNameMasterKey, databaseGetByID, upsertItem} from "../database";
-import {fromMasterSeed} from "./extended_key";
+import {ExtendedKey, fromMasterSeed} from "./extended_key";
 import {DsgKeyPair} from "./dsg_keypair";
 
 const __master_key_static_id = 1;
@@ -18,11 +18,12 @@ export class EncryptedSeed {
     }
 }
 
-class MasterKey {
+export class MasterKey {
     id: number = __master_key_static_id;
     seedCipherTxt: EncryptedSeed;
     accountSize: number = 1;
     publicKey: string;
+    seedKey?:ExtendedKey
 
     constructor(cipherTxt: EncryptedSeed, accountSize: number, publicKey?: string) {
         this.seedCipherTxt = cipherTxt;
@@ -34,8 +35,7 @@ class MasterKey {
         return await upsertItem(__tableNameMasterKey, this)
     }
 
-    unlock(pwd: string): Map<string, DsgKeyPair> {
-
+    unlock(pwd: string) {
         const decryptedSeedStr = decryptAes(this.seedCipherTxt, pwd);
         const seed = Buffer.from(decryptedSeedStr, 'hex');
 
@@ -44,13 +44,22 @@ class MasterKey {
             throw new Error('invalid password');
         }
 
-        const keyPairMap = new Map();
-        for (let i = 0; i < this.accountSize; i++) {
-            const keyPair = new DsgKeyPair(seedKey, i)
-            keyPairMap.set(keyPair.address.dsgAddr, keyPair);
+        this.seedKey = seedKey;
+    }
+
+    parseAccountListFromMasterSeed(): DsgKeyPair[] {
+
+        let result: DsgKeyPair[] = [];
+        if (!this.seedKey){
+            return result;
         }
 
-        return keyPairMap;
+        for (let i = 0; i < this.accountSize; i++) {
+            const keyPair = new DsgKeyPair(this.seedKey, i);
+            result.push(keyPair);
+        }
+
+        return result;
     }
 }
 

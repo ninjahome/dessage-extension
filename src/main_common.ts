@@ -2,7 +2,7 @@ import {createQRCodeImg} from "./common";
 import {__currentDatabaseVersion, __tableSystemSetting, databaseUpdate, getMaxIdRecord} from "./database";
 
 
-class SysSetting {
+export class SysSetting {
     id: number;
     address: string;
     network: string;
@@ -23,16 +23,15 @@ class SysSetting {
     }
 }
 
-export let __systemSetting: SysSetting;
 
-export async function loadLastSystemSetting(): Promise<void> {
+export async function loadLastSystemSetting(): Promise<SysSetting> {
     const ss = await getMaxIdRecord(__tableSystemSetting);
     if (ss) {
-        __systemSetting = new SysSetting(ss.id, ss.address, ss.network);
-        return;
+        return new SysSetting(ss.id, ss.address, ss.network);
     }
-    __systemSetting = new SysSetting(__currentDatabaseVersion, '', '');
+    return  new SysSetting(__currentDatabaseVersion, '', '');
 }
+
 export function commonAddrAndCode(valElmId: string, qrBtnId: string) {
     const area = document.getElementById(valElmId) as HTMLElement;
     const addrVal = area.querySelector(".address-val") as HTMLElement;
